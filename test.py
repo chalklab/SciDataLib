@@ -7,7 +7,7 @@ django.setup()
 from scidata.mariadb import *
 from scidata.crosswalks import *
 
-path = r"/Users/n01448636/Documents/django project 1/scidata/JSON_dumps"
+path = r"/Users/n01448636/Documents/chembl django/scidata/JSON_dumps"
 os.chdir(path)
 
 query_crosswalks_chembl = list(Chembl.objects.using('crosswalks').values())
