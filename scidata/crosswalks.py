@@ -31,6 +31,8 @@ class Chembl(models.Model):
     sdsection = models.CharField(max_length=11, blank=True, null=True)
     sdsubsection = models.CharField(max_length=32, blank=True, null=True)
     updated = models.DateTimeField()
+    meta = models.SmallIntegerField(blank=True, null=False)
+
 
     class Meta:
         managed = False
