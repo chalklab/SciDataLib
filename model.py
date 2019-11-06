@@ -66,6 +66,7 @@ class SciData:
 
         self.meta['@graph']['uid'] = uid
 
+
     meta = {
         "@context": [],
         "@id": "",
