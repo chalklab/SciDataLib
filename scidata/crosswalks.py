@@ -27,17 +27,20 @@ class Ccdc(models.Model):
 class Chembl(models.Model):
     table = models.CharField(max_length=128)
     field = models.CharField(max_length=128)
-    ontterm_id = models.SmallIntegerField(blank=True, null=False, primary_key=True)
+    ontterm_id = models.SmallIntegerField(blank=True, null=True)
     sdsection = models.CharField(max_length=11, blank=True, null=True)
     sdsubsection = models.CharField(max_length=32, blank=True, null=True)
+    category = models.CharField(max_length=64, blank=True, null=True)
+    unit = models.CharField(max_length=32, blank=True, null=True)
+    datatype = models.CharField(max_length=64, blank=True, null=True)
+    intlinks = models.CharField(max_length=1024, blank=True, null=True)
+    meta = models.CharField(max_length=64, blank=True, null=True)
+    ignore = models.IntegerField()
     updated = models.DateTimeField()
-    meta = models.SmallIntegerField(blank=True, null=False)
-
 
     class Meta:
         managed = False
         db_table = 'chembl'
-
 
 class Ncct(models.Model):
     database = models.CharField(max_length=64)

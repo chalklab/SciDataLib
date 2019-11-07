@@ -499,7 +499,7 @@ class SciData:
             elif e in self.meta['@graph'].keys():
                 self.meta['@graph'].pop(e)
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
-        print(temp)
+        # print(temp)
         return self.meta
 
 
