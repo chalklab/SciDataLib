@@ -2,32 +2,70 @@ import json
 import datetime
 from itertools import count
 from collections import defaultdict
+import django
 from django.forms.models import model_to_dict
+
+django.setup()
+from scidata.mariadb import *
+from scidata.crosswalks import *
 
 """
 This module contains the Scidata class used in generating Scidata JSON-LD documents.
 """
 
+#############
+
 def serialize(x):
     a = []
+    this = []
     def serial_model(modelobj):
-        opts = modelobj._meta.fields
-        key = (modelobj._meta.db_table)
-        modeldict = model_to_dict(modelobj)
-        value = modeldict.copy()
-        a.append({key:value})
-        for m in opts:
-            if m.is_relation:
-                foreignkey = getattr(modelobj, m.name)
-                if foreignkey:
-                    try:
-                        modeldict[m.name] = serial_model(foreignkey)
-                    except:
-                        pass
-    serial_model(x)
-    b = [i for n, i in enumerate(a) if i not in a[n + 1:]]
-    return(b)
+        if len(this) <= 100:
+            modeldict = model_to_dict(modelobj)
+            opts = modelobj._meta.get_fields()
+            keyrev = modelobj.__class__
+            keyvalrev = modelobj.pk
+            key = (modelobj._meta.db_table)
 
+            value = modeldict.copy()
+            valu = {}
+            for i, o in value.items():
+                valu.update({i: str(o)})
+            a.append({key: valu})
+            for q in opts:
+
+                if not q.one_to_many:
+                    if q.is_relation:
+                        foreignkey = getattr(modelobj, q.name)
+                        if foreignkey:
+                            try:
+                                modeldict[q.name] = serial_model(foreignkey)
+                                this.append(1)
+                            except:
+                                pass
+                # if q.one_to_many:
+                #     set = str(str(q.name) + '_set')
+                #     test = getattr(keyrev.objects.get(pk=keyvalrev), set)
+                #     if test.values().exists():
+                #         try:
+                #             if test.values()[10]:
+                #                 pass
+                #         except:
+                #             for m in test.all():
+                #                 key = m._meta.db_table
+                #                 modeldict = model_to_dict(m)
+                #                 value = modeldict.copy()
+                #                 valu = {}
+                #                 for i,o in value.items():
+                #                     valu.update({i:str(o)})
+                #                 a.append({key: valu})
+
+
+    serial_model(x)
+    d = [i for n, i in enumerate(a) if i not in a[n + 1:]]
+    # for v in d:
+    #     print(v)
+
+    return (d)
 
 
 def is_number(n):
@@ -499,7 +537,7 @@ class SciData:
             elif e in self.meta['@graph'].keys():
                 self.meta['@graph'].pop(e)
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
-        # print(temp)
+        print(temp)
         return self.meta
 
 
