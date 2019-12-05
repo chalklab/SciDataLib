@@ -111,6 +111,15 @@ DATABASES = {
         'PASSWORD': 'nerd4life*',
         'PORT': '3307',
         'unix_socket': '/var/run/mariadb/mariadb.pid'
+    },
+    'dsstox': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'dsstox',
+        'USER': 'postdoc',
+        'HOST': '127.0.0.1',
+        'PASSWORD': 'nerd4life*',
+        'PORT': '3307',
+        'unix_socket': '/var/run/mariadb/mariadb.pid'
     }
 }
 

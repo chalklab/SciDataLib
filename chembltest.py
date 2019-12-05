@@ -1,15 +1,15 @@
 from model import *
-import re
 import os
 import django
 
 django.setup()
-from scidata.mariadb import *
+from scidata.chembldb import *
 from scidata.crosswalks import *
 
 path = r"/Users/n01448636/Documents/chembl django/scidata/JSON_dumps"
 os.chdir(path)
 
+dbname = 'default'
 query_crosswalks_chembl = list(Chembl.objects.using('crosswalks').values())
 query_crosswalks_ontterms = list(Ontterms.objects.using('crosswalks').values())
 query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
@@ -19,7 +19,8 @@ for x in Activities.objects.values().filter(herg=1):
     Documents.add(x['doc_id'])
 
 Documents = {36053, 6432, 6570} ###Remove this line to process all documents###
-Documents = {36053}
+Documents = {5535}
+
 
 for DocumentNumber in Documents:
     doc_data = {}
@@ -84,18 +85,6 @@ for DocumentNumber in Documents:
         crosswalks.append(crosswalksA)
 
 
-    # crosswalkids = set()
-    # allids = set()
-    # for x in crosswalks:
-    #     crosswalkids.add(x['ontterm_id'])
-    # for x in query_crosswalks_ontterms:
-    #     allids.add(x['id'])
-    # remainingids = allids - crosswalkids
-    # for x in remainingids:
-    #     for onto in query_crosswalks_ontterms:
-    #         if onto['id'] == x:
-    #             crosswalks.append(onto)
-
 
     ###############################
 
@@ -103,6 +92,7 @@ for DocumentNumber in Documents:
     molregno_set = set()
     for mo in Activities.objects.values().filter(doc_id=DocumentNumber):
         molregno_set.add(mo['molregno_id'])
+    molregno_set = {81741}
     for mol in molregno_set:
         SciData.meta['@graph']['toc'] = []
         activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol)
@@ -113,115 +103,93 @@ for DocumentNumber in Documents:
         datagroupA = []
         nspaces = []
         methodology = []
+        methodologyx = []
         system = []
+        systemx = []
 
 
         for ac in activity_list:
             if ac['herg'] == 1:
 
-                datapointA = {}
 
-                meta = {}
-                exptmeta = {}
-                derivedmeta = {}
-                suppmeta = {}
-                nspaces = set()
-                experimentaldata = {}
-                deriveddata = {}
-                suppdata = {}
 
                 chembl = (Activities.objects.values('molregno_id__chembl_id').get(activity_id=ac['activity_id']))
 
-                serialized = serialize(Activities.objects.get(activity_id=ac['activity_id']))
+                serialized = serialize(Activities.objects.get(activity_id=ac['activity_id']), dbname)
 
+                datapoint_set = set()
+                for serial in serialized:
+                    allunsorted.update(serial)
+                    for serial_table, serial_dict in serial.items():
+                        for cross in crosswalks:
+                            if cross['sdsection'] == 'dataset':
+                                if cross['table'] == serial_table:
+                                    datapoint_set.add(cross['sdsubsection'])
 
 
                 for serial in serialized:
                     allunsorted.update(serial)
                     for serial_table, serial_dict in serial.items():
-                        if serial_table == 'activities':
-                            datagroupA.append('datapoint')
-                            for cross in crosswalks:
-                                if cross['sdsection'] == 'dataset':
-                                    if cross['table'] == serial_table:
-                                        for k, v in serial_dict.items():
-                                            if k == cross['field']:
-                                                nspaces.add(cross['nspace_id'])
+                        dataall = []
+                        # if serial_table in ['activity_stds_lookup']:
+                        if serial_table in ['activities', 'activity_stds_lookup']:
 
-                                                if v is not None:
-                                                    if cross['sdsubsection'] == 'metadata':
-                                                        meta.update({str(k): str(v)})
+                            for dat in datapoint_set:
 
-                                                    if cross['sdsubsection'] == 'exptdata':
-                                                        if cross['meta'] is '1':
-                                                            exptmeta.update({str(k): str(v)})
-                                                        if cross['meta'] is not None:
-                                                            if cross['meta'] is not '1':
-                                                                exptmeta.update({str(cross['meta']): str(v)})
-                                                        if cross['meta'] is None:
-                                                            experimentaldata.update({k: str(v)})
-                                                            experimentaldata.update({'@id': 'value', '@type': 'sci:value'})
+                                datapointA = {}
+                                meta = {}
+                                exptmeta = {}
+                                nspaces = set()
+                                experimentaldata = {}
+                                exptdataall = {}
 
-                                                    if cross['sdsubsection'] == 'deriveddata':
-                                                        if cross['meta'] is '1':
-                                                            derivedmeta.update({str(k): str(v)})
-                                                        if cross['meta'] is not None:
-                                                            if cross['meta'] is not '1':
-                                                                derivedmeta.update({str(cross['meta']): str(v)})
-                                                        if cross['meta'] is None:
-                                                            deriveddata.update({k: str(v)})
-                                                            deriveddata.update({'@id': 'value', '@type': 'sci:value'})
 
-                                                    if cross['sdsubsection'] == 'suppdata':
-                                                        if cross['meta'] is '1':
-                                                            suppmeta.update({str(k): str(v)})
-                                                        if cross['meta'] is not None:
-                                                            if cross['meta'] is not '1':
-                                                                suppmeta.update({str(cross['meta']): str(v)})
-                                                        if cross['meta'] is None:
-                                                            suppdata.update({k: str(v)})
-                                                            suppdata.update({'@id': 'value', '@type': 'sci:value'})
+                                for cross in crosswalks:
+                                    if cross['sdsection'] == 'dataset':
+                                        if cross['table'] == serial_table:
+                                            for k, v in serial_dict.items():
+                                                if k == cross['field']:
+                                                    nspaces.add(cross['nspace_id'])
 
-                            dataall = []
-                            if experimentaldata:
-                                exptdataall = exptmeta
-                                exptdataall.update({
-                                            '@id': 'datum',
-                                            '@type': 'sci:exptdata',
-                                            'value': experimentaldata
-                                            })
+                                                    if v is not None:
+                                                        if cross['sdsubsection'] == 'metadata':
+                                                            meta.update({str(k): str(v)})
+                                                        if cross['sdsubsection'] == dat:
+                                                            if cross['meta'] is '1':
+                                                                exptmeta.update({str(k): str(v)})
+                                                            if cross['meta'] is not None:
+                                                                if cross['meta'] is not '1':
+                                                                    exptmeta.update({str(cross['meta']): str(v)})
+                                                            if cross['meta'] is None:
+                                                                experimentaldata.update({k: str(v)})
+                                                                experimentaldata.update(
+                                                                    {'@id': 'value', '@type': 'sci:value'})
 
-                                dataall.append(exptdataall)
-                            if deriveddata:
-                                deriveddataall = derivedmeta
-                                deriveddataall.update({
-                                            '@id': 'datum',
-                                            '@type': 'sci:deriveddata',
-                                            'value': deriveddata
-                                            })
+                                if experimentaldata:
+                                    exptdataall.update(exptmeta)
+                                    exptdataall.update({
+                                        '@id': 'datum',
+                                        '@type': 'sci:' + dat,
+                                        'value': experimentaldata
+                                    })
 
-                                dataall.append(deriveddataall)
-                            if suppdata:
-                                suppdataall = suppmeta
-                                suppdataall.update({
-                                            '@id': 'datum',
-                                            '@type': 'sci:suppdata',
-                                            'value': suppdata
-                                            })
-                                dataall.append(suppdataall)
+                                    dataall.append(exptdataall)
 
-                            datapointA.update(meta)
-                            datapointA.update({
-                                '@id': 'datapoint',
-                                '@type': 'sci:datapoint',
-                                'activity_id': ac['activity_id'],
-                                'data': dataall
-                            })
+                                    datapointA.update(meta)
+                                    datapointA.update({
+                                        '@id': 'datapoint',
+                                        '@type': 'sci:datapoint',
+                                        'activity_id': ac['activity_id'],
+                                        'data': dataall
+                                    })
 
                             datapoint.append(datapointA)
+                            datagroupA.append('datapoint')
+
+
+##########END#############
 
                 methodology_set = set()
-                methodologyA = {}
                 for serial in serialized:
                     for serial_table, serial_dict in serial.items():
                         for cross in crosswalks:
@@ -243,6 +211,7 @@ for DocumentNumber in Documents:
                                                     if v is not None:
                                                         methodologyA.update({k: str(v)})
                     methodology.append(methodologyA)
+                    methodologyx = [i for n, i in enumerate(methodology) if i not in methodology[n + 1:]]
 
                 system_set = set()
                 systemA = {}
@@ -273,6 +242,7 @@ for DocumentNumber in Documents:
                                                     if v:
                                                         systemA.update({k:v})
                     system.append(systemA)
+                    systemx = [i for n, i in enumerate(system) if i not in system[n + 1:]]
 
                 metadata = []
                 for serial in serialized:
@@ -286,26 +256,27 @@ for DocumentNumber in Documents:
 
 
 
-
-        datagroup.append(
-            {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': str(mol), 'datapoints': datagroupA})
+        if datagroupA:
+            datagroup.append(
+                {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': str(mol), 'datapoints': datagroupA})
 
         if methodology:
-            test.aspects(methodology)
+            test.aspects(methodologyx)
         if system:
-            test.facets(system)
+            test.facets(systemx)
         if datapoint:
             test.datapoint(datapoint)
         if datagroup:
             test.datagroup(datagroup)
 
-
-        for x in nspaces:
-            for y in query_crosswalks_nspaces:
-                    if y['id'] == x:
-                        namespace.update({y['ns']:y['path']})
-        namespaces = ", ".join(repr(e) for e in namespace)
-        test.namespace(namespace)
+        if nspaces:
+            for x in nspaces:
+                for y in query_crosswalks_nspaces:
+                        if y['id'] == x:
+                            namespace.update({y['ns']:y['path']})
+        if namespace:
+            namespaces = ", ".join(repr(e) for e in namespace)
+            test.namespace(namespace)
         test.starttime()
 
 
@@ -326,10 +297,11 @@ for DocumentNumber in Documents:
         except:
             pass
 
-
-        put = test.output
-        with open(str(DocumentNumber) + '_' + str(mol) + '.json', 'w') as f:
-            json.dump(put, f)
+        if datapoint:
+            put = test.output
+            with open(str(DocumentNumber) + '_' + str(mol) + '.json', 'w') as f:
+                json.dump(put, f)
+        print(datapoint)
 
         # break
 
