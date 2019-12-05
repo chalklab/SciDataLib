@@ -6,8 +6,6 @@ import django
 from django.forms.models import model_to_dict
 
 django.setup()
-from scidata.mariadb import *
-from scidata.crosswalks import *
 
 """
 This module contains the Scidata class used in generating Scidata JSON-LD documents.
@@ -15,58 +13,51 @@ This module contains the Scidata class used in generating Scidata JSON-LD docume
 
 #############
 
-def serialize(x):
+def serialize(x, y):
     a = []
-    this = []
-    def serial_model(modelobj):
-        if len(this) <= 100:
-            modeldict = model_to_dict(modelobj)
-            opts = modelobj._meta.get_fields()
-            keyrev = modelobj.__class__
-            keyvalrev = modelobj.pk
-            key = (modelobj._meta.db_table)
-
-            value = modeldict.copy()
-            valu = {}
-            for i, o in value.items():
-                valu.update({i: str(o)})
-            a.append({key: valu})
-            for q in opts:
-
-                if not q.one_to_many:
-                    if q.is_relation:
-                        foreignkey = getattr(modelobj, q.name)
-                        if foreignkey:
-                            try:
-                                modeldict[q.name] = serial_model(foreignkey)
-                                this.append(1)
-                            except:
+    def serial_model(modelobj, dbname):
+        modeldict = model_to_dict(modelobj)
+        opts = modelobj._meta.get_fields()
+        keyrev = modelobj.__class__
+        keyvalrev = modelobj.pk
+        key = modelobj._meta.db_table
+        value = modeldict.copy()
+        valu = {}
+        for i, o in value.items():
+            valu.update({i: str(o)})
+        a.append({key: valu})
+        for q in opts:
+            if not q.one_to_many:
+                if q.is_relation:
+                    foreignkey = getattr(modelobj, q.name)
+                    if foreignkey:
+                        try:
+                            modeldict[q.name] = serial_model(foreignkey, dbname)
+                        except:
+                            pass
+            if q.one_to_many:
+                # if q.name not in ['activities']:
+                if q.name:
+                    set = str(str(q.name) + '_set')
+                    test = getattr(keyrev.objects.using(y).get(pk=keyvalrev), set)
+                    if test.values().exists():
+                        try:
+                            if test.values()[1]:
                                 pass
-                # if q.one_to_many:
-                #     set = str(str(q.name) + '_set')
-                #     test = getattr(keyrev.objects.get(pk=keyvalrev), set)
-                #     if test.values().exists():
-                #         try:
-                #             if test.values()[10]:
-                #                 pass
-                #         except:
-                #             for m in test.all():
-                #                 key = m._meta.db_table
-                #                 modeldict = model_to_dict(m)
-                #                 value = modeldict.copy()
-                #                 valu = {}
-                #                 for i,o in value.items():
-                #                     valu.update({i:str(o)})
-                #                 a.append({key: valu})
+                        except:
+                            for m in test.all():
+                                key = m._meta.db_table
+                                modeldict = model_to_dict(m)
+                                value = modeldict.copy()
+                                valu = {}
+                                for i,o in value.items():
+                                    valu.update({i:str(o)})
+                                a.append({key: valu})
 
 
-    serial_model(x)
+    serial_model(x, y)
     d = [i for n, i in enumerate(a) if i not in a[n + 1:]]
-    # for v in d:
-    #     print(v)
-
     return (d)
-
 
 def is_number(n):
     """Function used for determining datatype"""

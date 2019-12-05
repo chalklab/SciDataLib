@@ -46,6 +46,7 @@ class Activities(models.Model):
     text_value = models.CharField(max_length=1000, blank=True, null=True)
     standard_text_value = models.CharField(max_length=1000, blank=True, null=True)
     herg = models.IntegerField()
+    std_act = models.ForeignKey('ActivityStdsLookup', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
