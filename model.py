@@ -26,6 +26,7 @@ def serialize(x, y):
         for i, o in value.items():
             valu.update({i: str(o)})
         a.append({key: valu})
+        # print(a)
         for q in opts:
             if not q.one_to_many:
                 if q.is_relation:
@@ -111,8 +112,8 @@ class SciData:
             "starttime": "",
             "permalink": "",
             "related": [],
-            "ids": [],
             "toc": [],
+            "ids": [],
             "scidata": {
                 "@id": "scidata",
                 "@type": "sci:scientificData",
@@ -292,11 +293,28 @@ class SciData:
         self.meta['@graph']['related'] = related
         return self.meta
 
+
     def add_related(self, related: str) -> dict:
         """Make or replace the related URIs (adds to array)"""
 
         self.meta['@graph']['related'].append(related)
         return self.meta
+
+
+
+    def ids(self, ids: str) -> dict:
+        """Make or replace the ids (adds to array)"""
+
+        self.meta['@graph']['ids'] = ids
+        return self.meta
+
+    def add_ids(self, ids: str) -> dict:
+        """Make or replace the ids (adds to array)"""
+
+        self.meta['@graph']['ids'].append(ids)
+        return self.meta
+
+
 
     def discipline(self, disc: str) -> dict:
         """Make or replace discipline"""
@@ -445,25 +463,25 @@ class SciData:
         return self.meta
 
     # rewritten by SJC 081219
-    '''def add_source(self, _source):
+    '''def add_source(self, source):
         srcs = self.meta['@graph']['sources']
         ld = {
-            '@id': '_source/' + str(len(srcs) + 1) + '/',
-            '@type': 'dc:_source'
+            '@id': 'source/' + str(len(srcs) + 1) + '/',
+            '@type': 'dc:source'
         }
-        src = dict(ld, *_source)
+        src = dict(ld, *source)
         srcs.append(src)
         self.meta['@graph']['sources'] = srcs
         return self.meta'''
 
     def source(self, source: list) -> dict:
-        """Make or replace the _source"""
+        """Make or replace the source"""
 
         srcs = []
         for x in source:
             ld = {
-                '@id': '_source/' + str(len(srcs) + 1) + '/',
-                '@type': 'dc:_source'
+                '@id': 'source/' + str(len(srcs) + 1) + '/',
+                '@type': 'dc:source'
             }
             ld.update(x)
             srcs.append(ld)
@@ -471,13 +489,13 @@ class SciData:
         return self.meta
 
     def add_source(self, source: list) -> dict:
-        """Add to the _source"""
+        """Add to the source"""
 
         srcs = self.meta['@graph']['sources']
         for x in source:
             ld = {
-                '@id': '_source/' + str(len(srcs) + 1) + '/',
-                '@type': 'dc:_source'
+                '@id': 'source/' + str(len(srcs) + 1) + '/',
+                '@type': 'dc:source'
             }
             ld.update(x)
             srcs.append(ld)
@@ -528,7 +546,7 @@ class SciData:
             elif e in self.meta['@graph'].keys():
                 self.meta['@graph'].pop(e)
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
-        print(temp)
+        # print(temp)
         return self.meta
 
 
