@@ -1,6 +1,7 @@
 from model import *
 import os
 import django
+import ast
 
 django.setup()
 from scidata.chembldb import *
@@ -18,9 +19,8 @@ Documents = set()
 for x in Activities.objects.values().filter(herg=1):
     Documents.add(x['doc_id'])
 
-Documents = {36053, 6432, 6570} ###Remove this line to process all documents###
-Documents = {5535}
-
+Documents = {36053, 5535, 6305} ###Remove this line to process all documents###
+# Documents = {36053}
 
 for DocumentNumber in Documents:
     doc_data = {}
@@ -33,34 +33,35 @@ for DocumentNumber in Documents:
 
     namespace = {}
 
+
     ###############################
 
     test = SciData(doc_data['doc_id'])
-    test.context('context HERE')
+    test.context('https://stuchalk.github.io/scidata/contexts/scidata.jsonld')
     test.base({"@base": "http://BASE.jsonld"})
-    test.doc_id("@ID HERE")
+    # test.doc_id("@ID HERE")
     test.graph_id("@graph_ID HERE")
     test.graph_uid("@unique_ID HERE")
     test.title(doc_data['title'])
     test.author(authors)
     test.description(doc_data['abstract'])
     test.publisher(doc_data['journal'])
-    test.version('X.X')
+    test.version('1.0')
     test.permalink("http://PERMALINK.jsonld")
     test.related("http://RELATED.jsonld")
-    test.discipline('science')
-    test.subdiscipline('subscience')
-    test.source([{"citation1": "Johnson Research Group http://CITATION.edu", "url": "http://CITATION.jsonld"}])
-    test.rights("http://creativecommons.org/publicdomain/zero/1.0/")
+    test.discipline('https://w3id.org/skgo/modsci#Chemistry')
+    test.subdiscipline('https://w3id.org/skgo/modsci#MedicinalChemistry')
+    # test.source([{"citation1": "Johnson Research Group http://CITATION.edu", "url": "http://CITATION.jsonld"}])
+    test.rights("CHEMBL Rights HERE")
 
     ####
 
-    test.add_context("added context")
+    # test.add_context("added context")
     # test.add_namespace({"namespace2": "http://NAMESPACE.owl#"}) #content is replaced by test.namespace further in script
     # test.add_keyword('keyword 2')
-    test.add_source([{"citation2": "Chalk Research Group http://chalk.coas.unf.edu",
-                      "url": "http://stuchalk.github.io/scidata/examples/ph.jsonld"}])
-    test.add_rights("rights 2")
+    # test.add_source([{"citation2": "Chalk Research Group http://chalk.coas.unf.edu",
+    #                   "url": "http://stuchalk.github.io/scidata/examples/ph.jsonld"}])
+    # test.add_rights("rights 2")
 
     ###############################
 
@@ -84,74 +85,122 @@ for DocumentNumber in Documents:
                             crosswalksA.update({x:y})
         crosswalks.append(crosswalksA)
 
-
-
-    ###############################
-
-
     molregno_set = set()
     for mo in Activities.objects.values().filter(doc_id=DocumentNumber):
         molregno_set.add(mo['molregno_id'])
     molregno_set = {81741}
     for mol in molregno_set:
         SciData.meta['@graph']['toc'] = []
-        activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol)
+        activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, herg=1)
 
         allunsorted = {}
         datapoint = []
         datagroup = []
         datagroupA = []
-        nspaces = []
+        namespacetoc = []
         methodology = []
         methodologyx = []
         system = []
         systemx = []
-
+        nspaces = set()
+        nspacestoc = set()
 
         for ac in activity_list:
-            if ac['herg'] == 1:
+
+            chembl = (Activities.objects.values('molregno_id__chembl_id').get(activity_id=ac['activity_id']))
+
+            serialized = serialize(Activities.objects.get(activity_id=ac['activity_id']), dbname)
+            # for x in serialized:
+            #     print(x)
+            # break
+
+
+            serializedset = set()
+            for cross in crosswalks:
+                if cross['category']:
+                    serializedset.add(cross['category'])
+                else:
+                    serializedset.add(cross['table'])
+
+
+            serializedgrouped = []
+            for serset in serializedset:
+                ser1 = {serset:{}}
+                for cross in crosswalks:
+                    if cross['category']:
+                        if cross['category'] == serset:
+                            for serial in serialized:
+                                for serial_table,serial_dict in serial.items():
+                                    if cross['table'] == serial_table:
+                                        ser1[serset].update(serial_dict)
+                    else:
+                        if cross['table'] == serset:
+                            for serial in serialized:
+                                for serial_table, serial_dict in serial.items():
+                                    if cross['table'] == serial_table:
+                                        ser1[serset].update(serial_dict)
+                if ser1[serset]:
+                    serializedgrouped.append(ser1)
 
 
 
-                chembl = (Activities.objects.values('molregno_id__chembl_id').get(activity_id=ac['activity_id']))
-
-                serialized = serialize(Activities.objects.get(activity_id=ac['activity_id']), dbname)
-
-                datapoint_set = set()
-                for serial in serialized:
-                    allunsorted.update(serial)
-                    for serial_table, serial_dict in serial.items():
-                        for cross in crosswalks:
+            datapoint_set = set()
+            for serial in serializedgrouped:
+                allunsorted.update(serial)
+                for serial_table, serial_dict in serial.items():
+                    for cross in crosswalks:
+                        if cross['ignore'] is None:
                             if cross['sdsection'] == 'dataset':
                                 if cross['table'] == serial_table:
                                     datapoint_set.add(cross['sdsubsection'])
 
+            for serial in serializedgrouped:
+                print(serial)
+                allunsorted.update(serial)
+                for serial_table, serial_dict in serial.items():
 
-                for serial in serialized:
-                    allunsorted.update(serial)
-                    for serial_table, serial_dict in serial.items():
-                        dataall = []
-                        # if serial_table in ['activity_stds_lookup']:
-                        if serial_table in ['activities', 'activity_stds_lookup']:
+                    dataall = []
+                    datapointA = {}
 
-                            for dat in datapoint_set:
+                    for dat in datapoint_set:
 
-                                datapointA = {}
-                                meta = {}
-                                exptmeta = {}
-                                nspaces = set()
-                                experimentaldata = {}
-                                exptdataall = {}
+                        datapointA = {}
+                        meta = {}
+                        exptmeta = {}
+                        experimentaldata = {}
+                        exptdataall = {}
 
+                        for cross in crosswalks:
+                            if cross['ignore'] is None:
+                                if cross['sdsection'] == 'dataset':
+                                    if cross['category']:
+                                        if cross['category'] == serial_table:
+                                            for k, v in serial_dict.items():
+                                                if k == cross['field']:
+                                                    nspaces.add(cross['nspace_id'])
+                                                    nspacestoc.add(cross['url'])
 
-                                for cross in crosswalks:
-                                    if cross['sdsection'] == 'dataset':
+                                                    if v not in ['None']:
+                                                        if cross['sdsubsection'] == 'metadata':
+                                                            meta.update({str(k): str(v)})
+                                                        if cross['sdsubsection'] == dat:
+                                                            if cross['meta'] is '1':
+                                                                exptmeta.update({str(k): str(v)})
+                                                            if cross['meta'] is not None:
+                                                                if cross['meta'] is not '1':
+                                                                    exptmeta.update({str(cross['meta']): str(v)})
+                                                            if cross['meta'] is None:
+                                                                experimentaldata.update({k: str(v)})
+                                                                experimentaldata.update(
+                                                                    {'@id': 'value', '@type': 'sci:value'})
+                                    else:
                                         if cross['table'] == serial_table:
                                             for k, v in serial_dict.items():
                                                 if k == cross['field']:
                                                     nspaces.add(cross['nspace_id'])
+                                                    nspacestoc.add(cross['url'])
 
-                                                    if v is not None:
+                                                    if v not in ['None']:
                                                         if cross['sdsubsection'] == 'metadata':
                                                             meta.update({str(k): str(v)})
                                                         if cross['sdsubsection'] == dat:
@@ -165,96 +214,98 @@ for DocumentNumber in Documents:
                                                                 experimentaldata.update(
                                                                     {'@id': 'value', '@type': 'sci:value'})
 
-                                if experimentaldata:
-                                    exptdataall.update(exptmeta)
-                                    exptdataall.update({
-                                        '@id': 'datum',
-                                        '@type': 'sci:' + dat,
-                                        'value': experimentaldata
-                                    })
+                        if experimentaldata:
 
-                                    dataall.append(exptdataall)
+                            exptdataall.update(exptmeta)
+                            exptdataall.update({
+                                '@id': 'datum',
+                                '@type': 'sci:' + dat,
+                                'value': experimentaldata
+                            })
 
-                                    datapointA.update(meta)
-                                    datapointA.update({
-                                        '@id': 'datapoint',
-                                        '@type': 'sci:datapoint',
-                                        'activity_id': ac['activity_id'],
-                                        'data': dataall
-                                    })
+                            dataall.append(exptdataall)
 
-                            datapoint.append(datapointA)
-                            datagroupA.append('datapoint')
+                    if dataall:
+                        datapointA.update(meta)
+                        datapointA.update({
+                            '@id': 'datapoint',
+                            '@type': 'sci:datapoint',
+                            'activity_id': ac['activity_id'],
+                            'data': dataall
+                        })
 
+                    if datapointA:
+                        datapoint.append(datapointA)
+                        datagroupA.append('datapoint')
+                        datapointA={}
 
-##########END#############
-
-                methodology_set = set()
-                for serial in serialized:
-                    for serial_table, serial_dict in serial.items():
-                        for cross in crosswalks:
+            methodology_set = set()
+            for serial in serializedgrouped:
+                for serial_table, serial_dict in serial.items():
+                    for cross in crosswalks:
+                        if cross['ignore'] is None:
                             if cross['sdsection'] == 'methodology':
                                 if cross['table'] == serial_table:
                                     methodology_set.add(cross['sdsubsection'])
-                for met in methodology_set:
-                    methodologyA = ({
-                        '@id': met,
-                        '@type': 'sci:' + met})
-                    for serial in serialized:
-                        for serial_table, serial_dict in serial.items():
-                            for cross in crosswalks:
+            for met in methodology_set:
+                methodologyA = ({
+                    '@id': met,
+                    '@type': 'sci:' + met})
+                for serial in serializedgrouped:
+                    for serial_table, serial_dict in serial.items():
+                        for cross in crosswalks:
+                            if cross['ignore'] is None:
                                 if cross['sdsection'] == 'methodology':
                                     if cross['table'] == serial_table:
                                         if cross['sdsubsection'] == met:
                                             for k, v in serial_dict.items():
                                                 if k == cross['field']:
-                                                    if v is not None:
+                                                    nspaces.add(cross['nspace_id'])
+                                                    nspacestoc.add(cross['url'])
+                                                    if v not in ['None']:
                                                         methodologyA.update({k: str(v)})
-                    methodology.append(methodologyA)
-                    methodologyx = [i for n, i in enumerate(methodology) if i not in methodology[n + 1:]]
+                methodology.append(methodologyA)
+                methodologyx = [i for n, i in enumerate(methodology) if i not in methodology[n + 1:]]
 
-                system_set = set()
-                systemA = {}
-                for serial in serialized:
+            system_set = set()
+            systemA = {}
+            for serial in serializedgrouped:
 
-                    for serial_table, serial_dict in serial.items():
-
-                        for cross in crosswalks:
-
-
+                for serial_table, serial_dict in serial.items():
+                    for cross in crosswalks:
+                        if cross['ignore'] is None:
                             if cross['sdsection'] == 'system':
-
                                 if cross['table'] == serial_table:
-
                                     system_set.add(cross['sdsubsection'])
-                for sys in system_set:
-                    systemA = ({
-                        '@id': sys,
-                        '@type': 'sci:' + sys})
-                    for serial in serialized:
-                        for serial_table, serial_dict in serial.items():
-                            for cross in crosswalks:
+            for sys in system_set:
+                systemA = ({
+                    '@id': sys,
+                    '@type': 'sci:' + sys})
+                for serial in serializedgrouped:
+                    for serial_table, serial_dict in serial.items():
+                        for cross in crosswalks:
+                            if cross['ignore'] is None:
                                 if cross['sdsection'] == 'system':
                                     if cross['table'] == serial_table:
                                         if cross['sdsubsection'] == sys:
                                             for k, v in serial_dict.items():
                                                 if k == cross['field']:
-                                                    if v:
+                                                    nspaces.add(cross['nspace_id'])
+                                                    nspacestoc.add(cross['url'])
+                                                    if v not in ['None']:
                                                         systemA.update({k:v})
-                    system.append(systemA)
-                    systemx = [i for n, i in enumerate(system) if i not in system[n + 1:]]
+                system.append(systemA)
+                systemx = [i for n, i in enumerate(system) if i not in system[n + 1:]]
 
-                metadata = []
-                for serial in serialized:
-                    for serial_table, serial_dict in serial.items():
-                        for cross in crosswalks:
-                            if cross['sdsection'] == 'metadata':
-                                if cross['table'] == serial_table:
-                                    for k, v in serial_dict.items():
-                                        if k == cross['field']:
-                                            metadata.append({k: v, 'type': cross['sdsubsection']})
-
-
+            metadata = []
+            for serial in serializedgrouped:
+                for serial_table, serial_dict in serial.items():
+                    for cross in crosswalks:
+                        if cross['sdsection'] == 'metadata':
+                            if cross['table'] == serial_table:
+                                for k, v in serial_dict.items():
+                                    if k == cross['field']:
+                                        metadata.append({k: v, 'type': cross['sdsubsection']})
 
         if datagroupA:
             datagroup.append(
@@ -272,12 +323,20 @@ for DocumentNumber in Documents:
         if nspaces:
             for x in nspaces:
                 for y in query_crosswalks_nspaces:
-                        if y['id'] == x:
-                            namespace.update({y['ns']:y['path']})
+                    if y['id'] == x:
+                        namespace.update({y['ns']:y['path']})
+
+        if nspacestoc:
+            for x in nspacestoc:
+                namespacetoc.append(x)
+
+
         if namespace:
             namespaces = ", ".join(repr(e) for e in namespace)
             test.namespace(namespace)
-        test.starttime()
+        if namespacetoc:
+            test.ids(namespacetoc)
+
 
 
         try:
@@ -298,16 +357,21 @@ for DocumentNumber in Documents:
             pass
 
         if datapoint:
+
+
+            test.starttime()
+            test.doc_id('scidata:chembl'+allunsorted['docs']['doc_id']+'_'+allunsorted['molecule_dictionary']['chembl'])
+            test.source([{'doi':allunsorted['docs']['doi']}])
             put = test.output
-            with open(str(DocumentNumber) + '_' + str(mol) + '.json', 'w') as f:
+            with open(str(DocumentNumber) + '_' + str(allunsorted['molecule_dictionary']['chembl']) + '.json', 'w') as f:
                 json.dump(put, f)
-        print(datapoint)
+
 
         # break
 
                 #
                 # other = []
-                # for serial in serialized:
+                # for serial in serializedgrouped:
                 #     for serial_table, serial_dict in serial.items():
                 #         for cross in crosswalks:
                 #             if cross['sdsection'] == 'other':
