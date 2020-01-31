@@ -19,8 +19,8 @@ Documents = set()
 for x in Activities.objects.values().filter(herg=1):
     Documents.add(x['doc_id'])
 
-Documents = {36053, 5535, 6305} ###Remove this line to process all documents###
-# Documents = {36053}
+# Documents = {36053, 5535, 5706, 6642, 6305, 50275} ###Remove this line to process all documents###
+Documents = {5535}
 
 for DocumentNumber in Documents:
     doc_data = {}
@@ -52,7 +52,7 @@ for DocumentNumber in Documents:
     test.discipline('https://w3id.org/skgo/modsci#Chemistry')
     test.subdiscipline('https://w3id.org/skgo/modsci#MedicinalChemistry')
     # test.source([{"citation1": "Johnson Research Group http://CITATION.edu", "url": "http://CITATION.jsonld"}])
-    test.rights("CHEMBL Rights HERE")
+    test.rights("https://creativecommons.org/licenses/by-sa/3.0/legalcode")
 
     ####
 
@@ -88,10 +88,11 @@ for DocumentNumber in Documents:
     molregno_set = set()
     for mo in Activities.objects.values().filter(doc_id=DocumentNumber):
         molregno_set.add(mo['molregno_id'])
-    molregno_set = {81741}
+    # molregno_set = {610143}
     for mol in molregno_set:
         SciData.meta['@graph']['toc'] = []
         activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, herg=1)
+
 
         allunsorted = {}
         datapoint = []
@@ -109,11 +110,48 @@ for DocumentNumber in Documents:
 
             chembl = (Activities.objects.values('molregno_id__chembl_id').get(activity_id=ac['activity_id']))
 
-            serialized = serialize(Activities.objects.get(activity_id=ac['activity_id']), dbname)
-            # for x in serialized:
-            #     print(x)
-            # break
+            # serialized = serialize(Activities.objects.get(activity_id=ac['activity_id']), dbname)
+            serializedpre = serialize(Activities.objects.get(activity_id=ac['activity_id']))
 
+
+            serializedsetpre = set()
+            for cross in crosswalks:
+                if cross['category']:
+                    serializedsetpre.add(cross['category'])
+                else:
+                    serializedsetpre.add(cross['table'])
+
+
+            serialized = []
+            for x,y in serializedpre.items():
+                den = denester(x,y)
+                serialized.append(den)
+
+            serializednew = []
+            for x in serialized:
+                for y in x:
+                    empty = {}
+                    for sersetpre in serializedsetpre:
+                        emptee = {sersetpre: {}}
+                        for cross in crosswalks:
+                            if cross['category']:
+                                if cross['category'] == sersetpre:
+                                    for serial_table, serial_dict in y.items():
+                                        if cross['table'] == serial_table:
+                                            emptee[sersetpre].update(serial_dict)
+
+                            else:
+                                if cross['table'] == sersetpre:
+                                    for serial_table, serial_dict in y.items():
+                                        if cross['table'] == serial_table:
+                                            emptee[sersetpre].update(serial_dict)
+
+                        if emptee[sersetpre]:
+                            empty.update(emptee)
+
+                    if empty:
+
+                        serializednew.append(empty)
 
             serializedset = set()
             for cross in crosswalks:
@@ -129,13 +167,13 @@ for DocumentNumber in Documents:
                 for cross in crosswalks:
                     if cross['category']:
                         if cross['category'] == serset:
-                            for serial in serialized:
+                            for serial in serializednew:
                                 for serial_table,serial_dict in serial.items():
                                     if cross['table'] == serial_table:
                                         ser1[serset].update(serial_dict)
                     else:
                         if cross['table'] == serset:
-                            for serial in serialized:
+                            for serial in serializednew:
                                 for serial_table, serial_dict in serial.items():
                                     if cross['table'] == serial_table:
                                         ser1[serset].update(serial_dict)
@@ -146,6 +184,9 @@ for DocumentNumber in Documents:
 
             datapoint_set = set()
             for serial in serializedgrouped:
+
+                # print(serial)
+
                 allunsorted.update(serial)
                 for serial_table, serial_dict in serial.items():
                     for cross in crosswalks:
@@ -155,7 +196,6 @@ for DocumentNumber in Documents:
                                     datapoint_set.add(cross['sdsubsection'])
 
             for serial in serializedgrouped:
-                print(serial)
                 allunsorted.update(serial)
                 for serial_table, serial_dict in serial.items():
 
@@ -239,6 +279,8 @@ for DocumentNumber in Documents:
                         datagroupA.append('datapoint')
                         datapointA={}
 
+
+
             methodology_set = set()
             for serial in serializedgrouped:
                 for serial_table, serial_dict in serial.items():
@@ -306,10 +348,13 @@ for DocumentNumber in Documents:
                                 for k, v in serial_dict.items():
                                     if k == cross['field']:
                                         metadata.append({k: v, 'type': cross['sdsubsection']})
+        #
+            # print('xxx',metadata)
 
         if datagroupA:
             datagroup.append(
                 {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': str(mol), 'datapoints': datagroupA})
+        #
 
         if methodology:
             test.aspects(methodologyx)
@@ -319,7 +364,7 @@ for DocumentNumber in Documents:
             test.datapoint(datapoint)
         if datagroup:
             test.datagroup(datagroup)
-
+        #
         if nspaces:
             for x in nspaces:
                 for y in query_crosswalks_nspaces:
@@ -358,7 +403,6 @@ for DocumentNumber in Documents:
 
         if datapoint:
 
-
             test.starttime()
             test.doc_id('scidata:chembl'+allunsorted['docs']['doc_id']+'_'+allunsorted['molecule_dictionary']['chembl'])
             test.source([{'doi':allunsorted['docs']['doi']}])
@@ -367,7 +411,6 @@ for DocumentNumber in Documents:
                 json.dump(put, f)
 
 
-        # break
 
                 #
                 # other = []
