@@ -13,52 +13,91 @@ This module contains the Scidata class used in generating Scidata JSON-LD docume
 
 #############
 
-def serialize(x, y):
-    a = []
-    def serial_model(modelobj, dbname):
-        modeldict = model_to_dict(modelobj)
+def denester(q,r):
+    denestered = []
+    def denest(x,y):
+        denested = {str(x):{}}
+        for a,b in y.items():
+            if type(b) is dict:
+                denest(a,b)
+            else:
+                denested[x].update({str(a):str(b)})
+
+        if denested[x]:
+            denestered.append(denested)
+    denest(q,r)
+    return denestered
+
+def serialize(modelobj1):
+    def serialized(modelobj):
         opts = modelobj._meta.get_fields()
+        dbt = modelobj._meta.db_table
+        modeldict = model_to_dict(modelobj)
         keyrev = modelobj.__class__
         keyvalrev = modelobj.pk
-        key = modelobj._meta.db_table
-        value = modeldict.copy()
-        valu = {}
-        for i, o in value.items():
-            valu.update({i: str(o)})
-        a.append({key: valu})
-        # print(a)
-        for q in opts:
-            if not q.one_to_many:
-                if q.is_relation:
-                    foreignkey = getattr(modelobj, q.name)
-                    if foreignkey:
-                        try:
-                            modeldict[q.name] = serial_model(foreignkey, dbname)
-                        except:
+        for m in opts:
+            if not m.one_to_many:
+                foreignkey = getattr(modelobj, m.name)
+                if foreignkey:
+                    try:
+                        dbt = foreignkey._meta.db_table
+                        modeldict[dbt] = serialize(foreignkey)
+                    except:
+                        pass
+            if m.one_to_many:
+                set = str(str(m.name) + '_set')
+                test = getattr(keyrev.objects.get(pk=keyvalrev), set)
+                if test.values().exists():
+                    try:
+                        if test.values()[1]:
                             pass
-            if q.one_to_many:
-                # if q.name not in ['activities']:
-                if q.name:
-                    set = str(str(q.name) + '_set')
-                    test = getattr(keyrev.objects.using(y).get(pk=keyvalrev), set)
-                    if test.values().exists():
+                    except:
+                        for n in test.all():
+                            key = n._meta.db_table
+                            modeldict1 = model_to_dict(n)
+                            value = modeldict1.copy()
+                            valu = {}
+                            for i, o in value.items():
+                                valu.update({i: str(o)})
+                            try:
+                                modeldict[key].append(valu)
+                            except:
+                                modeldict.update({key: valu})
+        return (modeldict)
+    opts = modelobj1._meta.get_fields()
+    dbt = modelobj1._meta.db_table
+    modeldict = {dbt:model_to_dict(modelobj1)}
+    keyrev = modelobj1.__class__
+    keyvalrev = modelobj1.pk
+    for m in opts:
+        if not m.one_to_many:
+            foreignkey = getattr(modelobj1, m.name)
+            if foreignkey:
+                try:
+                    dbt = foreignkey._meta.db_table
+                    modeldict[dbt] = serialized(foreignkey)
+                except:
+                    pass
+        if m.one_to_many:
+            set = str(str(m.name) + '_set')
+            test = getattr(keyrev.objects.get(pk=keyvalrev), set)
+            if test.values().exists():
+                try:
+                    if test.values()[1]:
+                        pass
+                except:
+                    for n in test.all():
+                        key = n._meta.db_table
+                        modeldict1 = model_to_dict(n)
+                        value = modeldict1.copy()
+                        valu = {}
+                        for i, o in value.items():
+                            valu.update({i:str(o)})
                         try:
-                            if test.values()[1]:
-                                pass
+                            modeldict[key].append(valu)
                         except:
-                            for m in test.all():
-                                key = m._meta.db_table
-                                modeldict = model_to_dict(m)
-                                value = modeldict.copy()
-                                valu = {}
-                                for i,o in value.items():
-                                    valu.update({i:str(o)})
-                                a.append({key: valu})
-
-
-    serial_model(x, y)
-    d = [i for n, i in enumerate(a) if i not in a[n + 1:]]
-    return (d)
+                            modeldict.update({key:valu})
+    return(modeldict)
 
 def is_number(n):
     """Function used for determining datatype"""
@@ -68,7 +107,6 @@ def is_number(n):
     except ValueError:
         return False
     return True
-
 
 def find_sigfigs(x):
     """Function used for determining significant figures"""
@@ -547,6 +585,8 @@ class SciData:
                 self.meta['@graph'].pop(e)
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
         # print(temp)
+
+        print('complete')
         return self.meta
 
 
