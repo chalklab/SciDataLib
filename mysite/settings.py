@@ -96,7 +96,7 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'chembl_25',
+        'NAME': 'chembl_26',
         'USER': 'postdoc',
         'HOST': '127.0.0.1',
         'PASSWORD': 'nerd4life*',
