@@ -1,0 +1,64 @@
+from model import *
+import os
+import django
+import ast
+
+django.setup()
+from scidata.chembldb26 import *
+from scidata.crosswalks import *
+
+path = r"/Users/n01448636/Documents/chembl django/scidata/JSON_dumps"
+os.chdir(path)
+
+dbname = 'default'
+query_crosswalks_chembl = list(Chembl.objects.using('crosswalks').values())
+query_crosswalks_ontterms = list(Ontterms.objects.using('crosswalks').values())
+query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
+
+crosswalks = []
+for ont in query_crosswalks_chembl:
+    crosswalksA = ont
+    if crosswalksA['sdsection'] is None:
+        for onto in query_crosswalks_ontterms:
+            if crosswalksA['ontterm_id'] == onto['id']:
+                for x, y in onto.items():
+                    crosswalksA.update({x: y})
+    else:
+        for onto in query_crosswalks_ontterms:
+            if crosswalksA['ontterm_id'] == onto['id']:
+                for x, y in onto.items():
+                    if x not in ['sdsection', 'sdsubsection']:
+                        crosswalksA.update({x: y})
+    crosswalks.append(crosswalksA)
+
+context = ["https://stuchalk.github.io/scidata/contexts/scidata_general.jsonld",
+        "https://stuchalk.github.io/scidata/contexts/scidata_methodology.jsonld",
+        "https://stuchalk.github.io/scidata/contexts/scidata_system.jsonld",
+        "https://stuchalk.github.io/scidata/contexts/scidata_dataset.jsonld"]
+
+
+content = {}
+namespaces = []
+for x in crosswalks:
+    content.update({x['field']:{'@id':x['url'],'@type':x['datatype']}})
+    namespaces.append(x['nspace_id'])
+
+nspaces = {}
+for x in namespaces:
+    for y in query_crosswalks_nspaces:
+        if x == y['id']:
+            nspaces.update({y['ns']:y['path']})
+
+z = {}
+z.update(nspaces)
+z.update(content)
+
+context.append(z)
+
+final = {'@context':context}
+
+test = json.dumps(final, indent=4, ensure_ascii=False)
+print(test)
+
+with open('chembl_context.jsonld', 'w') as f:
+    json.dump(final, f)

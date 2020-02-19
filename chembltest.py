@@ -4,7 +4,7 @@ import django
 import ast
 
 django.setup()
-from scidata.chembldb import *
+from scidata.chembldb26 import *
 from scidata.crosswalks import *
 
 path = r"/Users/n01448636/Documents/chembl django/scidata/JSON_dumps"
@@ -20,13 +20,22 @@ for x in Activities.objects.values().filter(herg=1):
     Documents.add(x['doc_id'])
 
 # Documents = {36053, 5535, 5706, 6642, 6305, 50275} ###Remove this line to process all documents###
+
+# print(Documents)
 Documents = {5535}
+
+# Documents = {109127, 101009, 109408, 109604, 103612, 107786, 107801, 108080}
+
 
 for DocumentNumber in Documents:
     doc_data = {}
     doc_data.update(Docs.objects.values().get(doc_id=DocumentNumber))
 
-    auth = doc_data['authors'].split(', ')
+    try:
+        auth = doc_data['authors'].split(', ')
+    except:
+        auth = ['Anonymous']
+        # print(DocumentNumber)
     authors = []
     for a in auth:
         authors.append({'name':a})
@@ -40,8 +49,8 @@ for DocumentNumber in Documents:
     test.context('https://stuchalk.github.io/scidata/contexts/scidata.jsonld')
     test.base({"@base": "http://BASE.jsonld"})
     # test.doc_id("@ID HERE")
-    test.graph_id("@graph_ID HERE")
-    test.graph_uid("@unique_ID HERE")
+    test.graph_id("graph_ID_HERE")
+    test.graph_uid("unique_ID_HERE")
     test.title(doc_data['title'])
     test.author(authors)
     test.description(doc_data['abstract'])
