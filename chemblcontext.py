@@ -31,11 +31,14 @@ for ont in query_crosswalks_chembl:
                         crosswalksA.update({x: y})
     crosswalks.append(crosswalksA)
 
-context = ["https://stuchalk.github.io/scidata/contexts/scidata_general.jsonld",
-        "https://stuchalk.github.io/scidata/contexts/scidata_methodology.jsonld",
-        "https://stuchalk.github.io/scidata/contexts/scidata_system.jsonld",
-        "https://stuchalk.github.io/scidata/contexts/scidata_dataset.jsonld"]
+# context = ["https://stuchalk.github.io/scidata/contexts/scidata_general.jsonld",
+#         "https://stuchalk.github.io/scidata/contexts/scidata_methodology.jsonld",
+#         "https://stuchalk.github.io/scidata/contexts/scidata_system.jsonld",
+#         "https://stuchalk.github.io/scidata/contexts/scidata_dataset.jsonld"]
 
+context = []
+
+vocab = {'@vocab':'https://www.w3.org/2001/XMLSchema#'}
 
 content = {}
 namespaces = []
@@ -50,12 +53,15 @@ for x in namespaces:
             nspaces.update({y['ns']:y['path']})
 
 z = {}
+z.update(vocab)
 z.update(nspaces)
 z.update(content)
 
-context.append(z)
-
-final = {'@context':context}
+if context:
+    context.append(z)
+    final = {'@context':context}
+else:
+    final = {'@context':z}
 
 test = json.dumps(final, indent=4, ensure_ascii=False)
 print(test)

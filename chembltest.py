@@ -46,7 +46,7 @@ for DocumentNumber in Documents:
     ###############################
 
     test = SciData(doc_data['doc_id'])
-    test.context('https://stuchalk.github.io/scidata/contexts/scidata.jsonld')
+    test.context('https://stuchalk.github.io/scidata/contexts/chembl.jsonld')
     test.base({"@base": "http://BASE.jsonld"})
     # test.doc_id("@ID HERE")
     test.graph_id("graph_ID_HERE")
@@ -117,7 +117,8 @@ for DocumentNumber in Documents:
 
         for ac in activity_list:
 
-            chembl = (Activities.objects.values('molregno_id__chembl_id').get(activity_id=ac['activity_id']))
+            # chembl = (Activities.objects.values('molregno_id__chembl_id').get(activity_id=ac['activity_id']))
+            # print(chembl)
 
             # serialized = serialize(Activities.objects.get(activity_id=ac['activity_id']), dbname)
             serializedpre = serialize(Activities.objects.get(activity_id=ac['activity_id']))
@@ -133,11 +134,13 @@ for DocumentNumber in Documents:
 
             serialized = []
             for x,y in serializedpre.items():
+                # print(x,y)
                 den = denester(x,y)
                 serialized.append(den)
 
             serializednew = []
             for x in serialized:
+                # print(x)
                 for y in x:
                     empty = {}
                     for sersetpre in serializedsetpre:
@@ -194,9 +197,6 @@ for DocumentNumber in Documents:
             datapoint_set = set()
             for serial in serializedgrouped:
 
-                # print(serial)
-
-                allunsorted.update(serial)
                 for serial_table, serial_dict in serial.items():
                     for cross in crosswalks:
                         if cross['ignore'] is None:
@@ -205,6 +205,8 @@ for DocumentNumber in Documents:
                                     datapoint_set.add(cross['sdsubsection'])
 
             for serial in serializedgrouped:
+                print(serial)
+
                 allunsorted.update(serial)
                 for serial_table, serial_dict in serial.items():
 
@@ -362,7 +364,7 @@ for DocumentNumber in Documents:
 
         if datagroupA:
             datagroup.append(
-                {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': str(mol), 'datapoints': datagroupA})
+                {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': str(allunsorted['molecule_dictionary']['chembl_id']), 'datapoints': datagroupA})
         #
 
         if methodology:
@@ -413,10 +415,10 @@ for DocumentNumber in Documents:
         if datapoint:
 
             test.starttime()
-            test.doc_id('scidata:chembl'+allunsorted['docs']['doc_id']+'_'+allunsorted['molecule_dictionary']['chembl'])
+            test.doc_id('scidata:chembl'+allunsorted['docs']['doc_id']+'_'+allunsorted['molecule_dictionary']['chembl_id'])
             test.source([{'doi':allunsorted['docs']['doi']}])
             put = test.output
-            with open(str(DocumentNumber) + '_' + str(allunsorted['molecule_dictionary']['chembl']) + '.json', 'w') as f:
+            with open(str(DocumentNumber) + '_' + str(allunsorted['molecule_dictionary']['chembl_id']) + '.jsonld', 'w') as f:
                 json.dump(put, f)
 
 
