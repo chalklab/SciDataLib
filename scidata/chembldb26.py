@@ -208,6 +208,7 @@ class Assays(models.Model):
     src = models.ForeignKey('Source', models.DO_NOTHING)
     src_assay_id = models.CharField(max_length=50, blank=True, null=True)
     chembl = models.ForeignKey('ChemblIdLookup', models.DO_NOTHING, unique=True)
+    # chembl = models.OneToOneField('ChemblIdLookup', models.DO_NOTHING)
     updated_on = models.DateTimeField(blank=True, null=True)
     updated_by = models.CharField(max_length=250, blank=True, null=True)
     orig_description = models.CharField(max_length=4000, blank=True, null=True)

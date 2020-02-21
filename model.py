@@ -3,7 +3,8 @@ import datetime
 from itertools import count
 from collections import defaultdict
 import django
-from django.forms.models import model_to_dict
+# from django.forms.models import model_to_dict
+from itertools import chain
 
 django.setup()
 
@@ -12,6 +13,20 @@ This module contains the Scidata class used in generating Scidata JSON-LD docume
 """
 
 #############
+
+def custom_to_dict(instance, fields=None, exclude=None):
+    opts = instance._meta
+    data = {}
+    for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
+        if not getattr(f, 'editable', False):
+            continue
+        if fields and f.attname not in fields:
+            continue
+        if exclude and f.attname in exclude:
+            continue
+        data[f.attname] = f.value_from_object(instance)
+    return data
+
 
 def denester(q,r):
     denestered = []
@@ -28,20 +43,24 @@ def denester(q,r):
     denest(q,r)
     return denestered
 
+
+
 def serialize(modelobj1):
     def serialized(modelobj):
         opts = modelobj._meta.get_fields()
+
         dbt = modelobj._meta.db_table
-        modeldict = model_to_dict(modelobj)
+        modeldict = custom_to_dict(modelobj)
         keyrev = modelobj.__class__
         keyvalrev = modelobj.pk
+
         for m in opts:
             if not m.one_to_many:
-                foreignkey = getattr(modelobj, m.name)
-                if foreignkey:
+                foreignk = getattr(modelobj, m.name)
+                if foreignk:
                     try:
-                        dbt = foreignkey._meta.db_table
-                        modeldict[dbt] = serialize(foreignkey)
+                        dbt = foreignk._meta.db_table
+                        modeldict[dbt] = serialize(foreignk)
                     except:
                         pass
             if m.one_to_many:
@@ -54,7 +73,7 @@ def serialize(modelobj1):
                     except:
                         for n in test.all():
                             key = n._meta.db_table
-                            modeldict1 = model_to_dict(n)
+                            modeldict1 = custom_to_dict(n)
                             value = modeldict1.copy()
                             valu = {}
                             for i, o in value.items():
@@ -66,13 +85,15 @@ def serialize(modelobj1):
         return (modeldict)
     opts = modelobj1._meta.get_fields()
     dbt = modelobj1._meta.db_table
-    modeldict = {dbt:model_to_dict(modelobj1)}
+    modeldict = {dbt:custom_to_dict(modelobj1)}
     keyrev = modelobj1.__class__
     keyvalrev = modelobj1.pk
     for m in opts:
+
         if not m.one_to_many:
             foreignkey = getattr(modelobj1, m.name)
             if foreignkey:
+
                 try:
                     dbt = foreignkey._meta.db_table
                     modeldict[dbt] = serialized(foreignkey)
@@ -87,8 +108,11 @@ def serialize(modelobj1):
                         pass
                 except:
                     for n in test.all():
+
                         key = n._meta.db_table
-                        modeldict1 = model_to_dict(n)
+
+                        modeldict1 = custom_to_dict(n)
+
                         value = modeldict1.copy()
                         valu = {}
                         for i, o in value.items():
@@ -584,7 +608,7 @@ class SciData:
             elif e in self.meta['@graph'].keys():
                 self.meta['@graph'].pop(e)
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
-        print(temp)
+        # print(temp)
 
         print('complete')
         return self.meta
