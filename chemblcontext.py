@@ -43,8 +43,12 @@ vocab = {'@vocab':'https://www.w3.org/2001/XMLSchema#'}
 content = {}
 namespaces = []
 for x in crosswalks:
-    content.update({x['field']:{'@id':x['url'],'@type':x['datatype']}})
-    namespaces.append(x['nspace_id'])
+    try:
+        content.update({x['field']:{'@id':x['url'],'@type':x['datatype']}})
+        namespaces.append(x['nspace_id'])
+    except:
+        print('failed')
+        print(x)
 
 nspaces = {}
 for x in namespaces:

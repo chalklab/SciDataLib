@@ -25,6 +25,7 @@ def custom_to_dict(instance, fields=None, exclude=None):
         if exclude and f.attname in exclude:
             continue
         data[f.attname] = f.value_from_object(instance)
+    # print(data)
     return data
 
 
@@ -42,8 +43,6 @@ def denester(q,r):
             denestered.append(denested)
     denest(q,r)
     return denestered
-
-
 
 def serialize(modelobj1):
     def serialized(modelobj):
@@ -86,6 +85,7 @@ def serialize(modelobj1):
     opts = modelobj1._meta.get_fields()
     dbt = modelobj1._meta.db_table
     modeldict = {dbt:custom_to_dict(modelobj1)}
+
     keyrev = modelobj1.__class__
     keyvalrev = modelobj1.pk
     for m in opts:
@@ -108,11 +108,8 @@ def serialize(modelobj1):
                         pass
                 except:
                     for n in test.all():
-
                         key = n._meta.db_table
-
                         modeldict1 = custom_to_dict(n)
-
                         value = modeldict1.copy()
                         valu = {}
                         for i, o in value.items():
@@ -158,7 +155,6 @@ class SciData:
 
         self.meta['@graph']['uid'] = uid
 
-
     meta = {
         "@context": [],
         "@id": "",
@@ -195,23 +191,16 @@ class SciData:
         }
     }
 
-    contexts = ["https://stuchalk.github.io/scidata/contexts/scidata.jsonld"]
-    nspaces = {
-                "sci": "https://stuchalk.github.io/scidata/contexts/scidata.jsonld",
-                "sub": "http://stuchalk.github.io/scidata/ontology/substance/substance.owl#",
-                "chm": "http://stuchalk.github.io/scidata/ontology/chemical/chemical.owl#",
-                "prop": "http://stuchalk.github.io/scidata/ontology/property/property.owl#",
-                "qudt": "http://www.qudt.org/qudt/owl/1.0.0/unit.owl#",
-                "dc": "http://purl.org/dc/terms/",
-                "xsd": "http://www.w3.org/2001/XMLSchema#"
-              }
+    contexts = []
+    nspaces = {}
     bass = {}
 
-    def context(self, context: str) -> dict:
+
+    def context(self, context: list) -> dict:
         """Make or replace the external context files"""
 
         self.contexts = []
-        self.contexts.append(context)
+        self.contexts = context
         self.make_context()
         return self.meta
 
@@ -355,28 +344,24 @@ class SciData:
         self.meta['@graph']['related'] = related
         return self.meta
 
-
     def add_related(self, related: str) -> dict:
         """Make or replace the related URIs (adds to array)"""
 
         self.meta['@graph']['related'].append(related)
         return self.meta
 
-
-
     def ids(self, ids: str) -> dict:
         """Make or replace the ids (adds to array)"""
 
-        self.meta['@graph']['ids'] = ids
+        self.meta['@graph']['ids'] = sorted(set(ids))
         return self.meta
 
     def add_ids(self, ids: str) -> dict:
         """Make or replace the ids (adds to array)"""
 
         self.meta['@graph']['ids'].append(ids)
+        self.meta['@graph']['ids'] = sorted(set(ids))
         return self.meta
-
-
 
     def discipline(self, disc: str) -> dict:
         """Make or replace discipline"""
@@ -424,7 +409,7 @@ class SciData:
                 for key, value in a.items():
                     if key == '@type' and 'methodology/' + value not in self.meta['@graph']['toc']:
                         self.meta['@graph']['toc'].append(value)
-                        self.meta['@graph']['toc'] = sorted(self.meta['@graph']['toc'])
+                        self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
         return self.meta
 
     def facets(self, facets: list) -> dict:
@@ -460,7 +445,7 @@ class SciData:
                 for key, value in a.items():
                     if key == '@type' and 'system/' + value not in self.meta['@graph']['toc']:
                         self.meta['@graph']['toc'].append(value)
-                        self.meta['@graph']['toc'] = sorted(self.meta['@graph']['toc'])
+                        self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
         return self.meta
 
     def datapoint(self, datapoint: list) -> dict:
@@ -521,7 +506,7 @@ class SciData:
                 for key, value in a.items():
                     if key == '@type' and 'datagroup/' + value not in self.meta['@graph']['toc']:
                         self.meta['@graph']['toc'].append(value)
-                        self.meta['@graph']['toc'] = sorted(self.meta['@graph']['toc'])
+                        self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
         return self.meta
 
     # rewritten by SJC 081219
