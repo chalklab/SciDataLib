@@ -1,13 +1,12 @@
 from model import *
 import os
 import django
-import ast
 
 django.setup()
 from scidata.chembldb26 import *
 from scidata.crosswalks import *
 
-path = r"/Users/n01448636/Documents/chembl django/scidata/JSON_dumps"
+path = r"/Users/n01448636/Documents/PycharmProjects/chembl_django/scidata/JSON_dumps"
 os.chdir(path)
 
 dbname = 'default'
@@ -108,7 +107,7 @@ for DocumentNumber in Documents:
     for x in allgrouped:
         for y in x.values():
             count += len(y)
-    print(count)
+    # print(count)
 
     molregno_set = set()
     for mo in Activities.objects.values().filter(doc_id=DocumentNumber):
@@ -187,8 +186,10 @@ for DocumentNumber in Documents:
 
                     if empty:
                         serializednew.append(empty)
-            # print(serializednew)
-
+            for x in serialized:
+                print(x)
+            for x in serialized:
+                print(x)
             serializednew = allgrouped
 
             serializedset = set()
