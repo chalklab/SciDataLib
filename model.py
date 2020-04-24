@@ -25,7 +25,6 @@ def custom_to_dict(instance, fields=None, exclude=None):
         if exclude and f.attname in exclude:
             continue
         data[f.attname] = f.value_from_object(instance)
-    # print(data)
     return data
 
 
