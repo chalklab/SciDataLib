@@ -239,10 +239,10 @@ for DocumentNumber in Documents:
                                                         if cross['sdsubsection'] == 'metadata':
                                                             meta.update({str(k): str(v)})
                                                         if cross['sdsubsection'] == dat:
-                                                            if cross['meta'] is '1':
+                                                            if cross['meta'] == '1':
                                                                 exptmeta.update({str(k): str(v)})
                                                             if cross['meta'] is not None:
-                                                                if cross['meta'] is not '1':
+                                                                if cross['meta'] != '1':
                                                                     exptmeta.update({str(cross['meta']): str(v)})
                                                             if cross['meta'] is None:
                                                                 if not exptmeta['table_name__placeholder']:
@@ -261,10 +261,10 @@ for DocumentNumber in Documents:
                                                         if cross['sdsubsection'] == 'metadata':
                                                             meta.update({str(k): str(v)})
                                                         if cross['sdsubsection'] == dat:
-                                                            if cross['meta'] is '1':
+                                                            if cross['meta'] == '1':
                                                                 exptmeta.update({str(k): str(v)})
                                                             if cross['meta'] is not None:
-                                                                if cross['meta'] is not '1':
+                                                                if cross['meta'] != '1':
                                                                     exptmeta.update({str(cross['meta']): str(v)})
                                                             if cross['meta'] is None:
                                                                 if not exptmeta['table_name__placeholder']:
