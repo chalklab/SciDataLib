@@ -30,6 +30,7 @@ class Chembl(models.Model):
     ontterm_id = models.SmallIntegerField(blank=True, null=True)
     sdsection = models.CharField(max_length=11, blank=True, null=True)
     sdsubsection = models.CharField(max_length=32, blank=True, null=True)
+    sdsubsubsection = models.CharField(max_length=64, blank=True, null=True)
     category = models.CharField(max_length=64, blank=True, null=True)
     unit = models.CharField(max_length=32, blank=True, null=True)
     datatype = models.CharField(max_length=64, blank=True, null=True)
