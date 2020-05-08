@@ -14,6 +14,14 @@ query_crosswalks_chembl = list(Chembl.objects.using('crosswalks').values())
 query_crosswalks_ontterms = list(Ontterms.objects.using('crosswalks').values())
 query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
 
+'''BAD gene Chembl is 3817'''
+Documents = set()
+for x in TargetDictionary.objects.values().filter(chembl_id='CHEMBL3817'):
+    for y in Assays.objects.values().filter(tid=x['tid']):
+        Documents.add(y['doc_id'])
+''''''
+
+
 Documents = set()
 for x in Activities.objects.values().filter(herg=1):
     Documents.add(x['doc_id'])
@@ -85,19 +93,32 @@ for DocumentNumber in Documents:
                             crosswalksA.update({x:y})
         crosswalks.append(crosswalksA)
 
-
+    '''Default querying of valid molregnos'''
     molregno_set = set()
     for mo in Activities.objects.values().filter(doc_id=DocumentNumber):
         molregno_set.add(mo['molregno_id'])
+    # print(molregno_set)
 
-    ''' limiter to process only one molregno from each doc number. Hash out to process all molregnos '''
-    molregno_set_filtered = set()
-    for mol in molregno_set:
-        SciData.meta['@graph']['toc'] = []
-        activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, herg=1)
-        if activity_list:
-            molregno_set_filtered.add(mol)
-    molregno_set = {list(molregno_set_filtered)[0]}
+    # '''limiter to query molregnos for a specific target. Not complete!! Don't use. '''
+    # molregno_set = set()
+    # for x in TargetDictionary.objects.values().filter(chembl_id='CHEMBL1083708'):
+    #     for y in Assays.objects.values().filter(tid=x['tid'], doc_id=DocumentNumber):
+    #         for z in Activities.objects.values().filter(assay_id=y['assay_id'],doc_id=DocumentNumber):
+    #             molregno_set.add(z['molregno'])
+    # print(molregno_set)
+    # ''''''
+
+    # ''' limiter to process only one molregno from each doc number. Hash out to process all molregnos '''
+    # molregno_set_filtered = set()
+    # for mol in molregno_set:
+    #     SciData.meta['@graph']['toc'] = []
+    #     activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, herg=1)
+    #     if activity_list:
+    #         molregno_set_filtered.add(mol)
+    # molregno_set = {list(molregno_set_filtered)[0]}
+
+    # '''Manual molregno set override. Hash out to use defaults'''
+    # molregno_set = [632150]
 
 
     for mol in molregno_set:
@@ -168,7 +189,7 @@ for DocumentNumber in Documents:
                 if x not in serializednew2:
                     serializednew2.append(x)
             serializednew = serializednew2
-            print(serializednew)
+            # print(serializednew)
 
             '''creates new list of tables present with data'''
             serializedset = set()
@@ -353,12 +374,24 @@ for DocumentNumber in Documents:
                                             for k, v in serial_dict.items():
                                                 if k == cross['field']:
                                                     if v not in ['None']:
-                                                        nspaces.add(cross['nspace_id'])
-                                                        nspacestoc.add(cross['url'])
-                                                        systemA.update({
-                                                            '@id': sys,
-                                                            '@type': 'sci:' + sys})
-                                                        systemA.update({k:v})
+                                                        if cross['sdsubsubsection'] is not None:
+                                                            nspaces.add(cross['nspace_id'])
+                                                            nspacestoc.add(cross['url'])
+                                                            try:
+                                                                systemA[cross['sdsubsubsection']].update({k:v})
+                                                            except:
+                                                                systemA.update({cross['sdsubsubsection']: {}})
+                                                                systemA[cross['sdsubsubsection']].update({
+                                                                    "@id": cross['sdsubsubsection'],
+                                                                    "@type": "sci:"+cross['sdsubsubsection'],
+                                                                    k: v})
+                                                        else:
+                                                            nspaces.add(cross['nspace_id'])
+                                                            nspacestoc.add(cross['url'])
+                                                            systemA.update({
+                                                                '@id': sys,
+                                                                '@type': 'sci:' + sys})
+                                                            systemA.update({k:v})
                 if systemA:
                     system.append(systemA)
             systemx = [i for n, i in enumerate(system) if i not in system[n + 1:]]
@@ -385,7 +418,6 @@ for DocumentNumber in Documents:
         if system:
             test.facets(systemx)
         if datapoint:
-            # print(datapoint)
             test.datapoint(datapoint)
         if datagroup:
             test.datagroup(datagroup)
