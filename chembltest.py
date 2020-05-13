@@ -14,24 +14,27 @@ query_crosswalks_chembl = list(Chembl.objects.using('crosswalks').values())
 query_crosswalks_ontterms = list(Ontterms.objects.using('crosswalks').values())
 query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
 
-'''BAD gene Chembl is 3817'''
+
+'''
+Filter Docs by Target ChemblID
+HERG gene Chembl is 240 
+BAD gene Chembl is 3817. 
+'''
+targetchembl = 'CHEMBL240'
 Documents = set()
-for x in TargetDictionary.objects.values().filter(chembl_id='CHEMBL3817'):
+AssaySet = set()
+for x in TargetDictionary.objects.values().filter(chembl_id=targetchembl):
     for y in Assays.objects.values().filter(tid=x['tid']):
+        AssaySet.add(y['assay_id'])
         Documents.add(y['doc_id'])
-''''''
+AssayList = list(AssaySet)
 
-
-Documents = set()
-for x in Activities.objects.values().filter(herg=1):
-    Documents.add(x['doc_id'])
-
+'''Specify document(s) explicitly. Specified Document must contain a molregno that targets the specified targetchembl'''
 Documents = {51366} # Hash this line to process all documents
 
 for DocumentNumber in Documents:
     doc_data = {}
     doc_data.update(Docs.objects.values().get(doc_id=DocumentNumber))
-
     try:
         auth = doc_data['authors'].split(', ')
     except:
@@ -40,9 +43,7 @@ for DocumentNumber in Documents:
     authors = []
     for a in auth:
         authors.append({'name':a})
-
     namespace = {}
-
 
     ###############################
 
@@ -93,38 +94,25 @@ for DocumentNumber in Documents:
                             crosswalksA.update({x:y})
         crosswalks.append(crosswalksA)
 
-    '''Default querying of valid molregnos'''
+
+    '''Query molregnos for the specified targetchembl and Documents (if specified)'''
     molregno_set = set()
-    for mo in Activities.objects.values().filter(doc_id=DocumentNumber):
-        molregno_set.add(mo['molregno_id'])
-    # print(molregno_set)
+    for x in TargetDictionary.objects.values().filter(chembl_id=targetchembl):
+        for y in Assays.objects.values().filter(tid=x['tid'], doc_id=DocumentNumber):
+            for z in Activities.objects.values().filter(assay_id=y['assay_id']):
+                molregno_set.add(z['molregno_id'])
+    ''''''
 
-    # '''limiter to query molregnos for a specific target. Not complete!! Don't use. '''
-    # molregno_set = set()
-    # for x in TargetDictionary.objects.values().filter(chembl_id='CHEMBL1083708'):
-    #     for y in Assays.objects.values().filter(tid=x['tid'], doc_id=DocumentNumber):
-    #         for z in Activities.objects.values().filter(assay_id=y['assay_id'],doc_id=DocumentNumber):
-    #             molregno_set.add(z['molregno'])
-    # print(molregno_set)
-    # ''''''
+    ''' limiter to process only one molregno from each doc number. Hash out to process all molregnos'''
+    molregno_set = {list(molregno_set)[0]}
+    print(molregno_set)
 
-    # ''' limiter to process only one molregno from each doc number. Hash out to process all molregnos '''
-    # molregno_set_filtered = set()
-    # for mol in molregno_set:
-    #     SciData.meta['@graph']['toc'] = []
-    #     activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, herg=1)
-    #     if activity_list:
-    #         molregno_set_filtered.add(mol)
-    # molregno_set = {list(molregno_set_filtered)[0]}
-
-    # '''Manual molregno set override. Hash out to use defaults'''
+    # '''Manual molregno set override. Must target specified targetchembl. Hash out to use defaults'''
     # molregno_set = [632150]
-
 
     for mol in molregno_set:
         SciData.meta['@graph']['toc'] = []
-        activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, herg=1) #list of activity_ids for each molregno for each doc_id
-
+        activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, assay_id__in=AssayList) #list of activity_ids for each molregno for each doc_id
         allunsorted = {}
         datapoint = []
         datagroup = []
