@@ -14,13 +14,16 @@ query_crosswalks_chembl = list(Chembl.objects.using('crosswalks').values())
 query_crosswalks_ontterms = list(Ontterms.objects.using('crosswalks').values())
 query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
 
+'''Set populateall to False for Normal Operation. Set to True to generate fully populated document'''
+populateall = False
 
 '''
 Filter Docs by Target ChemblID
 HERG gene Chembl is 240 
-BAD gene Chembl is 3817. 
+BAD gene Chembl is 3817
 '''
 targetchembl = 'CHEMBL240'
+targetchemblid = targetchembl.replace("CHEMBL","")
 Documents = set()
 AssaySet = set()
 for x in TargetDictionary.objects.values().filter(chembl_id=targetchembl):
@@ -30,7 +33,7 @@ for x in TargetDictionary.objects.values().filter(chembl_id=targetchembl):
 AssayList = list(AssaySet)
 
 '''Specify document(s) explicitly. Specified Document must contain a molregno that targets the specified targetchembl'''
-Documents = {51366} # Hash this line to process all documents
+Documents = {51366} # Hash this line to process all valid  documents
 
 for DocumentNumber in Documents:
     doc_data = {}
@@ -94,6 +97,16 @@ for DocumentNumber in Documents:
                             crosswalksA.update({x:y})
         crosswalks.append(crosswalksA)
 
+    allgroupedtableset = set()
+    for x in crosswalks:
+        allgroupedtableset.add(x['table'])
+    allgrouped = []  # replaces serializednew
+    for table in allgroupedtableset:
+        entries = {}
+        for x in crosswalks:
+            if x['table'] == table:
+                entries.update({x['field']:x['field']+'_data'})
+        allgrouped.append({table:entries})
 
     '''Query molregnos for the specified targetchembl and Documents (if specified)'''
     molregno_set = set()
@@ -101,11 +114,13 @@ for DocumentNumber in Documents:
         for y in Assays.objects.values().filter(tid=x['tid'], doc_id=DocumentNumber):
             for z in Activities.objects.values().filter(assay_id=y['assay_id']):
                 molregno_set.add(z['molregno_id'])
-    ''''''
+
+    if populateall:
+        molregno_set = {list(molregno_set)[0]}
 
     ''' limiter to process only one molregno from each doc number. Hash out to process all molregnos'''
     molregno_set = {list(molregno_set)[0]}
-    print(molregno_set)
+
 
     # '''Manual molregno set override. Must target specified targetchembl. Hash out to use defaults'''
     # molregno_set = [632150]
@@ -137,13 +152,11 @@ for DocumentNumber in Documents:
                 else:
                     serializedsetpre.add(cross['table'])
 
-
             '''Remove nesting and convert to a list of dictionaries where each dictionary corresponds to one crosswalks table'''
             serialized = []
             for x,y in serializedpre.items():
                 den = denester(x,y)
                 serialized.append(den)
-
 
             '''Reassigns list of dictionaries based on category designation'''
             serializednew = []
@@ -177,7 +190,10 @@ for DocumentNumber in Documents:
                 if x not in serializednew2:
                     serializednew2.append(x)
             serializednew = serializednew2
-            # print(serializednew)
+
+            # $$$#
+            if populateall:
+                serializednew = allgrouped
 
             '''creates new list of tables present with data'''
             serializedset = set()
@@ -393,13 +409,10 @@ for DocumentNumber in Documents:
                                 for k, v in serial_dict.items():
                                     if k == cross['field']:
                                         metadata.append({k: v, 'type': cross['sdsubsection']})
-        #
-            # print('xxx',metadata)
 
         if datagroupA:
             datagroup.append(
                 {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': str(allunsorted['molecule_dictionary']['chembl_id']), 'datapoints': datagroupA})
-        #
 
         if methodology:
             test.aspects(methodologyx)
@@ -454,21 +467,23 @@ for DocumentNumber in Documents:
 
         if datapoint:
 
-
             test.starttime()
-            test.doc_id('scidata:chembl'+allunsorted['docs']['doc_id']+'_'+allunsorted['molecule_dictionary']['chembl_id'])
-            test.source([{'title':allunsorted['docs']['title'],
-                          'doi':allunsorted['docs']['doi'],
-                          'journal':allunsorted['docs']['journal'],
-                          'year':allunsorted['docs']['year'],
-                          'volume':allunsorted['docs']['volume'],
-                          'issue':allunsorted['docs']['issue']}])
+            documentchemblid = str(doc_data['doc_id'])
+            moleculechemblid = allunsorted['molecule_dictionary']['chembl_id'].replace("CHEMBL", "_")
+
+            test.doc_id('scidata:chembl:'+targetchemblid+'_'+documentchemblid+moleculechemblid)
+            test.source([{'title':doc_data['title'],
+                          'doi':doc_data['doi'],
+                          'journal':doc_data['journal'],
+                          'year':doc_data['year'],
+                          'volume':doc_data['volume'],
+                          'issue':doc_data['issue']}])
             test.add_source([{"url": "https://www.ebi.ac.uk/chembl/document_report_card/"+allunsorted['docs']['chembl_id']+"/"}])
-            test.graph_uid('scidata:chembl'+allunsorted['docs']['doc_id']+'_'+allunsorted['molecule_dictionary']['chembl_id'])
+            test.graph_uid('scidata:chembl'+documentchemblid+moleculechemblid)
             put = test.output
-            with open(str(DocumentNumber) + '_' + str(allunsorted['molecule_dictionary']['chembl_id']) + '.jsonld', 'w') as f:
-                json.dump(put, f)
-
-
-
-
+            if populateall:
+                with open('populated_'+targetchemblid+'_'+documentchemblid+ '.jsonld', 'w') as f:
+                    json.dump(put, f)
+            else:
+                with open(targetchemblid+'_'+documentchemblid+moleculechemblid+ '.jsonld', 'w') as f:
+                    json.dump(put, f)
