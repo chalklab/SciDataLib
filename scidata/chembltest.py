@@ -1,12 +1,14 @@
-from model import *
+from scidata.model import *
 import os
 import django
 
+
 django.setup()
-from scidata.chembldb26 import *
+from scidata.chembldb27 import *
 from scidata.crosswalks import *
 
-path = r"/Users/n01448636/Documents/PycharmProjects/chembl_django/scidata/JSON_dumps"
+path = r"/Users/n01448636/Documents/GoogleDrive/PycharmProjects/scidata_python/scidata/JSON_dumps"
+
 os.chdir(path)
 
 dbname = 'default'
@@ -16,25 +18,26 @@ query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
 
 '''Set populateall to False for Normal Operation. Set to True to generate fully populated document'''
 populateall = False
-
+# activity_count = 0
+# molregno_count = 0
 '''
 Filter Docs by Target ChemblID
 HERG gene Chembl is 240 
 BAD gene Chembl is 3817
+SARS-COV-2 is 4303835
 '''
-targetchembl = 'CHEMBL240'
+targetchembl = 'CHEMBL4303835'
+
 targetchemblid = targetchembl.replace("CHEMBL","")
 Documents = set()
 AssaySet = set()
 for x in TargetDictionary.objects.values().filter(chembl_id=targetchembl):
-    for y in Assays.objects.values().filter(tid=x['tid']):
+    for y in Assays.objects.values().filter(tid=x['tid'], assay_organism = 'Homo sapiens'):
         AssaySet.add(y['assay_id'])
         Documents.add(y['doc_id'])
 AssayList = list(AssaySet)
-
 '''Specify document(s) explicitly. Specified Document must contain a molregno that targets the specified targetchembl'''
-Documents = {51366} # Hash this line to process all valid  documents
-
+# Documents = {65593} # Hash this line to process all valid  documents
 for DocumentNumber in Documents:
     doc_data = {}
     doc_data.update(Docs.objects.values().get(doc_id=DocumentNumber))
@@ -119,13 +122,14 @@ for DocumentNumber in Documents:
         molregno_set = {list(molregno_set)[0]}
 
     ''' limiter to process only one molregno from each doc number. Hash out to process all molregnos'''
-    molregno_set = {list(molregno_set)[0]}
+    # molregno_set = {list(molregno_set)[0]}
 
 
     # '''Manual molregno set override. Must target specified targetchembl. Hash out to use defaults'''
     # molregno_set = [632150]
 
     for mol in molregno_set:
+        # molregno_count += 1
         SciData.meta['@graph']['toc'] = []
         activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, assay_id__in=AssayList) #list of activity_ids for each molregno for each doc_id
         allunsorted = {}
@@ -141,6 +145,8 @@ for DocumentNumber in Documents:
         nspacestoc = set()
 
         for ac in activity_list:
+            # activity_count += 1
+            # continue
 
             serializedpre = serialize(Activities.objects.get(activity_id=ac['activity_id'])) #Pulls in all data linked to specifiy activity_id. serialize definition in model file.
 
@@ -487,3 +493,5 @@ for DocumentNumber in Documents:
             else:
                 with open(targetchemblid+'_'+documentchemblid+moleculechemblid+ '.jsonld', 'w') as f:
                     json.dump(put, f)
+# print('activity_count: '+str(activity_count))
+# print('molregno count: '+str(molregno_count))

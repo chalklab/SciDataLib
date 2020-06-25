@@ -94,12 +94,21 @@ DATABASES = {
     #     'OPTIONS': {
     #         'unix_socket': '/Applications/MAMP/tmp/mysql/mysql.sock'}
     # }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'chembl_26',
+    #     'USER': 'postdoc',
+    #     'HOST': '127.0.0.1',
+    #     'PASSWORD': 'nerd4life*',
+    #     'PORT': '3307',
+    #     'unix_socket': '/var/run/mariadb/mariadb.pid'
+    # },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'chembl_26',
-        'USER': 'postdoc',
+        'NAME': 'chembl_27',
+        'USER': 'sciflow',
         'HOST': '127.0.0.1',
-        'PASSWORD': 'nerd4life*',
+        'PASSWORD': 'letthedatafl0w',
         'PORT': '3307',
         'unix_socket': '/var/run/mariadb/mariadb.pid'
     },
