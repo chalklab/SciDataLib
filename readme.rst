@@ -1,0 +1,1 @@
+Python library for development of SciData JSON-LD files

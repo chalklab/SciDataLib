@@ -1,13 +1,11 @@
-from model import *
+from scidata.model import *
 import os
 import django
-import ast
 
 django.setup()
-from scidata.chembldb26 import *
 from scidata.crosswalks import *
 
-path = r"/Users/n01448636/Documents/PycharmProjects/chembl_django/scidata/JSON_dumps"
+path = r"/Users/n01448636/Documents/PycharmProjects/scidata_python/scidata/JSON_dumps"
 os.chdir(path)
 
 dbname = 'default'
