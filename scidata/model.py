@@ -3,9 +3,10 @@ import datetime
 from itertools import count
 from collections import defaultdict
 import django
-# from django.forms.models import model_to_dict
+import os
 from itertools import chain
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 
 """
@@ -13,7 +14,6 @@ This module contains the Scidata class used in generating Scidata JSON-LD docume
 """
 
 #############
-
 def custom_to_dict(instance, fields=None, exclude=None):
     opts = instance._meta
     data = {}

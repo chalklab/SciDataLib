@@ -2,12 +2,12 @@ from scidata.model import *
 import os
 import django
 
-
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 from scidata.chembldb27 import *
 from scidata.crosswalks import *
 
-path = r"/Users/n01448636/Documents/GoogleDrive/PycharmProjects/scidata_python/scidata/JSON_dumps"
+path = r"/Users/n01448636/Documents/GoogleDrive/PycharmProjects/SciDataLib/scidata/JSON_dumps"
 
 os.chdir(path)
 
