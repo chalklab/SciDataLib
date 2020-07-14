@@ -20,26 +20,27 @@ class ActionType(models.Model):
 
 class Activities(models.Model):
     activity_id = models.BigIntegerField(primary_key=True)
-    assay = models.ForeignKey('Assays', models.DO_NOTHING)
-    doc = models.ForeignKey('Docs', models.DO_NOTHING, blank=True, null=True)
-    record = models.ForeignKey('CompoundRecords', models.DO_NOTHING)
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
+    assays = models.ForeignKey('Assays', models.DO_NOTHING, db_column='assay_id')
+    docs = models.ForeignKey('Docs', models.DO_NOTHING, blank=True, null=True, db_column='doc_id')
+    compound_records = models.ForeignKey('CompoundRecords', models.DO_NOTHING, db_column='record_id')
+    # molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
     standard_relation = models.CharField(max_length=50, blank=True, null=True)
     standard_value = models.DecimalField(max_digits=64, decimal_places=30, blank=True, null=True)
     standard_units = models.CharField(max_length=100, blank=True, null=True)
     standard_flag = models.IntegerField(blank=True, null=True)
     standard_type = models.CharField(max_length=250, blank=True, null=True)
     activity_comment = models.CharField(max_length=4000, blank=True, null=True)
-    data_validity_comment = models.ForeignKey('DataValidityLookup', models.DO_NOTHING, db_column='data_validity_comment', blank=True, null=True)
+    data_validity_lookup = models.ForeignKey('DataValidityLookup', models.DO_NOTHING, db_column='data_validity_comment', blank=True, null=True)
     potential_duplicate = models.IntegerField(blank=True, null=True)
     pchembl_value = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    bao_endpoint = models.ForeignKey('BioassayOntology', models.DO_NOTHING, db_column='bao_endpoint', blank=True, null=True)
+    bioassay_ontology = models.ForeignKey('BioassayOntology', models.DO_NOTHING, db_column='bao_endpoint', blank=True, null=True)
     uo_units = models.CharField(max_length=10, blank=True, null=True)
     qudt_units = models.CharField(max_length=70, blank=True, null=True)
     toid = models.IntegerField(blank=True, null=True)
     upper_value = models.DecimalField(max_digits=64, decimal_places=30, blank=True, null=True)
     standard_upper_value = models.DecimalField(max_digits=64, decimal_places=30, blank=True, null=True)
-    src = models.ForeignKey('Source', models.DO_NOTHING, blank=True, null=True)
+    source = models.ForeignKey('Source', models.DO_NOTHING, blank=True, null=True, db_column='src_id')
     type = models.CharField(max_length=250)
     relation = models.CharField(max_length=50, blank=True, null=True)
     value = models.DecimalField(max_digits=64, decimal_places=30, blank=True, null=True)
@@ -56,7 +57,7 @@ class Activities(models.Model):
 
 class ActivityProperties(models.Model):
     ap_id = models.BigIntegerField(primary_key=True)
-    activity = models.ForeignKey(Activities, models.DO_NOTHING)
+    activities = models.ForeignKey(Activities, models.DO_NOTHING, db_column="activity_id")
     type = models.CharField(max_length=250)
     relation = models.CharField(max_length=50, blank=True, null=True)
     value = models.DecimalField(max_digits=64, decimal_places=30, blank=True, null=True)
@@ -73,7 +74,7 @@ class ActivityProperties(models.Model):
     class Meta:
         managed = False
         db_table = 'activity_properties'
-        unique_together = (('activity', 'type'),)
+        unique_together = (('activities', 'type'),)
 
 
 class ActivitySmid(models.Model):
@@ -101,7 +102,7 @@ class ActivityStdsLookup(models.Model):
 class ActivitySupp(models.Model):
     as_id = models.BigIntegerField(primary_key=True)
     rgid = models.BigIntegerField()
-    smid = models.ForeignKey(ActivitySmid, models.DO_NOTHING, db_column='smid', blank=True, null=True)
+    activity_smid = models.ForeignKey(ActivitySmid, models.DO_NOTHING, db_column='smid', blank=True, null=True)
     type = models.CharField(max_length=250)
     relation = models.CharField(max_length=50, blank=True, null=True)
     value = models.DecimalField(max_digits=64, decimal_places=30, blank=True, null=True)
@@ -122,8 +123,8 @@ class ActivitySupp(models.Model):
 
 class ActivitySuppMap(models.Model):
     actsm_id = models.BigIntegerField(primary_key=True)
-    activity = models.ForeignKey(Activities, models.DO_NOTHING)
-    smid = models.ForeignKey(ActivitySmid, models.DO_NOTHING, db_column='smid')
+    activities = models.ForeignKey(Activities, models.DO_NOTHING, db_column="activity_id")
+    activity_smid = models.ForeignKey(ActivitySmid, models.DO_NOTHING, db_column='smid')
 
     class Meta:
         managed = False
@@ -132,13 +133,13 @@ class ActivitySuppMap(models.Model):
 
 class AssayClassMap(models.Model):
     ass_cls_map_id = models.BigIntegerField(primary_key=True)
-    assay = models.ForeignKey('Assays', models.DO_NOTHING)
-    assay_class = models.ForeignKey('AssayClassification', models.DO_NOTHING)
+    assays = models.ForeignKey('Assays', models.DO_NOTHING, db_column='assay_id')
+    assay_classification = models.ForeignKey('AssayClassification', models.DO_NOTHING, db_column='assay_class_id')
 
     class Meta:
         managed = False
         db_table = 'assay_class_map'
-        unique_together = (('assay', 'assay_class'),)
+        unique_together = (('assaysZ', 'assay_classification'),)
 
 
 class AssayClassification(models.Model):
@@ -157,7 +158,7 @@ class AssayClassification(models.Model):
 
 class AssayParameters(models.Model):
     assay_param_id = models.BigIntegerField(primary_key=True)
-    assay = models.ForeignKey('Assays', models.DO_NOTHING)
+    assays = models.ForeignKey('Assays', models.DO_NOTHING, db_column="assay_id")
     type = models.CharField(max_length=250)
     relation = models.CharField(max_length=50, blank=True, null=True)
     value = models.DecimalField(max_digits=64, decimal_places=30, blank=True, null=True)
@@ -187,7 +188,7 @@ class AssayType(models.Model):
 
 class Assays(models.Model):
     assay_id = models.BigIntegerField(primary_key=True)
-    doc = models.ForeignKey('Docs', models.DO_NOTHING)
+    docs = models.ForeignKey('Docs', models.DO_NOTHING, db_column="doc_id")
     description = models.CharField(max_length=4000, blank=True, null=True)
     assay_type = models.ForeignKey(AssayType, models.DO_NOTHING, db_column='assay_type', blank=True, null=True)
     assay_test_type = models.CharField(max_length=20, blank=True, null=True)
@@ -198,15 +199,15 @@ class Assays(models.Model):
     assay_tissue = models.CharField(max_length=100, blank=True, null=True)
     assay_cell_type = models.CharField(max_length=100, blank=True, null=True)
     assay_subcellular_fraction = models.CharField(max_length=100, blank=True, null=True)
-    tid = models.ForeignKey('TargetDictionary', models.DO_NOTHING, db_column='tid', blank=True, null=True)
+    target_dictionary = models.ForeignKey('TargetDictionary', models.DO_NOTHING, db_column='tid', blank=True, null=True)
     relationship_type = models.ForeignKey('RelationshipType', models.DO_NOTHING, db_column='relationship_type', blank=True, null=True)
     confidence_score = models.ForeignKey('ConfidenceScoreLookup', models.DO_NOTHING, db_column='confidence_score', blank=True, null=True)
     curated_by = models.ForeignKey('CurationLookup', models.DO_NOTHING, db_column='curated_by', blank=True, null=True)
     activity_count = models.BigIntegerField(blank=True, null=True)
     assay_source = models.CharField(max_length=50, blank=True, null=True)
-    src = models.ForeignKey('Source', models.DO_NOTHING)
+    source = models.ForeignKey('Source', models.DO_NOTHING, db_column="src_id")
     src_assay_id = models.CharField(max_length=50, blank=True, null=True)
-    chembl = models.ForeignKey('ChemblIdLookup', models.DO_NOTHING, unique=True)
+    chembl_id_lookup = models.ForeignKey('ChemblIdLookup', models.DO_NOTHING, unique=True, db_column="chembl_id")
     # chembl = models.OneToOneField('ChemblIdLookup', models.DO_NOTHING)
     updated_on = models.DateTimeField(blank=True, null=True)
     updated_by = models.CharField(max_length=250, blank=True, null=True)
@@ -216,11 +217,11 @@ class Assays(models.Model):
     mc_target_type = models.CharField(max_length=28, blank=True, null=True)
     mc_target_name = models.CharField(max_length=4000, blank=True, null=True)
     mc_target_accession = models.CharField(max_length=255, blank=True, null=True)
-    cell = models.ForeignKey('CellDictionary', models.DO_NOTHING, blank=True, null=True)
-    bao_format = models.ForeignKey('BioassayOntology', models.DO_NOTHING, db_column='bao_format', blank=True, null=True)
-    tissue = models.ForeignKey('TissueDictionary', models.DO_NOTHING, blank=True, null=True)
+    cell_dictionary = models.ForeignKey('CellDictionary', models.DO_NOTHING, blank=True, null=True,db_column='cell_id')
+    bioassay_ontology = models.ForeignKey('BioassayOntology', models.DO_NOTHING, db_column='bao_format', blank=True, null=True)
+    tissue_dictionary = models.ForeignKey('TissueDictionary', models.DO_NOTHING, blank=True, null=True, db_column="tissue_id")
     curation_comment = models.CharField(max_length=4000, blank=True, null=True)
-    variant = models.ForeignKey('VariantSequences', models.DO_NOTHING, blank=True, null=True)
+    variant_sequences = models.ForeignKey('VariantSequences', models.DO_NOTHING, blank=True, null=True, db_column="variant_id")
     aidx = models.CharField(max_length=200)
     job_id = models.IntegerField()
     log_id = models.IntegerField()
@@ -284,17 +285,17 @@ class BioassayOntology(models.Model):
 
 class BiotherapeuticComponents(models.Model):
     biocomp_id = models.BigIntegerField(primary_key=True)
-    molregno = models.ForeignKey('Biotherapeutics', models.DO_NOTHING, db_column='molregno')
-    component = models.ForeignKey(BioComponentSequences, models.DO_NOTHING)
+    biotherapeutics = models.ForeignKey('Biotherapeutics', models.DO_NOTHING, db_column='molregno')
+    bio_component_sequences = models.ForeignKey(BioComponentSequences, models.DO_NOTHING, db_column="component_id")
 
     class Meta:
         managed = False
         db_table = 'biotherapeutic_components'
-        unique_together = (('molregno', 'component'),)
+        unique_together = (('biotherapeutics', 'bio_component_sequences'),)
 
 
 class Biotherapeutics(models.Model):
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
     # molregno = models.OneToOneField('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
     description = models.CharField(max_length=2000, blank=True, null=True)
     helm_notation = models.CharField(max_length=4000, blank=True, null=True)
@@ -315,7 +316,7 @@ class CellDictionary(models.Model):
     efo_id = models.CharField(max_length=12, blank=True, null=True)
     cellosaurus_id = models.CharField(max_length=15, blank=True, null=True)
     cl_lincs_id = models.CharField(max_length=8, blank=True, null=True)
-    chembl = models.ForeignKey('ChemblIdLookup', models.DO_NOTHING, unique=True, blank=True, null=True)
+    chembl_id_lookup = models.ForeignKey('ChemblIdLookup', models.DO_NOTHING, unique=True, blank=True, null=True, db_column="chembl_id")
     # chembl = models.OneToOneField('ChemblIdLookup', models.DO_NOTHING, blank=True, null=True)
     cell_ontology_id = models.CharField(max_length=10, blank=True, null=True)
 
@@ -338,38 +339,38 @@ class ChemblIdLookup(models.Model):
 
 
 class ComponentClass(models.Model):
-    component = models.ForeignKey('ComponentSequences', models.DO_NOTHING)
-    protein_class = models.ForeignKey('ProteinClassification', models.DO_NOTHING)
+    component_sequences = models.ForeignKey('ComponentSequences', models.DO_NOTHING, db_column="component_id")
+    protein_classification = models.ForeignKey('ProteinClassification', models.DO_NOTHING, db_column="protein_class_id")
     comp_class_id = models.BigIntegerField(primary_key=True)
 
     class Meta:
         managed = False
         db_table = 'component_class'
-        unique_together = (('component', 'protein_class'),)
+        unique_together = (('component_sequences', 'protein_classification'),)
 
 
 class ComponentDomains(models.Model):
     compd_id = models.BigIntegerField(primary_key=True)
-    domain = models.ForeignKey('Domains', models.DO_NOTHING, blank=True, null=True)
-    component = models.ForeignKey('ComponentSequences', models.DO_NOTHING)
+    domains = models.ForeignKey('Domains', models.DO_NOTHING, blank=True, null=True, db_column="domain_id")
+    component_sequences = models.ForeignKey('ComponentSequences', models.DO_NOTHING, db_column="component_id")
     start_position = models.BigIntegerField(blank=True, null=True)
     end_position = models.BigIntegerField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'component_domains'
-        unique_together = (('domain', 'component', 'start_position'),)
+        unique_together = (('domains', 'component_sequences', 'start_position'),)
 
 
 class ComponentGo(models.Model):
     comp_go_id = models.BigIntegerField(primary_key=True)
-    component = models.ForeignKey('ComponentSequences', models.DO_NOTHING)
-    go = models.ForeignKey('GoClassification', models.DO_NOTHING)
+    component_sequences = models.ForeignKey('ComponentSequences', models.DO_NOTHING, db_column="component_id")
+    go_classification = models.ForeignKey('GoClassification', models.DO_NOTHING, db_column="go_id")
 
     class Meta:
         managed = False
         db_table = 'component_go'
-        unique_together = (('component', 'go'),)
+        unique_together = (('component_sequences', 'go_classification'),)
 
 
 class ComponentSequences(models.Model):
@@ -391,18 +392,18 @@ class ComponentSequences(models.Model):
 
 class ComponentSynonyms(models.Model):
     compsyn_id = models.BigIntegerField(primary_key=True)
-    component = models.ForeignKey(ComponentSequences, models.DO_NOTHING)
+    component_sequences = models.ForeignKey(ComponentSequences, models.DO_NOTHING, db_column="component_id")
     component_synonym = models.CharField(max_length=500, blank=True, null=True)
     syn_type = models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'component_synonyms'
-        unique_together = (('component', 'component_synonym', 'syn_type'),)
+        unique_together = (('component_sequences', 'component_synonym', 'syn_type'),)
 
 
 class CompoundProperties(models.Model):
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
     # molregno = models.OneToOneField('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
     mw_freebase = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
     alogp = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
@@ -434,11 +435,11 @@ class CompoundProperties(models.Model):
 
 class CompoundRecords(models.Model):
     record_id = models.BigIntegerField(primary_key=True)
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
-    doc = models.ForeignKey('Docs', models.DO_NOTHING)
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
+    docs = models.ForeignKey('Docs', models.DO_NOTHING, db_column="doc_id")
     compound_key = models.CharField(max_length=250, blank=True, null=True)
     compound_name = models.CharField(max_length=4000, blank=True, null=True)
-    src = models.ForeignKey('Source', models.DO_NOTHING)
+    source = models.ForeignKey('Source', models.DO_NOTHING, db_column="src_id")
     src_compound_id = models.CharField(max_length=150, blank=True, null=True)
     cidx = models.CharField(max_length=200)
 
@@ -449,17 +450,17 @@ class CompoundRecords(models.Model):
 
 class CompoundStructuralAlerts(models.Model):
     cpd_str_alert_id = models.BigIntegerField(primary_key=True)
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno')
-    alert = models.ForeignKey('StructuralAlerts', models.DO_NOTHING)
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno')
+    structural_alerts = models.ForeignKey('StructuralAlerts', models.DO_NOTHING, db_column="alert_id")
 
     class Meta:
         managed = False
         db_table = 'compound_structural_alerts'
-        unique_together = (('molregno', 'alert'),)
+        unique_together = (('molecule_dictionary', 'structural_alerts'),)
 
 
 class CompoundStructures(models.Model):
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
     # molregno = models.OneToOneField('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', primary_key=True)
     molfile = models.TextField(blank=True, null=True)
     standard_inchi = models.CharField(max_length=4000, blank=True, null=True)
@@ -500,7 +501,7 @@ class DataValidityLookup(models.Model):
 
 
 class DefinedDailyDose(models.Model):
-    atc_code = models.ForeignKey(AtcClassification, models.DO_NOTHING, db_column='atc_code')
+    atc_classification = models.ForeignKey(AtcClassification, models.DO_NOTHING, db_column='atc_code')
     ddd_units = models.CharField(max_length=200, blank=True, null=True)
     ddd_admr = models.CharField(max_length=1000, blank=True, null=True)
     ddd_comment = models.CharField(max_length=2000, blank=True, null=True)
@@ -522,7 +523,7 @@ class Docs(models.Model):
     last_page = models.CharField(max_length=50, blank=True, null=True)
     pubmed_id = models.BigIntegerField(unique=True, blank=True, null=True)
     doi = models.CharField(max_length=100, blank=True, null=True)
-    chembl = models.ForeignKey(ChemblIdLookup, models.DO_NOTHING, unique=True)
+    chembl_id_lookup = models.ForeignKey(ChemblIdLookup, models.DO_NOTHING, unique=True, db_column='chembl_id')
     # chembl = models.OneToOneField(ChemblIdLookup, models.DO_NOTHING)
     title = models.CharField(max_length=500, blank=True, null=True)
     doc_type = models.CharField(max_length=50)
@@ -551,8 +552,8 @@ class Domains(models.Model):
 
 class DrugIndication(models.Model):
     drugind_id = models.BigIntegerField(primary_key=True)
-    record = models.ForeignKey(CompoundRecords, models.DO_NOTHING)
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
+    compound_records = models.ForeignKey(CompoundRecords, models.DO_NOTHING, db_column="record_id")
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
     max_phase_for_ind = models.IntegerField(blank=True, null=True)
     mesh_id = models.CharField(max_length=20)
     mesh_heading = models.CharField(max_length=200)
@@ -562,16 +563,16 @@ class DrugIndication(models.Model):
     class Meta:
         managed = False
         db_table = 'drug_indication'
-        unique_together = (('record', 'mesh_id', 'efo_id'),)
+        unique_together = (('compound_records', 'mesh_id', 'efo_id'),)
 
 
 class DrugMechanism(models.Model):
     mec_id = models.BigIntegerField(primary_key=True)
-    record = models.ForeignKey(CompoundRecords, models.DO_NOTHING)
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
+    compound_records = models.ForeignKey(CompoundRecords, models.DO_NOTHING, db_column="record_id")
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
     mechanism_of_action = models.CharField(max_length=250, blank=True, null=True)
-    tid = models.ForeignKey('TargetDictionary', models.DO_NOTHING, db_column='tid', blank=True, null=True)
-    site = models.ForeignKey(BindingSites, models.DO_NOTHING, blank=True, null=True)
+    target_dictionary = models.ForeignKey('TargetDictionary', models.DO_NOTHING, db_column='tid', blank=True, null=True)
+    binding_sites = models.ForeignKey(BindingSites, models.DO_NOTHING, blank=True, null=True, db_column="sites")
     action_type = models.ForeignKey(ActionType, models.DO_NOTHING, db_column='action_type', blank=True, null=True)
     direct_interaction = models.IntegerField(blank=True, null=True)
     molecular_mechanism = models.IntegerField(blank=True, null=True)
@@ -586,17 +587,17 @@ class DrugMechanism(models.Model):
 
 
 class Formulations(models.Model):
-    product = models.ForeignKey('Products', models.DO_NOTHING)
+    products = models.ForeignKey('Products', models.DO_NOTHING, db_column="product_id")
     ingredient = models.CharField(max_length=200, blank=True, null=True)
     strength = models.CharField(max_length=300, blank=True, null=True)
-    record = models.ForeignKey(CompoundRecords, models.DO_NOTHING)
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
+    compound_records = models.ForeignKey(CompoundRecords, models.DO_NOTHING, db_column="compound_id")
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
     formulation_id = models.BigIntegerField(primary_key=True)
 
     class Meta:
         managed = False
         db_table = 'formulations'
-        unique_together = (('product', 'record'),)
+        unique_together = (('products', 'compound_records'),)
 
 
 class FracClassification(models.Model):
@@ -648,7 +649,7 @@ class HracClassification(models.Model):
 
 class IndicationRefs(models.Model):
     indref_id = models.BigIntegerField(primary_key=True)
-    drugind = models.ForeignKey(DrugIndication, models.DO_NOTHING)
+    drug_indication = models.ForeignKey(DrugIndication, models.DO_NOTHING, db_column="drugind")
     ref_type = models.CharField(max_length=50)
     ref_id = models.CharField(max_length=4000)
     ref_url = models.CharField(max_length=4000)
@@ -676,7 +677,7 @@ class IracClassification(models.Model):
 
 
 class LigandEff(models.Model):
-    activity = models.ForeignKey(Activities, models.DO_NOTHING, primary_key=True)
+    activities = models.ForeignKey(Activities, models.DO_NOTHING, primary_key=True, db_column="activity_id")
     # activity = models.OneToOneField(Activities, models.DO_NOTHING, primary_key=True)
     bei = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
     sei = models.DecimalField(max_digits=9, decimal_places=2, blank=True, null=True)
@@ -690,7 +691,7 @@ class LigandEff(models.Model):
 
 class MechanismRefs(models.Model):
     mecref_id = models.BigIntegerField(primary_key=True)
-    mec = models.ForeignKey(DrugMechanism, models.DO_NOTHING)
+    drug_mechanism = models.ForeignKey(DrugMechanism, models.DO_NOTHING, db_column="mec_id")
     ref_type = models.CharField(max_length=50)
     ref_id = models.CharField(max_length=200, blank=True, null=True)
     ref_url = models.CharField(max_length=400, blank=True, null=True)
@@ -703,13 +704,13 @@ class MechanismRefs(models.Model):
 
 class Metabolism(models.Model):
     met_id = models.BigIntegerField(primary_key=True)
-    drug_record = models.ForeignKey(CompoundRecords, models.DO_NOTHING, blank=True, null=True)
+    compound_records = models.ForeignKey(CompoundRecords, models.DO_NOTHING, blank=True, null=True, db_column="drug_record")
     substrate_record = models.ForeignKey(CompoundRecords, models.DO_NOTHING, blank=True, null=True)
     metabolite_record = models.ForeignKey(CompoundRecords, models.DO_NOTHING, blank=True, null=True)
     pathway_id = models.BigIntegerField(blank=True, null=True)
     pathway_key = models.CharField(max_length=50, blank=True, null=True)
     enzyme_name = models.CharField(max_length=200, blank=True, null=True)
-    enzyme_tid = models.ForeignKey('TargetDictionary', models.DO_NOTHING, db_column='enzyme_tid', blank=True, null=True)
+    target_dictionary = models.ForeignKey('TargetDictionary', models.DO_NOTHING, db_column='enzyme_tid', blank=True, null=True)
     met_conversion = models.CharField(max_length=200, blank=True, null=True)
     organism = models.CharField(max_length=100, blank=True, null=True)
     tax_id = models.BigIntegerField(blank=True, null=True)
@@ -718,12 +719,12 @@ class Metabolism(models.Model):
     class Meta:
         managed = False
         db_table = 'metabolism'
-        unique_together = (('drug_record', 'substrate_record', 'metabolite_record', 'pathway_id', 'enzyme_name', 'enzyme_tid', 'tax_id'),)
+        unique_together = (('compound_records', 'substrate_record', 'metabolite_record', 'pathway_id', 'enzyme_name', 'enzyme_tid', 'tax_id'),)
 
 
 class MetabolismRefs(models.Model):
     metref_id = models.BigIntegerField(primary_key=True)
-    met = models.ForeignKey(Metabolism, models.DO_NOTHING)
+    metabolism = models.ForeignKey(Metabolism, models.DO_NOTHING, db_column="met_id")
     ref_type = models.CharField(max_length=50)
     ref_id = models.CharField(max_length=200, blank=True, null=True)
     ref_url = models.CharField(max_length=400, blank=True, null=True)
@@ -736,8 +737,8 @@ class MetabolismRefs(models.Model):
 
 class MoleculeAtcClassification(models.Model):
     mol_atc_id = models.BigIntegerField(primary_key=True)
-    level5 = models.ForeignKey(AtcClassification, models.DO_NOTHING, db_column='level5')
-    molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno')
+    atc_classification = models.ForeignKey(AtcClassification, models.DO_NOTHING, db_column='level5')
+    molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno')
 
     class Meta:
         managed = False
@@ -747,7 +748,7 @@ class MoleculeAtcClassification(models.Model):
 class MoleculeDictionary(models.Model):
     molregno = models.BigIntegerField(primary_key=True)
     pref_name = models.CharField(max_length=255, blank=True, null=True)
-    chembl = models.ForeignKey(ChemblIdLookup, models.DO_NOTHING, unique=True)
+    chembl_id_lookup = models.ForeignKey(ChemblIdLookup, models.DO_NOTHING, unique=True, db_column='chembl_id')
     # chembl = models.OneToOneField(ChemblIdLookup, models.DO_NOTHING)
     max_phase = models.IntegerField()
     therapeutic_flag = models.IntegerField()
@@ -785,17 +786,17 @@ class MoleculeDictionary(models.Model):
 
 class MoleculeFracClassification(models.Model):
     mol_frac_id = models.BigIntegerField(primary_key=True)
-    frac_class = models.ForeignKey(FracClassification, models.DO_NOTHING)
-    molregno = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno')
+    frac_classification = models.ForeignKey(FracClassification, models.DO_NOTHING, db_column="frac_class_id")
+    molecule_dictionary = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno')
 
     class Meta:
         managed = False
         db_table = 'molecule_frac_classification'
-        unique_together = (('frac_class', 'molregno'),)
+        unique_together = (('frac_classification', 'molecule_dictionary'),)
 
 
 class MoleculeHierarchy(models.Model):
-    molregno = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno', primary_key=True)
+    molecule_dictionary = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno', primary_key=True)
     # molregno = models.OneToOneField(MoleculeDictionary, models.DO_NOTHING, db_column='molregno', primary_key=True)
     parent_molregno = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='parent_molregno', blank=True, null=True)
     active_molregno = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='active_molregno', blank=True, null=True)
@@ -807,37 +808,37 @@ class MoleculeHierarchy(models.Model):
 
 class MoleculeHracClassification(models.Model):
     mol_hrac_id = models.BigIntegerField(primary_key=True)
-    hrac_class = models.ForeignKey(HracClassification, models.DO_NOTHING)
-    molregno = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno')
+    hrac_classification = models.ForeignKey(HracClassification, models.DO_NOTHING, db_column="hrac_class_id")
+    molecule_dictionary = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno')
 
     class Meta:
         managed = False
         db_table = 'molecule_hrac_classification'
-        unique_together = (('hrac_class', 'molregno'),)
+        unique_together = (('hrac_classification', 'molecule_dictionary'),)
 
 
 class MoleculeIracClassification(models.Model):
     mol_irac_id = models.BigIntegerField(primary_key=True)
-    irac_class = models.ForeignKey(IracClassification, models.DO_NOTHING)
-    molregno = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno')
+    irac_classification = models.ForeignKey(IracClassification, models.DO_NOTHING, db_column="irac_class_id")
+    molecule_dictionary = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno')
 
     class Meta:
         managed = False
         db_table = 'molecule_irac_classification'
-        unique_together = (('irac_class', 'molregno'),)
+        unique_together = (('irac_classification', 'molecule_dictionary'),)
 
 
 class MoleculeSynonyms(models.Model):
-    molregno = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno')
+    molecule_dictionary = models.ForeignKey(MoleculeDictionary, models.DO_NOTHING, db_column='molregno')
     syn_type = models.CharField(max_length=50)
     molsyn_id = models.BigIntegerField(primary_key=True)
-    res_stem = models.ForeignKey('ResearchStem', models.DO_NOTHING, blank=True, null=True)
+    research_stem = models.ForeignKey('ResearchStem', models.DO_NOTHING, blank=True, null=True, db_column="res_stem")
     synonyms = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'molecule_synonyms'
-        unique_together = (('molregno', 'syn_type', 'synonyms'),)
+        unique_together = (('molecule_dictionary', 'syn_type', 'synonyms'),)
 
 
 class OrganismClass(models.Model):
@@ -863,8 +864,8 @@ class PatentUseCodes(models.Model):
 
 class PredictedBindingDomains(models.Model):
     predbind_id = models.BigIntegerField(primary_key=True)
-    activity = models.ForeignKey(Activities, models.DO_NOTHING, blank=True, null=True)
-    site = models.ForeignKey(BindingSites, models.DO_NOTHING, blank=True, null=True)
+    activities = models.ForeignKey(Activities, models.DO_NOTHING, blank=True, null=True, db_column="activity_id")
+    binding_sites = models.ForeignKey(BindingSites, models.DO_NOTHING, blank=True, null=True, db_column="site_id")
     prediction_method = models.CharField(max_length=50, blank=True, null=True)
     confidence = models.CharField(max_length=10, blank=True, null=True)
 
@@ -875,19 +876,19 @@ class PredictedBindingDomains(models.Model):
 
 class ProductPatents(models.Model):
     prod_pat_id = models.BigIntegerField(primary_key=True)
-    product = models.ForeignKey('Products', models.DO_NOTHING)
+    products = models.ForeignKey('Products', models.DO_NOTHING, db_column="product_id")
     patent_no = models.CharField(max_length=20)
     patent_expire_date = models.DateTimeField()
     drug_substance_flag = models.IntegerField()
     drug_product_flag = models.IntegerField()
-    patent_use_code = models.ForeignKey(PatentUseCodes, models.DO_NOTHING, db_column='patent_use_code', blank=True, null=True)
+    patent_use_codes = models.ForeignKey(PatentUseCodes, models.DO_NOTHING, db_column='patent_use_code', blank=True, null=True)
     delist_flag = models.IntegerField()
     submission_date = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'product_patents'
-        unique_together = (('product', 'patent_no', 'patent_expire_date', 'patent_use_code'),)
+        unique_together = (('products', 'patent_no', 'patent_expire_date', 'patent_use_codes'),)
 
 
 class Products(models.Model):
@@ -912,7 +913,7 @@ class Products(models.Model):
 
 class ProteinClassSynonyms(models.Model):
     protclasssyn_id = models.BigIntegerField(primary_key=True)
-    protein_class = models.ForeignKey('ProteinClassification', models.DO_NOTHING)
+    protein_classification = models.ForeignKey('ProteinClassification', models.DO_NOTHING, db_column="protein_class_id")
     protein_class_synonym = models.CharField(max_length=1000, blank=True, null=True)
     syn_type = models.CharField(max_length=20, blank=True, null=True)
 
@@ -964,7 +965,7 @@ class RelationshipType(models.Model):
 
 class ResearchCompanies(models.Model):
     co_stem_id = models.BigIntegerField(primary_key=True)
-    res_stem = models.ForeignKey('ResearchStem', models.DO_NOTHING, blank=True, null=True)
+    research_stem = models.ForeignKey('ResearchStem', models.DO_NOTHING, blank=True, null=True, db_column="res_stem")
     company = models.CharField(max_length=100, blank=True, null=True)
     country = models.CharField(max_length=50, blank=True, null=True)
     previous_company = models.CharField(max_length=100, blank=True, null=True)
@@ -972,7 +973,7 @@ class ResearchCompanies(models.Model):
     class Meta:
         managed = False
         db_table = 'research_companies'
-        unique_together = (('res_stem', 'company'),)
+        unique_together = (('research_stem', 'company'),)
 
 
 class ResearchStem(models.Model):
@@ -986,15 +987,15 @@ class ResearchStem(models.Model):
 
 class SiteComponents(models.Model):
     sitecomp_id = models.BigIntegerField(primary_key=True)
-    site = models.ForeignKey(BindingSites, models.DO_NOTHING)
-    component = models.ForeignKey(ComponentSequences, models.DO_NOTHING, blank=True, null=True)
-    domain = models.ForeignKey(Domains, models.DO_NOTHING, blank=True, null=True)
+    binding_sites = models.ForeignKey(BindingSites, models.DO_NOTHING, db_column="site_id")
+    component_sequences = models.ForeignKey(ComponentSequences, models.DO_NOTHING, blank=True, null=True, db_column="component")
+    domains = models.ForeignKey(Domains, models.DO_NOTHING, blank=True, null=True, db_column="domain_id")
     site_residues = models.CharField(max_length=2000, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'site_components'
-        unique_together = (('site', 'component', 'domain'),)
+        unique_together = (('binding_sites', 'component_sequences', 'domains'),)
 
 
 class Source(models.Model):
@@ -1019,7 +1020,7 @@ class StructuralAlertSets(models.Model):
 
 class StructuralAlerts(models.Model):
     alert_id = models.BigIntegerField(primary_key=True)
-    alert_set = models.ForeignKey(StructuralAlertSets, models.DO_NOTHING)
+    structural_alert_sets = models.ForeignKey(StructuralAlertSets, models.DO_NOTHING, db_column="alert_set")
     alert_name = models.CharField(max_length=100)
     smarts = models.CharField(max_length=4000)
 
@@ -1029,15 +1030,15 @@ class StructuralAlerts(models.Model):
 
 
 class TargetComponents(models.Model):
-    tid = models.ForeignKey('TargetDictionary', models.DO_NOTHING, db_column='tid')
-    component = models.ForeignKey(ComponentSequences, models.DO_NOTHING)
+    target_dictionary = models.ForeignKey('TargetDictionary', models.DO_NOTHING, db_column='tid')
+    component_sequences = models.ForeignKey(ComponentSequences, models.DO_NOTHING, db_column="component_sequences")
     targcomp_id = models.BigIntegerField(primary_key=True)
     homologue = models.IntegerField()
 
     class Meta:
         managed = False
         db_table = 'target_components'
-        unique_together = (('tid', 'component'),)
+        unique_together = (('target_dictionary', 'component_sequences'),)
 
 
 class TargetDictionary(models.Model):
@@ -1046,7 +1047,7 @@ class TargetDictionary(models.Model):
     pref_name = models.CharField(max_length=200)
     tax_id = models.BigIntegerField(blank=True, null=True)
     organism = models.CharField(max_length=150, blank=True, null=True)
-    chembl = models.ForeignKey(ChemblIdLookup, models.DO_NOTHING, unique=True)
+    chembl_id_lookup = models.ForeignKey(ChemblIdLookup, models.DO_NOTHING, unique=True, db_column="chembl_id")
     # chembl = models.OneToOneField(ChemblIdLookup, models.DO_NOTHING)
     species_group_flag = models.IntegerField()
 
@@ -1056,7 +1057,7 @@ class TargetDictionary(models.Model):
 
 
 class TargetRelations(models.Model):
-    tid = models.ForeignKey(TargetDictionary, models.DO_NOTHING, db_column='tid')
+    target_dictionary = models.ForeignKey(TargetDictionary, models.DO_NOTHING, db_column='tid')
     relationship = models.CharField(max_length=20)
     related_tid = models.ForeignKey(TargetDictionary, models.DO_NOTHING, db_column='related_tid')
     targrel_id = models.BigIntegerField(primary_key=True)
@@ -1081,7 +1082,7 @@ class TissueDictionary(models.Model):
     uberon_id = models.CharField(max_length=15, blank=True, null=True)
     pref_name = models.CharField(max_length=200)
     efo_id = models.CharField(max_length=20, blank=True, null=True)
-    chembl = models.ForeignKey(ChemblIdLookup, models.DO_NOTHING, unique=True)
+    chembl_id_lookup = models.ForeignKey(ChemblIdLookup, models.DO_NOTHING, unique=True, db_column="chembl_id")
     # chembl = models.OneToOneField(ChemblIdLookup, models.DO_NOTHING)
     bto_id = models.CharField(max_length=20, blank=True, null=True)
     caloha_id = models.CharField(max_length=7, blank=True, null=True)

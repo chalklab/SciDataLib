@@ -27,6 +27,14 @@ def custom_to_dict(instance, fields=None, exclude=None):
         data[f.attname] = f.value_from_object(instance)
     return data
 
+def to_dict(instance):
+    opts = instance._meta
+    data = {}
+    for f in chain(opts.concrete_fields, opts.private_fields):
+        data[f.name] = f.value_from_object(instance)
+    for f in opts.many_to_many:
+        data[f.name] = [i.id for i in f.value_from_object(instance)]
+    return data
 
 def denester(q,r):
     denestered = []
@@ -159,6 +167,7 @@ class SciData:
         "@id": "",
         "@graph": {
             "@id": "",
+            "@type": "",
             "uid": "",
             "title": "",
             "author": [],
@@ -227,7 +236,7 @@ class SciData:
     def base(self, base: dict) -> dict:
         """Make or replace the base"""
 
-        if base != "":
+        if base == "":
             self.bass = {"@base": "http://BASE.jsonld"}
             self.make_context()
         else:
@@ -254,6 +263,12 @@ class SciData:
         """Make or replace the graph id"""
 
         self.meta['@graph']['@id'] = i
+        return self.meta
+
+    def graph_type(self, i: str) -> dict:
+        """Make or replace the graph type"""
+
+        self.meta['@graph']['@type'] = i
         return self.meta
 
     def graph_uid(self, i: str) -> dict:
@@ -640,6 +655,12 @@ class SciData:
     @property
     def output(self) -> dict:
         """Generates Scidata JSON-LD File"""
+
+        # for key, value in self.meta['@graph'].items():
+        #     if key == '@type' + value not in self.meta['@graph']['toc']:
+        #         # print(value)
+        #         self.meta['@graph']['toc'].append(value)
+        #         self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
 
         empty = []
         for key, value in self.meta['@graph'].items():
