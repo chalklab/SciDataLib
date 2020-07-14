@@ -1,14 +1,19 @@
 from scidata.model import *
 import os
 import django
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 from scidata.chembldb27 import *
 from scidata.crosswalks import *
+from scidata.serializers import *
+from rest_framework.renderers import JSONRenderer
+import pprint
+
+
+from django.core import serializers
+
 
 path = r"/Users/n01448636/Documents/GoogleDrive/PycharmProjects/SciDataLib/scidata/JSON_dumps"
-
 os.chdir(path)
 
 dbname = 'default'
@@ -16,28 +21,43 @@ query_crosswalks_chembl = list(Chembl.objects.using('crosswalks').values())
 query_crosswalks_ontterms = list(Ontterms.objects.using('crosswalks').values())
 query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
 
-'''Set populateall to False for Normal Operation. Set to True to generate fully populated document'''
-populateall = False
-# activity_count = 0
-# molregno_count = 0
-'''
-Filter Docs by Target ChemblID
-HERG gene Chembl is 240 
-BAD gene Chembl is 3817
-SARS-COV-2 is 4303835
-'''
-targetchembl = 'CHEMBL4303835'
+'''Filter Docs by Target ChemblID, HERG gene is 240, SARS-COV-2 is 4303835, PSEN1 is 2473'''
+targetchembl = 'CHEMBL376'
+
+'''Special Cases. Leave False for general use'''
+populateall = False #Generate data for all fields that have crosswalk entry
+fast = False #Test script quickly by only processing one unspecified doc_id and one unspecified molregno
+specific_document = 102486 #internal doc_id for specific document
+specific_molregno = 16450 #molregno of molecule of interest
+specific_activity = 17126237 #activity_id of specific activity of interest
+specific_target_organism = False #assay target organism
+
+
+unique_id = '<uniqueID>'
+
 
 targetchemblid = targetchembl.replace("CHEMBL","")
 Documents = set()
 AssaySet = set()
-for x in TargetDictionary.objects.values().filter(chembl_id=targetchembl):
-    for y in Assays.objects.values().filter(tid=x['tid'], assay_organism = 'Homo sapiens'):
-        AssaySet.add(y['assay_id'])
-        Documents.add(y['doc_id'])
+for x in TargetDictionary.objects.values().filter(chembl_id_lookup=targetchembl):
+    if specific_target_organism:
+        for y in Assays.objects.values().filter(target_dictionary=x['tid'], assay_organism = specific_target_organism):
+            AssaySet.add(y['assay_id'])
+            Documents.add(y['docs_id'])
+    else:
+        for y in Assays.objects.values().filter(target_dictionary=x['tid']):
+            AssaySet.add(y['assay_id'])
+            Documents.add(y['docs_id'])
 AssayList = list(AssaySet)
-'''Specify document(s) explicitly. Specified Document must contain a molregno that targets the specified targetchembl'''
-# Documents = {65593} # Hash this line to process all valid  documents
+
+
+if populateall:
+    Documents = {list(Documents)[0]}
+if fast:
+    Documents = {list(Documents)[0]}
+if specific_document:
+    Documents = {specific_document}
+
 for DocumentNumber in Documents:
     doc_data = {}
     doc_data.update(Docs.objects.values().get(doc_id=DocumentNumber))
@@ -45,7 +65,6 @@ for DocumentNumber in Documents:
         auth = doc_data['authors'].split(', ')
     except:
         auth = ['Anonymous']
-        # print(DocumentNumber)
     authors = []
     for a in auth:
         authors.append({'name':a})
@@ -55,21 +74,22 @@ for DocumentNumber in Documents:
 
     test = SciData(doc_data['doc_id'])
     test.context(['https://stuchalk.github.io/scidata/contexts/chembl.jsonld','https://stuchalk.github.io/scidata/contexts/scidata.jsonld'])
-    test.base({"@base": "http://BASE.jsonld"})
+    test.base({"@base": "https://scidata.unf.edu/chembl/covid/"+unique_id+"/"})
     # test.doc_id("@ID HERE")
-    test.graph_id("graph_ID_HERE")
+    test.graph_id("")
+    test.graph_type("sdo:scidata")
     test.title(doc_data['title'])
     test.author(authors)
     test.description(doc_data['abstract'])
     test.publisher(doc_data['journal'])
     test.version('1.0')
-    test.permalink("http://PERMALINK.jsonld")
+    test.permalink("https://scidata.unf.edu/chembl/covid/"+unique_id+"/")
     # test.related("http://RELATED.jsonld")
     test.discipline('w3i:Chemistry')
     test.subdiscipline('w3i:MedicinalChemistry')
     # test.source([{"citation1": "Johnson Research Group http://CITATION.edu", "url": "http://CITATION.jsonld"}])
     test.rights("https://creativecommons.org/licenses/by-nc-nd/4.0/")
-    addnamespace = {'w3i':'https://w3id.org/skgo/modsci#'}
+    addnamespace = {'sdo': 'https://stuchalk.github.io/scidata/ontology/scidata.owl#','w3i':'https://w3id.org/skgo/modsci#'}
 
     ####
 
@@ -113,26 +133,22 @@ for DocumentNumber in Documents:
 
     '''Query molregnos for the specified targetchembl and Documents (if specified)'''
     molregno_set = set()
-    for x in TargetDictionary.objects.values().filter(chembl_id=targetchembl):
-        for y in Assays.objects.values().filter(tid=x['tid'], doc_id=DocumentNumber):
-            for z in Activities.objects.values().filter(assay_id=y['assay_id']):
-                molregno_set.add(z['molregno_id'])
+    for x in TargetDictionary.objects.values().filter(chembl_id_lookup=targetchembl):
+        for y in Assays.objects.values().filter(target_dictionary=x['tid'], docs_id=DocumentNumber):
+            for z in Activities.objects.values().filter(assays_id=y['assay_id']):
+                molregno_set.add(z['molecule_dictionary_id'])
 
     if populateall:
         molregno_set = {list(molregno_set)[0]}
-
-    ''' limiter to process only one molregno from each doc number. Hash out to process all molregnos'''
-    # molregno_set = {list(molregno_set)[0]}
-
-
-    # '''Manual molregno set override. Must target specified targetchembl. Hash out to use defaults'''
-    # molregno_set = [632150]
+    if fast:
+        molregno_set = {list(molregno_set)[0]}
+    if specific_molregno:
+        molregno_set = [specific_molregno]
 
     for mol in molregno_set:
-        # molregno_count += 1
+
         SciData.meta['@graph']['toc'] = []
-        activity_list = Activities.objects.values().filter(doc_id=DocumentNumber, molregno_id=mol, assay_id__in=AssayList) #list of activity_ids for each molregno for each doc_id
-        allunsorted = {}
+        activity_list = Activities.objects.values().filter(docs_id=DocumentNumber, molecule_dictionary_id=mol, assays_id__in=AssayList) #list of activity_ids for each molregno for each doc_id
         datapoint = []
         datagroup = []
         datagroupA = []
@@ -144,11 +160,31 @@ for DocumentNumber in Documents:
         nspaces = set()
         nspacestoc = set()
 
+        if specific_activity:
+            activity_list = activity_list.values().filter(activity_id=specific_activity)
+        # print(activity_list)
         for ac in activity_list:
-            # activity_count += 1
-            # continue
 
-            serializedpre = serialize(Activities.objects.get(activity_id=ac['activity_id'])) #Pulls in all data linked to specifiy activity_id. serialize definition in model file.
+            ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id=ac['activity_id']))
+            # ActivitiesObjectA_JSON = JSONRenderer().render(ActivitiesObjectA.data)
+            pre1 = {}
+            activities = {}
+            nested = {}
+            pre2 = dict(ActivitiesObjectA.data)
+            for k, v in pre2.items():
+                if type(v) in [int, str]:
+                    activities.update({k: v})
+                else:
+                    nested.update({k: v})
+            pre1.update({'activities': activities})
+            pre1.update(nested)
+            allunsorted = json.dumps(pre1)
+            serializedpre = json.loads(allunsorted)
+
+
+            # serializedpre = serialize(Activities.objects.get(activity_id=ac['activity_id'])) #Pulls in all data linked to specifiy activity_id. serialize definition in model file.
+            # # print(serializedpre)
+
 
             '''creates list of crosswalks tables that crosswalk entries are sorted into after merging based on crosswalks category value if present'''
             serializedsetpre = set()
@@ -161,9 +197,10 @@ for DocumentNumber in Documents:
             '''Remove nesting and convert to a list of dictionaries where each dictionary corresponds to one crosswalks table'''
             serialized = []
             for x,y in serializedpre.items():
+
                 den = denester(x,y)
                 serialized.append(den)
-
+            print(serialized)
             '''Reassigns list of dictionaries based on category designation'''
             serializednew = []
             for x in serialized:
@@ -197,7 +234,6 @@ for DocumentNumber in Documents:
                     serializednew2.append(x)
             serializednew = serializednew2
 
-            # $$$#
             if populateall:
                 serializednew = allgrouped
 
@@ -243,7 +279,6 @@ for DocumentNumber in Documents:
                                     datapoint_set.add(cross['sdsubsection'])
 
             for serial in serializedgrouped:
-                allunsorted.update(serial)
                 for serial_table, serial_dict in serial.items():
                     dataall = []
                     datapointA = {}
@@ -418,7 +453,7 @@ for DocumentNumber in Documents:
 
         if datagroupA:
             datagroup.append(
-                {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': str(allunsorted['molecule_dictionary']['chembl_id']), 'datapoints': datagroupA})
+                {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': serializedpre['molecule_dictionary']['chembl_id_lookup']['chembl_id'], 'datapoints': datagroupA})
 
         if methodology:
             test.aspects(methodologyx)
@@ -442,8 +477,8 @@ for DocumentNumber in Documents:
 
         if namespace:
             namespaces = ", ".join(repr(e) for e in namespace)
-            test.namespace(namespace)
-            test.add_namespace(addnamespace)
+            test.namespace(addnamespace)
+            test.add_namespace(namespace)
 
         if namespacetoc:
             test.ids(namespacetoc)
@@ -455,19 +490,19 @@ for DocumentNumber in Documents:
 
 
         try:
-            test.add_keyword(allunsorted['activities']['type'])
+            test.add_keyword(serializedpre['activities']['type'])
         except:
             pass
         try:
-            test.add_keyword(allunsorted['target_dictionary']['pref_name'])
+            test.add_keyword(serializedpre['assays']['target_dictionary']['pref_name'])
         except:
             pass
         try:
-            test.add_keyword(allunsorted['cell_dictionary']['cell_name'])
+            test.add_keyword(serializedpre['cell_dictionary']['cell_name'])
         except:
             pass
         try:
-            test.add_keyword(allunsorted['molecule_dictionary']['molecule_type'])
+            test.add_keyword(serializedpre['molecule_dictionary']['molecule_type'])
         except:
             pass
 
@@ -475,17 +510,17 @@ for DocumentNumber in Documents:
 
             test.starttime()
             documentchemblid = str(doc_data['doc_id'])
-            moleculechemblid = allunsorted['molecule_dictionary']['chembl_id'].replace("CHEMBL", "_")
+            moleculechemblid = serializedpre['molecule_dictionary']['chembl_id_lookup']['chembl_id'].replace("CHEMBL", "_")
 
-            test.doc_id('scidata:chembl:'+targetchemblid+'_'+documentchemblid+moleculechemblid)
+            test.doc_id("https://scidata.unf.edu/chembl/covid/"+unique_id+"/")
             test.source([{'title':doc_data['title'],
                           'doi':doc_data['doi'],
                           'journal':doc_data['journal'],
                           'year':doc_data['year'],
                           'volume':doc_data['volume'],
                           'issue':doc_data['issue']}])
-            test.add_source([{"url": "https://www.ebi.ac.uk/chembl/document_report_card/"+allunsorted['docs']['chembl_id']+"/"}])
-            test.graph_uid('scidata:chembl'+documentchemblid+moleculechemblid)
+            test.add_source([{"url": "https://www.ebi.ac.uk/chembl/document_report_card/"+serializedpre['docs']['chembl_id_lookup']['chembl_id']+"/"}])
+            test.graph_uid("scidata:chembl:covid:"+unique_id)
             put = test.output
             if populateall:
                 with open('populated_'+targetchemblid+'_'+documentchemblid+ '.jsonld', 'w') as f:
@@ -493,5 +528,3 @@ for DocumentNumber in Documents:
             else:
                 with open(targetchemblid+'_'+documentchemblid+moleculechemblid+ '.jsonld', 'w') as f:
                     json.dump(put, f)
-# print('activity_count: '+str(activity_count))
-# print('molregno count: '+str(molregno_count))
