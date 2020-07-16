@@ -25,8 +25,12 @@ def denester(q,r):
             for a,b in y.items():
                 if type(b) is dict:
                     denest(a,b)
+                elif type(b) is list:
+                    for c in b:
+                        denest(a,c)
+
                 else:
-                    if b:
+                    if b not in ['null', None]:
                         denested.update({str(a):str(b)})
 
             if denested:

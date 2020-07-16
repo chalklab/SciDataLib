@@ -5,12 +5,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 
 import json
-import ast
 from rest_framework import serializers
-from rest_framework.renderers import JSONRenderer
 from scidata.chembldb27 import *
 from itertools import chain
-
 
 # class NonNullModelSerializer(serializers.ModelSerializer):
 #     def to_representation(self, instance):
@@ -37,122 +34,74 @@ class ActivitySuppMapSerializer(serializers.ModelSerializer):
         exclude = ['activities']
         depth = 1
 
+class CompoundPropertiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompoundProperties
+        fields = '__all__'
+        depth = 0
+
+class CompoundRecordsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompoundRecords
+        fields = '__all__'
+        depth = 0
+
+class CompoundStructuralAlertsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompoundStructuralAlerts
+        fields = '__all__'
+        depth = 0
+
+class CompoundStructuresSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompoundStructures
+        fields = '__all__'
+        depth = 0
+
+class DrugIndicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DrugIndication
+        fields = '__all__'
+        depth = 0
+
+
+class MoleculeDictionarySerializer(serializers.ModelSerializer):
+    compound_properties = CompoundPropertiesSerializer(source='compoundproperties_set', many=True, required=False)
+    # compound_records = CompoundRecordsSerializer(source='compoundrecords_set', many=True, required=False)
+    compound_structural_alerts = CompoundStructuralAlertsSerializer(source='compoundstructuralalerts_set', many=True, required=False)
+    compound_structures = CompoundStructuresSerializer(source='compoundstructures_set', many=True, required=False)
+    # drug_indication = DrugIndicationSerializer(source='compoundproperties_set', many=True, required=False)
+    class Meta:
+        model = MoleculeDictionary
+        fields = '__all__'
+        # extra_fields = ['compoundproperties']
+        depth = 1
+
+    # def get_field_names(self, declared_fields, info):
+    #     expanded_fields = super(MoleculeDictionarySerializer, self).get_field_names(declared_fields, info)
+    #
+    #     if getattr(self.Meta, 'extra_fields', None):
+    #         return expanded_fields + self.Meta.extra_fields
+    #     else:
+    #         return expanded_fields
+
 class ActivitiesSerializer(serializers.ModelSerializer):
     activity_supp_map = ActivitySuppMapSerializer(many=True, required=False)
+    molecule_dictionary = MoleculeDictionarySerializer()
     class Meta:
         model = Activities
         fields = '__all__'
         depth = 5
 
+
+# x = ActivitiesSerializer()
+# print(repr(x))
+
 # ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id=17126237))
 # ActivitiesObjectA_JSON = JSONRenderer().render(ActivitiesObjectA.data)
 # print(ActivitiesObjectA_JSON)
-
-# object = {}
-# activities = {}
-# nested = {}
-# test = dict(ActivitiesObjectA.data)
-# for k,v in test.items():
-#     if type(v) in [int, str, None.__class__]:
-#         activities.update({k:v})
-#     else:
-#         nested.update({k:v})
-# object.update({'activities':activities})
-# object.update(nested)
-# x = json.dumps(object)
-# y = json.loads(x)
-# print(x)
+# print(json.dumps(ActivitiesObjectA.data))
 
 
-# def custom_to_dict(instance, fields=None, exclude=None):
-#     opts = instance._meta
-#     data = {}
-#     for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
-#         if not getattr(f, 'editable', False):
-#             continue
-#         if fields and f.attname not in fields:
-#             continue
-#         if exclude and f.attname in exclude:
-#             continue
-#         data[f.attname] = f.value_from_object(instance)
-#     return data
-#
-# def serialize(modelobj1):
-#     def serialized(modelobj):
-#         opts = modelobj._meta.get_fields()
-#
-#         dbt = modelobj._meta.db_table
-#         modeldict = custom_to_dict(modelobj)
-#         keyrev = modelobj.__class__
-#         keyvalrev = modelobj.pk
-#
-#         for m in opts:
-#             if not m.one_to_many:
-#                 foreignk = getattr(modelobj, m.name)
-#                 if foreignk:
-#                     try:
-#                         dbt = foreignk._meta.db_table
-#                         modeldict[dbt] = serialize(foreignk)
-#                     except:
-#                         pass
-#             if m.one_to_many:
-#                 set = str(str(m.name) + '_set')
-#                 test = getattr(keyrev.objects.get(pk=keyvalrev), set)
-#                 if test.values().exists():
-#                     try:
-#                         if test.values()[1]:
-#                             pass
-#                     except:
-#                         for n in test.all():
-#                             key = n._meta.db_table
-#                             modeldict1 = custom_to_dict(n)
-#                             value = modeldict1.copy()
-#                             valu = {}
-#                             for i, o in value.items():
-#                                 valu.update({i: str(o)})
-#                             try:
-#                                 modeldict[key].append(valu)
-#                             except:
-#                                 modeldict.update({key: valu})
-#         return (modeldict)
-#     opts = modelobj1._meta.get_fields()
-#     dbt = modelobj1._meta.db_table
-#     modeldict = {dbt:custom_to_dict(modelobj1)}
-#
-#     keyrev = modelobj1.__class__
-#     keyvalrev = modelobj1.pk
-#     for m in opts:
-#
-#         if not m.one_to_many:
-#             foreignkey = getattr(modelobj1, m.name)
-#             if foreignkey:
-#
-#                 try:
-#                     dbt = foreignkey._meta.db_table
-#                     modeldict[dbt] = serialized(foreignkey)
-#                 except:
-#                     pass
-#         if m.one_to_many:
-#             set = str(str(m.name) + '_set')
-#             test = getattr(keyrev.objects.get(pk=keyvalrev), set)
-#             if test.values().exists():
-#                 try:
-#                     if test.values()[1]:
-#                         pass
-#                 except:
-#                     for n in test.all():
-#                         key = n._meta.db_table
-#                         modeldict1 = custom_to_dict(n)
-#                         value = modeldict1.copy()
-#                         valu = {}
-#                         for i, o in value.items():
-#                             valu.update({i:str(o)})
-#                         try:
-#                             modeldict[key].append(valu)
-#                         except:
-#                             modeldict.update({key:valu})
-#     return(modeldict)
-#
-#
-# serializedprex = serialize(Activities.objects.get(activity_id=17126237))
-# print(serializedprex)
+
+
