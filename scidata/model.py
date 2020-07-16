@@ -4,7 +4,6 @@ from itertools import count
 from collections import defaultdict
 import django
 import os
-from itertools import chain
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
@@ -14,118 +13,30 @@ This module contains the Scidata class used in generating Scidata JSON-LD docume
 """
 
 #############
-def custom_to_dict(instance, fields=None, exclude=None):
-    opts = instance._meta
-    data = {}
-    for f in chain(opts.concrete_fields, opts.private_fields, opts.many_to_many):
-        if not getattr(f, 'editable', False):
-            continue
-        if fields and f.attname not in fields:
-            continue
-        if exclude and f.attname in exclude:
-            continue
-        data[f.attname] = f.value_from_object(instance)
-    return data
 
-def to_dict(instance):
-    opts = instance._meta
-    data = {}
-    for f in chain(opts.concrete_fields, opts.private_fields):
-        data[f.name] = f.value_from_object(instance)
-    for f in opts.many_to_many:
-        data[f.name] = [i.id for i in f.value_from_object(instance)]
-    return data
+
+
 
 def denester(q,r):
-    denestered = []
+    denestered = {}
     def denest(x,y):
-        denested = {str(x):{}}
-        for a,b in y.items():
-            if type(b) is dict:
-                denest(a,b)
-            else:
-                denested[x].update({str(a):str(b)})
+        denested = {}
+        try:
+            for a,b in y.items():
+                if type(b) is dict:
+                    denest(a,b)
+                else:
+                    if b:
+                        denested.update({str(a):str(b)})
 
-        if denested[x]:
-            denestered.append(denested)
+            if denested:
+                denestered.update({str(x): denested})
+        except:
+            pass
+
     denest(q,r)
     return denestered
 
-def serialize(modelobj1):
-    def serialized(modelobj):
-        opts = modelobj._meta.get_fields()
-
-        dbt = modelobj._meta.db_table
-        modeldict = custom_to_dict(modelobj)
-        keyrev = modelobj.__class__
-        keyvalrev = modelobj.pk
-
-        for m in opts:
-            if not m.one_to_many:
-                foreignk = getattr(modelobj, m.name)
-                if foreignk:
-                    try:
-                        dbt = foreignk._meta.db_table
-                        modeldict[dbt] = serialize(foreignk)
-                    except:
-                        pass
-            if m.one_to_many:
-                set = str(str(m.name) + '_set')
-                test = getattr(keyrev.objects.get(pk=keyvalrev), set)
-                if test.values().exists():
-                    try:
-                        if test.values()[1]:
-                            pass
-                    except:
-                        for n in test.all():
-                            key = n._meta.db_table
-                            modeldict1 = custom_to_dict(n)
-                            value = modeldict1.copy()
-                            valu = {}
-                            for i, o in value.items():
-                                valu.update({i: str(o)})
-                            try:
-                                modeldict[key].append(valu)
-                            except:
-                                modeldict.update({key: valu})
-        return (modeldict)
-    opts = modelobj1._meta.get_fields()
-    dbt = modelobj1._meta.db_table
-    modeldict = {dbt:custom_to_dict(modelobj1)}
-
-    keyrev = modelobj1.__class__
-    keyvalrev = modelobj1.pk
-    for m in opts:
-
-        if not m.one_to_many:
-            foreignkey = getattr(modelobj1, m.name)
-            if foreignkey:
-
-                try:
-                    dbt = foreignkey._meta.db_table
-                    modeldict[dbt] = serialized(foreignkey)
-                except:
-                    pass
-        if m.one_to_many:
-            set = str(str(m.name) + '_set')
-            test = getattr(keyrev.objects.get(pk=keyvalrev), set)
-            if test.values().exists():
-                try:
-                    if test.values()[1]:
-                        pass
-                except:
-                    for n in test.all():
-                        key = n._meta.db_table
-                        modeldict1 = custom_to_dict(n)
-                        value = modeldict1.copy()
-                        valu = {}
-                        for i, o in value.items():
-                            valu.update({i:str(o)})
-                        try:
-                            modeldict[key].append(valu)
-                        except:
-                            modeldict.update({key:valu})
-    return(modeldict)
 
 def is_number(n):
     """Function used for determining datatype"""
