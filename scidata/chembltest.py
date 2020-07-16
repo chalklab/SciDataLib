@@ -1,17 +1,17 @@
 from scidata.model import *
+
 import os
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
+
 from scidata.chembldb27 import *
 from scidata.crosswalks import *
 from scidata.serializers import *
 from rest_framework.renderers import JSONRenderer
-import pprint
 
 
 from django.core import serializers
-
 
 path = r"/Users/n01448636/Documents/GoogleDrive/PycharmProjects/SciDataLib/scidata/JSON_dumps"
 os.chdir(path)
@@ -46,6 +46,7 @@ for x in TargetDictionary.objects.values().filter(chembl_id_lookup=targetchembl)
             Documents.add(y['docs_id'])
     else:
         for y in Assays.objects.values().filter(target_dictionary=x['tid']):
+
             AssaySet.add(y['assay_id'])
             Documents.add(y['docs_id'])
 AssayList = list(AssaySet)
@@ -59,6 +60,7 @@ if specific_document:
     Documents = {specific_document}
 
 for DocumentNumber in Documents:
+
     doc_data = {}
     doc_data.update(Docs.objects.values().get(doc_id=DocumentNumber))
     try:
@@ -162,7 +164,6 @@ for DocumentNumber in Documents:
 
         if specific_activity:
             activity_list = activity_list.values().filter(activity_id=specific_activity)
-        # print(activity_list)
         for ac in activity_list:
 
             ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id=ac['activity_id']))
@@ -172,18 +173,54 @@ for DocumentNumber in Documents:
             nested = {}
             pre2 = dict(ActivitiesObjectA.data)
             for k, v in pre2.items():
-                if type(v) in [int, str]:
+                if v is None:
+                    pass
+                elif type(v) in [int, str]:
                     activities.update({k: v})
                 else:
                     nested.update({k: v})
             pre1.update({'activities': activities})
             pre1.update(nested)
             allunsorted = json.dumps(pre1)
-            serializedpre = json.loads(allunsorted)
+            serializedprepre = json.loads(allunsorted)
+            print(allunsorted)
 
 
-            # serializedpre = serialize(Activities.objects.get(activity_id=ac['activity_id'])) #Pulls in all data linked to specifiy activity_id. serialize definition in model file.
-            # # print(serializedpre)
+
+            def chemblidmod(input):
+                dictA = {}
+                def chemblidmod2(a,b):
+                    dictB = {}
+                    for c,d in b.items():
+                        if c == "chembl_id_lookup":
+                            # new = b.items().copy()
+                            # new[c].update(d)
+                            dictB.update(d)
+                        elif type(d) is dict:
+                            dictB.update(chemblidmod2(c, d))
+                        else:
+                            dictB.update({c: d})
+                    if dictB:
+                        dictC = {a:dictB}
+                        return dictC
+                for x, y in input.items():
+                    if type(y) is dict:
+                        dictA.update(chemblidmod2(x,y))
+                    else:
+                        dictA.update({x: y})
+                return dictA
+
+            serializedpre = chemblidmod(serializedprepre)
+            serializedpre2 = json.dumps(serializedpre)
+            serializedpre3 = json.loads(serializedpre2)
+            print(serializedpre2)
+
+
+
+
+
+
+
 
 
             '''creates list of crosswalks tables that crosswalk entries are sorted into after merging based on crosswalks category value if present'''
@@ -194,45 +231,47 @@ for DocumentNumber in Documents:
                 else:
                     serializedsetpre.add(cross['table'])
 
+
             '''Remove nesting and convert to a list of dictionaries where each dictionary corresponds to one crosswalks table'''
-            serialized = []
-            for x,y in serializedpre.items():
-
+            serialized = {}
+            for x,y in serializedpre3.items():
                 den = denester(x,y)
-                serialized.append(den)
-            print(serialized)
+                if den:
+                    serialized.update(den)
+            serialized2 = json.dumps(serialized)
+            serialized3 = json.loads(serialized2)
+            print(serialized2)
+
             '''Reassigns list of dictionaries based on category designation'''
-            serializednew = []
-            for x in serialized:
-                for y in x:
-                    empty = {}
-                    for sersetpre in serializedsetpre:
-                        emptee = {sersetpre: {}}
-                        for cross in crosswalks:
-                            if cross['category']:
-                                if cross['category'] == sersetpre:
-                                    for serial_table, serial_dict in y.items():
-                                        if cross['table'] == serial_table:
-                                            emptee[sersetpre].update(serial_dict)
+            serializednew = {}
+            for serial_table, serial_dict in serialized.items():
 
-                            else:
-                                if cross['table'] == sersetpre:
-                                    for serial_table, serial_dict in y.items():
-                                        if cross['table'] == serial_table:
-                                            emptee[sersetpre].update(serial_dict)
+                empty = {}
+                for sersetpre in serializedsetpre:
+                    emptee = {sersetpre: {}}
+                    for cross in crosswalks:
+                        if cross['category']:
+                            if cross['category'] == sersetpre:
+                                if cross['table'] == serial_table:
+                                    emptee[sersetpre].update(serial_dict)
 
-                        if emptee[sersetpre]:
-                            empty.update(emptee)
+                        else:
+                            if cross['table'] == sersetpre:
+                                if cross['table'] == serial_table:
+                                    emptee[sersetpre].update(serial_dict)
 
-                    if empty:
-                        serializednew.append(empty)
+                    if emptee[sersetpre]:
+                        empty.update(emptee)
 
+                if empty:
+                    serializednew.update(empty)
+            print(json.dumps(serializednew))
             '''removes duplication'''
-            serializednew2 = []
-            for x in serializednew:
-                if x not in serializednew2:
-                    serializednew2.append(x)
-            serializednew = serializednew2
+            # serializednew2 = []
+            # for x in serializednew:
+            #     if x not in serializednew2:
+            #         serializednew2.append(x)
+            # serializednew = serializednew2
 
             if populateall:
                 serializednew = allgrouped
@@ -252,16 +291,14 @@ for DocumentNumber in Documents:
                 for cross in crosswalks:
                     if cross['category']:
                         if cross['category'] == serset:
-                            for serial in serializednew:
-                                for serial_table,serial_dict in serial.items():
-                                    if cross['table'] == serial_table:
-                                        ser1[serset].update(serial_dict)
+                            for serial_table,serial_dict in serializednew.items():
+                                if cross['table'] == serial_table:
+                                    ser1[serset].update(serial_dict)
                     else:
                         if cross['table'] == serset:
-                            for serial in serializednew:
-                                for serial_table, serial_dict in serial.items():
-                                    if cross['table'] == serial_table:
-                                        ser1[serset].update(serial_dict)
+                            for serial_table, serial_dict in serializednew.items():
+                                if cross['table'] == serial_table:
+                                    ser1[serset].update(serial_dict)
                 if ser1[serset]:
                     serializedgrouped.append(ser1)
 
@@ -453,7 +490,7 @@ for DocumentNumber in Documents:
 
         if datagroupA:
             datagroup.append(
-                {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': serializedpre['molecule_dictionary']['chembl_id_lookup']['chembl_id'], 'datapoints': datagroupA})
+                {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': serializedpre['molecule_dictionary']['chembl_id'], 'datapoints': datagroupA})
 
         if methodology:
             test.aspects(methodologyx)
@@ -510,7 +547,7 @@ for DocumentNumber in Documents:
 
             test.starttime()
             documentchemblid = str(doc_data['doc_id'])
-            moleculechemblid = serializedpre['molecule_dictionary']['chembl_id_lookup']['chembl_id'].replace("CHEMBL", "_")
+            moleculechemblid = serializedpre['molecule_dictionary']['chembl_id'].replace("CHEMBL", "_")
 
             test.doc_id("https://scidata.unf.edu/chembl/covid/"+unique_id+"/")
             test.source([{'title':doc_data['title'],
@@ -519,7 +556,7 @@ for DocumentNumber in Documents:
                           'year':doc_data['year'],
                           'volume':doc_data['volume'],
                           'issue':doc_data['issue']}])
-            test.add_source([{"url": "https://www.ebi.ac.uk/chembl/document_report_card/"+serializedpre['docs']['chembl_id_lookup']['chembl_id']+"/"}])
+            test.add_source([{"url": "https://www.ebi.ac.uk/chembl/document_report_card/"+serializedpre['docs']['chembl_id']+"/"}])
             test.graph_uid("scidata:chembl:covid:"+unique_id)
             put = test.output
             if populateall:
