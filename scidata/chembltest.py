@@ -8,9 +8,6 @@ django.setup()
 from scidata.chembldb27 import *
 from scidata.crosswalks import *
 from scidata.serializers import *
-from rest_framework.renderers import JSONRenderer
-
-
 from django.core import serializers
 
 path = r"/Users/n01448636/Documents/GoogleDrive/PycharmProjects/SciDataLib/scidata/JSON_dumps"
@@ -171,6 +168,7 @@ for DocumentNumber in Documents:
             pre1 = {}
             activities = {}
             nested = {}
+
             pre2 = dict(ActivitiesObjectA.data)
             for k, v in pre2.items():
                 if v is None:
@@ -183,7 +181,7 @@ for DocumentNumber in Documents:
             pre1.update(nested)
             allunsorted = json.dumps(pre1)
             serializedprepre = json.loads(allunsorted)
-            print(allunsorted)
+            # print(allunsorted)
 
 
 
@@ -211,16 +209,6 @@ for DocumentNumber in Documents:
                 return dictA
 
             serializedpre = chemblidmod(serializedprepre)
-            serializedpre2 = json.dumps(serializedpre)
-            serializedpre3 = json.loads(serializedpre2)
-            print(serializedpre2)
-
-
-
-
-
-
-
 
 
             '''creates list of crosswalks tables that crosswalk entries are sorted into after merging based on crosswalks category value if present'''
@@ -231,16 +219,12 @@ for DocumentNumber in Documents:
                 else:
                     serializedsetpre.add(cross['table'])
 
-
             '''Remove nesting and convert to a list of dictionaries where each dictionary corresponds to one crosswalks table'''
             serialized = {}
-            for x,y in serializedpre3.items():
+            for x,y in serializedpre.items():
                 den = denester(x,y)
                 if den:
                     serialized.update(den)
-            serialized2 = json.dumps(serialized)
-            serialized3 = json.loads(serialized2)
-            print(serialized2)
 
             '''Reassigns list of dictionaries based on category designation'''
             serializednew = {}
@@ -265,13 +249,8 @@ for DocumentNumber in Documents:
 
                 if empty:
                     serializednew.update(empty)
-            print(json.dumps(serializednew))
+            # print(json.dumps(serializednew))
             '''removes duplication'''
-            # serializednew2 = []
-            # for x in serializednew:
-            #     if x not in serializednew2:
-            #         serializednew2.append(x)
-            # serializednew = serializednew2
 
             if populateall:
                 serializednew = allgrouped
