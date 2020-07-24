@@ -19,15 +19,15 @@ query_crosswalks_ontterms = list(Ontterms.objects.using('crosswalks').values())
 query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
 
 '''Filter Docs by Target ChemblID, HERG gene is 240, SARS-COV-2 is 4303835, PSEN1 is 2473'''
-targetchembl = 'CHEMBL376'
+targetchembl = 'CHEMBL240'
 
 '''Special Cases. Leave False for general use'''
 populateall = False #Generate data for all fields that have crosswalk entry
 fast = False #Test script quickly by only processing one unspecified doc_id and one unspecified molregno
-specific_document = 102486 #internal doc_id for specific document
-specific_molregno = 16450 #molregno of molecule of interest
-specific_activity = 17126237 #activity_id of specific activity of interest
-specific_target_organism = False #assay target organism
+specific_document = 72215 #internal doc_id for specific document
+specific_molregno = False #molregno of molecule of interest
+specific_activity = False #activity_id of specific activity of interest
+specific_target_organism = 'Homo sapiens' #assay target organism
 
 
 unique_id = '<uniqueID>'
@@ -162,7 +162,6 @@ for DocumentNumber in Documents:
         if specific_activity:
             activity_list = activity_list.values().filter(activity_id=specific_activity)
         for ac in activity_list:
-
             ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id=ac['activity_id']))
             # ActivitiesObjectA_JSON = JSONRenderer().render(ActivitiesObjectA.data)
             pre1 = {}
@@ -209,7 +208,7 @@ for DocumentNumber in Documents:
                 return dictA
 
             serializedpre = chemblidmod(serializedprepre)
-
+            # print(json.dumps(serializedpre))
 
             '''creates list of crosswalks tables that crosswalk entries are sorted into after merging based on crosswalks category value if present'''
             serializedsetpre = set()
