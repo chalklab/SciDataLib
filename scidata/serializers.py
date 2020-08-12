@@ -64,8 +64,22 @@ class DrugIndicationSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 0
 
+class BiotherapeuticsComponentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BiotherapeuticComponents
+        fields = '__all__'
+        depth = 1
+
+class BiotherapeuticsSerializer(serializers.ModelSerializer):
+    biotherapeutic_components = BiotherapeuticsComponentsSerializer(source='biotherapeutic_somponents_set', many=True, required=False)
+
+    class Meta:
+        model = Biotherapeutics
+        fields = '__all__'
+        depth = 0
 
 class MoleculeDictionarySerializer(serializers.ModelSerializer):
+    biotherapeutics = BiotherapeuticsSerializer(source='biotherapeutics_set', many=True, required=False)
     compound_properties = CompoundPropertiesSerializer(source='compoundproperties_set', many=True, required=False)
     # compound_records = CompoundRecordsSerializer(source='compoundrecords_set', many=True, required=False)
     compound_structural_alerts = CompoundStructuralAlertsSerializer(source='compoundstructuralalerts_set', many=True, required=False)
@@ -94,7 +108,34 @@ class ActivitiesSerializer(serializers.ModelSerializer):
         depth = 5
 
 
+# class AssaysSerializer(serializers.ModelSerializer):
+#     activities = ActivitiesSerializer(many=True, required=False)
+#     class Meta:
+#         model = Activities
+#         fields = ['activities']
+#         depth = 1
+
+class DocsSerializer(serializers.ModelSerializer):
+    # assays = AssaysSerializer(many=True, required=False)
+    activities = ActivitiesSerializer(many=True)
+
+    class Meta:
+        model = Docs
+        fields = '__all__'
+        extra_fields = ['activities']
+        depth = 1
+
+    def get_field_names(self, declared_fields, info):
+        expanded_fields = super(DocsSerializer, self).get_field_names(declared_fields, info)
+
+        if getattr(self.Meta, 'extra_fields', None):
+            return expanded_fields + self.Meta.extra_fields
+        else:
+            return expanded_fields
+
+
 # x = ActivitiesSerializer()
+# x = MoleculeDictionarySerializer()
 # print(repr(x))
 
 # ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id=17126237))
