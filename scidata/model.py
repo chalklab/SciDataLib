@@ -14,9 +14,6 @@ This module contains the Scidata class used in generating Scidata JSON-LD docume
 
 #############
 
-
-
-
 def denester(q,r):
     denestered = {}
     def denest(x,y):

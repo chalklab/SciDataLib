@@ -21,7 +21,7 @@ class ActionType(models.Model):
 class Activities(models.Model):
     activity_id = models.BigIntegerField(primary_key=True)
     assays = models.ForeignKey('Assays', models.DO_NOTHING, db_column='assay_id')
-    docs = models.ForeignKey('Docs', models.DO_NOTHING, blank=True, null=True, db_column='doc_id')
+    docs = models.ForeignKey('Docs', models.DO_NOTHING, related_name='activities', blank=True, null=True, db_column='doc_id')
     compound_records = models.ForeignKey('CompoundRecords', models.DO_NOTHING, db_column='record_id')
     # molregno = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
     molecule_dictionary = models.ForeignKey('MoleculeDictionary', models.DO_NOTHING, db_column='molregno', blank=True, null=True)
