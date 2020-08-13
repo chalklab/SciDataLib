@@ -338,38 +338,9 @@ class SciData:
             iterateaspects(item)
             prefix = ['']
             self.meta['@graph']['scidata']['methodology']['aspects'].append(item)
-        for a in self.meta['@graph']['scidata']['methodology']['aspects']:
-            if isinstance(a, dict):
-                for key, value in a.items():
-                    if key == '@type' and 'methodology/' + value not in self.meta['@graph']['toc']:
-                        self.meta['@graph']['toc'].append(value)
-                        self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
+
         return self.meta
 
-
-        # def iterateaspects(it):
-        #     if '@id' in it:
-        #         category = it.get('@id', 'undefined')
-        #         index = next(count_index[category])
-        #         it['@id'] = '{category}/{index}/'.format(category=category, index=index)
-        #     else:
-        #         category = it.get('@type', 'undefined')
-        #         index = next(count_index[category])
-        #         it['@id'] = '{category}/{index}/'.format(category=category, index=index)
-        #     for x in it.values():
-        #         if isinstance(x, list):
-        #             for y in x:
-        #                 iterateaspects(y)
-        # for item in aspects:
-        #     iterateaspects(item)
-        #     self.meta['@graph']['scidata']['methodology']['aspects'].append(item)
-        # for a in self.meta['@graph']['scidata']['methodology']['aspects']:
-        #     if isinstance(a, dict):
-        #         for key, value in a.items():
-        #             if key == '@type' and 'methodology/' + value not in self.meta['@graph']['toc']:
-        #                 self.meta['@graph']['toc'].append(value)
-        #                 self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
-        # return self.meta
 
     def facets(self, facets: list) -> dict:
         """Make or replace the facets of the instance"""
@@ -407,38 +378,8 @@ class SciData:
             iteratefacets(item)
             prefix = ['']
             self.meta['@graph']['scidata']['system']['facets'].append(item)
-        for a in self.meta['@graph']['scidata']['system']['facets']:
-            if isinstance(a, dict):
-                for key, value in a.items():
-                    if key == '@type' and 'system/' + value not in self.meta['@graph']['toc']:
-                        self.meta['@graph']['toc'].append(value)
-                        self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
         return self.meta
 
-
-
-        # def iteratefacets(it):
-        #     if '@id' in it:
-        #         category = it['@id']
-        #     else:
-        #         category = 'undefined'
-        #     index = next(count_index[category])
-        #     it['@id'] = '{category}/{index}/'.format(category=category, index=index)
-        #     it['@type'] = 'sci:{category}'.format(category=category)
-        #     for x in it.values():
-        #         if isinstance(x, list):
-        #             for y in x:
-        #                 iteratefacets(y)
-        # for item in facets:
-        #     iteratefacets(item)
-        #     self.meta['@graph']['scidata']['system']['facets'].append(item)
-        # for a in self.meta['@graph']['scidata']['system']['facets']:
-        #     if isinstance(a, dict):
-        #         for key, value in a.items():
-        #             if key == '@type' and 'system/' + value not in self.meta['@graph']['toc']:
-        #                 self.meta['@graph']['toc'].append(value)
-        #                 self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
-        # return self.meta
 
     def datapoint(self, datapoint: list) -> dict:
         """Make or replace the datapoint"""
@@ -493,12 +434,6 @@ class SciData:
             iteratedatagroup(item)
             data.append(item)
             self.meta['@graph']['scidata']['dataset']['datagroup'] = data
-        for a in self.meta['@graph']['scidata']['dataset']['datagroup']:
-            if isinstance(a, dict):
-                for key, value in a.items():
-                    if key == '@type' and 'datagroup/' + value not in self.meta['@graph']['toc']:
-                        self.meta['@graph']['toc'].append(value)
-                        self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
         return self.meta
 
     # rewritten by SJC 081219
@@ -566,15 +501,35 @@ class SciData:
         })
         return self.meta
 
+    def toc(self):
+        def tocdict(a):
+            for key, value in a.items():
+                if key == '@type':
+                    self.meta['@graph']['toc'].append(value)
+                if isinstance(value, list):
+                    toclist(value)
+                if isinstance(value, dict):
+                    tocdict(value)
+        def toclist(a):
+            for x in a:
+                if isinstance(x, dict):
+                    tocdict(x)
+                if isinstance(x, list):
+                    toclist(x)
+        for key,value in self.meta['@graph'].items():
+            if key == '@type':
+                self.meta['@graph']['toc'].append(value)
+            if isinstance(value, dict):
+                tocdict(value)
+            if isinstance(value, list):
+                toclist(value)
+        self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
+        return self.meta
+
+
     @property
     def output(self) -> dict:
         """Generates Scidata JSON-LD File"""
-
-        # for key, value in self.meta['@graph'].items():
-        #     if key == '@type' + value not in self.meta['@graph']['toc']:
-        #         # print(value)
-        #         self.meta['@graph']['toc'].append(value)
-        #         self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
 
         empty = []
         for key, value in self.meta['@graph'].items():

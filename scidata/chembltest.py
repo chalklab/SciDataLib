@@ -537,6 +537,7 @@ for DocumentNumber in Documents:
 
             if datapoint:
 
+                test.toc()
                 test.starttime()
                 documentchemblid = str(doc_data['doc_id'])
                 moleculechemblid = serializedpre['molecule_dictionary']['chembl_id'].replace("CHEMBL", "_")
