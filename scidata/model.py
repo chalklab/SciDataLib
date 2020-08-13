@@ -541,7 +541,7 @@ class SciData:
         self.meta['@graph']['sources'] = srcs
         return self.meta
 
-    def rights(self, r: str) -> dict:
+    def rights(self, r: str, s: str) -> dict:
         """Make or replace the rights"""
 
         right = []
@@ -549,11 +549,12 @@ class SciData:
             '@id': 'rights/' + str(len(right) + 1) + '/',
             '@type': 'dc:rights',
             'license': r,
+            'holder': s,
         })
         self.meta['@graph']['rights'] = right
         return self.meta
 
-    def add_rights(self, r: str) -> dict:
+    def add_rights(self, r: str, s: str) -> dict:
         """Add the rights"""
 
         rights = self.meta['@graph']['rights']
@@ -561,6 +562,7 @@ class SciData:
             '@id': 'rights/' + str(len(self.meta['@graph']['rights']) + 1) + '/',
             '@type': 'dc:rights',
             'license': r,
+            'holder': s,
         })
         return self.meta
 
@@ -591,7 +593,7 @@ class SciData:
             elif e in self.meta['@graph'].keys():
                 self.meta['@graph'].pop(e)
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
-        # print(temp)
+        print(temp)
 
         print('complete')
         return self.meta
