@@ -26,7 +26,7 @@ targetchembl = 'CHEMBL240'
 '''Special Cases. Leave False for general use'''
 populateall = False #Generate data for all fields that have crosswalk entry
 fast_doc = False #Test script quickly by only processing one unspecified doc_id
-fast_mol = False #Test script quickly by only processing one unspecified molregno
+fast_mol = True #Test script quickly by only processing one unspecified molregno
 specific_document = 72215 #internal doc_id for specific document
 specific_molregno = 1518404 #molregno of molecule of interest
 specific_activity = False #activity_id of specific activity of interest
@@ -94,7 +94,7 @@ for DocumentNumber in Documents:
     test.discipline('w3i:Chemistry')
     test.subdiscipline('w3i:MedicinalChemistry')
     # test.source([{"citation1": "Johnson Research Group http://CITATION.edu", "url": "http://CITATION.jsonld"}])
-    test.rights("https://creativecommons.org/licenses/by-nc-nd/4.0/")
+    test.rights("https://creativecommons.org/licenses/by-nc-nd/4.0/","European Bioinformatics Institute")
     addnamespace = {'sdo': 'https://stuchalk.github.io/scidata/ontology/scidata.owl#','w3i':'https://w3id.org/skgo/modsci#'}
 
     ####
