@@ -40,8 +40,6 @@ INSTALLED_APPS = [
     'scidata.apps.ScidataConfig',
 ]
 
-
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -57,8 +55,7 @@ ROOT_URLCONF = 'mysite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -78,31 +75,6 @@ WSGI_APPLICATION = 'mysite.wsgi.application'
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'crosswalks',
-    #     'USER': 'root',
-    #     'PASSWORD': 'root',
-    #     'OPTIONS': {
-    #         'unix_socket': '/Applications/MAMP/tmp/mysql/mysql.sock'}
-    # },
-    # 'chembl': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'CHEMBL_25',
-    #     'USER': 'root',
-    #     'PASSWORD': 'root',
-    #     'OPTIONS': {
-    #         'unix_socket': '/Applications/MAMP/tmp/mysql/mysql.sock'}
-    # }
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'chembl_26',
-    #     'USER': 'postdoc',
-    #     'HOST': '127.0.0.1',
-    #     'PASSWORD': 'nerd4life*',
-    #     'PORT': '3307',
-    #     'unix_socket': '/var/run/mariadb/mariadb.pid'
-    # },
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'chembl_27',
@@ -131,8 +103,6 @@ DATABASES = {
         'unix_socket': '/var/run/mariadb/mariadb.pid'
     }
 }
-
-#DATABASE_ROUTERS = ['scidata.Router.CrosswalksRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/2.2/ref/settings/#auth-password-validators
