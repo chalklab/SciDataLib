@@ -1,3 +1,6 @@
+""" items to initialize """
+
+
 def is_number(n):
     """Function used for determining datatype"""
 

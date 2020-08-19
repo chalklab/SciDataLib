@@ -1,3 +1,4 @@
+""" setup file for python package"""
 from setuptools import setup
 
 setup(
@@ -5,6 +6,6 @@ setup(
    version='0.1',
    description='Python library for development of SciData JSON-LD files',
    author='Dylan Johnson',
-    license="MIT",
+   license="MIT",
    install_requires=['django']
 )
