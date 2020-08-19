@@ -1,3 +1,4 @@
+""" context file code """
 from scidata.model import *
 import os
 import django
