@@ -1,3 +1,4 @@
+""" This module contains the Scidata class used in generating Scidata JSON-LD documents """
 import json
 import datetime
 from itertools import count
@@ -8,34 +9,29 @@ import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 
-"""
-This module contains the Scidata class used in generating Scidata JSON-LD documents.
-"""
 
-#############
-
-def denester(q,r):
+def denester(q, r):
+    """ denester function """
     denestered = {}
-    def denest(x,y):
+
+    def denest(x, y):
+        """ denest function """
         denested = {}
-        try:
-            for a,b in y.items():
+        if type(y) is dict:
+            for a, b in y.items():
                 if type(b) is dict:
-                    denest(a,b)
+                    denest(a, b)
                 elif type(b) is list:
                     for c in b:
-                        denest(a,c)
+                        denest(a, c)
 
                 else:
                     if b not in ['null', None]:
-                        denested.update({str(a):str(b)})
+                        denested.update({str(a): str(b)})
 
             if denested:
                 denestered.update({str(x): denested})
-        except:
-            pass
-
-    denest(q,r)
+    denest(q, r)
     return denestered
 
 
@@ -48,15 +44,15 @@ def is_number(n):
         return False
     return True
 
+
 def find_sigfigs(x):
     """Function used for determining significant figures"""
-
     x = x.lower()
     if 'e' in x:
         mystr = x.split('e')
         return len((mystr[0])) - 1
     else:
-        n = ('%.*e' %(8, abs(float(x)))).split('e')
+        n = ('%.*e' % (8, abs(float(x)))).split('e')
         if '.' in x:
             s = x.replace('.', '')
             length = len(s) - len(s.rstrip('0'))
@@ -115,10 +111,8 @@ class SciData:
     nspaces = {}
     bass = {}
 
-
     def context(self, context: list) -> dict:
         """Make or replace the external context files"""
-
         self.contexts = []
         self.contexts = context
         self.make_context()
@@ -315,8 +309,8 @@ class SciData:
         prefix = ['']
         data = []
 
-
         def iterateaspects(it):
+            """ iterateaspects function """
             if '@id' in it:
                 category = prefix[-1] + it['@id']
                 categoryx = it['@id']
@@ -341,7 +335,6 @@ class SciData:
 
         return self.meta
 
-
     def facets(self, facets: list) -> dict:
         """Make or replace the facets of the instance"""
 
@@ -357,6 +350,7 @@ class SciData:
         data = []
 
         def iteratefacets(it):
+            """ iteratefacets function """
             if '@id' in it:
                 category = prefix[-1] + it['@id']
                 categoryx = it['@id']
@@ -380,9 +374,8 @@ class SciData:
             self.meta['@graph']['scidata']['system']['facets'].append(item)
         return self.meta
 
-
     def datapoint(self, datapoint: list) -> dict:
-        """Make or replace the datapoint"""
+        """ create or replace the datapoint """
 
         s = self.meta['@graph']['scidata']['dataset']
         if "@id" not in s:
@@ -396,6 +389,7 @@ class SciData:
         data = []
 
         def iteratedatapoint(it):
+            """ iteratedatapoint function """
             category = prefix[-1] + it['@id']
             index = next(count_index[category])
             it['@id'] = '{category}/{index}/'.format(category=category, index=index)
@@ -415,12 +409,12 @@ class SciData:
         return self.meta
 
     def datagroup(self, datagroup: list) -> dict:
-        """Make or replace the datagroup"""
-
+        """ create or replace the datagroup """
         count_index = defaultdict(lambda: count(1))
         data = []
 
         def iteratedatagroup(it):
+            """ iteratedatagroup function """
             category = it['@id']
             index = next(count_index[category])
             it['@id'] = '{category}/{index}/'.format(category=category, index=index)
@@ -463,7 +457,7 @@ class SciData:
         return self.meta
 
     def add_source(self, source: list) -> dict:
-        """Add to the source"""
+        """ add to the sources list"""
 
         srcs = self.meta['@graph']['sources']
         for x in source:
@@ -477,7 +471,7 @@ class SciData:
         return self.meta
 
     def rights(self, r: str, s: str) -> dict:
-        """Make or replace the rights"""
+        """ create or replace the rights """
 
         right = []
         right.append({
@@ -490,7 +484,7 @@ class SciData:
         return self.meta
 
     def add_rights(self, r: str, s: str) -> dict:
-        """Add the rights"""
+        """ add to the rights list """
 
         rights = self.meta['@graph']['rights']
         rights.append({
@@ -502,7 +496,9 @@ class SciData:
         return self.meta
 
     def toc(self):
+        """ toc function """
         def tocdict(a):
+            """ tocdict function """
             for key, value in a.items():
                 if key == '@type':
                     self.meta['@graph']['toc'].append(value)
@@ -510,13 +506,15 @@ class SciData:
                     toclist(value)
                 if isinstance(value, dict):
                     tocdict(value)
+
         def toclist(a):
+            """ toclist function """
             for x in a:
                 if isinstance(x, dict):
                     tocdict(x)
                 if isinstance(x, list):
                     toclist(x)
-        for key,value in self.meta['@graph'].items():
+        for key, value in self.meta['@graph'].items():
             if key == '@type':
                 self.meta['@graph']['toc'].append(value)
             if isinstance(value, dict):
@@ -525,7 +523,6 @@ class SciData:
                 toclist(value)
         self.meta['@graph']['toc'] = sorted(set(self.meta['@graph']['toc']))
         return self.meta
-
 
     @property
     def output(self) -> dict:
@@ -552,5 +549,3 @@ class SciData:
 
         print('complete')
         return self.meta
-
-
