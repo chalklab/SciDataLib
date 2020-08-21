@@ -157,11 +157,11 @@ for DocumentNumber in Documents:
 
     for mol in molregno_set:
 
-        for eachassay in AssayList:
+        # for eachassay in AssayList: #for further division of output by assay
 
             SciData.meta['@graph']['toc'] = []
-            # activity_list = Activities.objects.values().filter(docs_id=DocumentNumber, molecule_dictionary_id=mol, assays_id__in=AssayList) #list of activity_ids for each molregno for each doc_id
-            activity_list = Activities.objects.values().filter(docs_id=DocumentNumber, molecule_dictionary_id=mol, assays_id=eachassay) #list of activity_ids for each molregno for each doc_id
+            activity_list = Activities.objects.values().filter(docs_id=DocumentNumber, molecule_dictionary_id=mol, assays_id__in=AssayList) #list of activity_ids for each molregno for each doc_id
+            # activity_list = Activities.objects.values().filter(docs_id=DocumentNumber, molecule_dictionary_id=mol, assays_id=eachassay) #list of activity_ids for each molregno for each doc_id
             datapoint = []
             datagroup = []
             datagroupA = []
@@ -541,8 +541,8 @@ for DocumentNumber in Documents:
 
                 test.toc()
                 test.starttime()
-                documentchemblid = str(doc_data['doc_id'])
-                moleculechemblid = serializedpre['molecule_dictionary']['chembl_id'].replace("CHEMBL", "_")
+                documentchemblid = str(serializedpre['docs']['chembl_id'].replace("CHEMBL", "_"))
+                moleculechemblid = str(serializedpre['molecule_dictionary']['chembl_id'].replace("CHEMBL", "_"))
                 assaychemblid = str(serializedpre['assays']['assay_id'])
 
 
@@ -560,8 +560,11 @@ for DocumentNumber in Documents:
                 test.graph_uid("scidata:chembl:covid:"+unique_id)
                 put = test.output
                 if populateall:
-                    with open('populated_'+targetchemblid+'_'+documentchemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
+                    # with open('populated_'+targetchemblid+'_'+documentchemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
+                    with open('populated_'+targetchemblid+'_'+documentchemblid+ '.jsonld', 'w') as f:
+
                         json.dump(put, f)
                 else:
-                    with open(targetchemblid+'_'+documentchemblid+moleculechemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
+                    # with open(targetchemblid+'_'+documentchemblid+moleculechemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
+                    with open(targetchemblid+'_'+documentchemblid+moleculechemblid+ '.jsonld', 'w') as f:
                         json.dump(put, f)
