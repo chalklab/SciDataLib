@@ -28,9 +28,10 @@ populateall = False #Generate data for all fields that have crosswalk entry
 fast_doc = False #Test script quickly by only processing one unspecified doc_id
 fast_mol = True #Test script quickly by only processing one unspecified molregno
 specific_document = 72215 #internal doc_id for specific document
-specific_molregno = 1518404 #molregno of molecule of interest
-specific_activity = False #activity_id of specific activity of interest
+specific_molregno = 5638 #molregno of molecule of interest
+specific_activity = 12645960 #activity_id of specific activity of interest
 specific_target_organism = 'Homo sapiens' #assay target organism
+
 
 
 unique_id = '<uniqueID>'
@@ -143,7 +144,7 @@ for DocumentNumber in Documents:
     for x in TargetDictionary.objects.values().filter(chembl_id_lookup=targetchembl):
         for y in Assays.objects.values().filter(target_dictionary=x['tid'], docs_id=DocumentNumber):
             assays_set.add(y['assay_id'])
-            for z in Activities.objects.values().filter(assays_id=y['assay_id'], doc_id=DocumentNumber):
+            for z in Activities.objects.values().filter(assays_id=y['assay_id'], docs_id=DocumentNumber):
                 molregno_set.add(z['molecule_dictionary_id'])
     AssayList = list(assays_set)
 
@@ -516,7 +517,8 @@ for DocumentNumber in Documents:
             if relate:
                 test.related(relate)
 
-
+            # if serializedpre['activities']['type']:
+            #     test.add_keyword(serializedpre['activities']['type'])
 
             try:
                 test.add_keyword(serializedpre['activities']['type'])
