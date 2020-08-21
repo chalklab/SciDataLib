@@ -71,7 +71,7 @@ class BiotherapeuticsComponentsSerializer(serializers.ModelSerializer):
         depth = 1
 
 class BiotherapeuticsSerializer(serializers.ModelSerializer):
-    biotherapeutic_components = BiotherapeuticsComponentsSerializer(source='biotherapeutic_somponents_set', many=True, required=False)
+    biotherapeutic_components = BiotherapeuticsComponentsSerializer(source='biotherapeutic_components_set', many=True, required=False)
 
     class Meta:
         model = Biotherapeutics
@@ -79,16 +79,18 @@ class BiotherapeuticsSerializer(serializers.ModelSerializer):
         depth = 0
 
 class MoleculeDictionarySerializer(serializers.ModelSerializer):
-    biotherapeutics = BiotherapeuticsSerializer(source='biotherapeutics_set', many=True, required=False)
-    compound_properties = CompoundPropertiesSerializer(source='compoundproperties_set', many=True, required=False)
+    biotherapeutics = BiotherapeuticsSerializer(source='molecule_dictionary_biotherapeutics', required=False)
+    compound_properties = CompoundPropertiesSerializer(source='molecule_dictionary_compound_properties', required=False)
+    # compound_properties = CompoundPropertiesSerializer(source='compoundproperties_set', many=True, required=False)
     # compound_records = CompoundRecordsSerializer(source='compoundrecords_set', many=True, required=False)
     compound_structural_alerts = CompoundStructuralAlertsSerializer(source='compoundstructuralalerts_set', many=True, required=False)
-    compound_structures = CompoundStructuresSerializer(source='compoundstructures_set', many=True, required=False)
+    compound_structures = CompoundStructuresSerializer(source='molecule_dictionary_compound_structures', required=False)
     # drug_indication = DrugIndicationSerializer(source='compoundproperties_set', many=True, required=False)
     class Meta:
         model = MoleculeDictionary
         fields = '__all__'
-        # extra_fields = ['compoundproperties']
+        # extra_fields = ['compoundproperties_set']
+        # extra_fields = ['compound_properties']
         depth = 1
 
     # def get_field_names(self, declared_fields, info):
@@ -135,8 +137,21 @@ class DocsSerializer(serializers.ModelSerializer):
 
 
 # x = ActivitiesSerializer()
+# x = DocsSerializer()
 # x = MoleculeDictionarySerializer()
 # print(repr(x))
+
+
+# test = MoleculeDictionarySerializer(MoleculeDictionary.objects.first())
+# print(json.dumps(test.data, indent=4))
+
+# ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id='12645960'))
+# print(json.dumps(ActivitiesObjectA.data, indent=4))
+# DocsObjectA = DocsSerializer(Docs.objects.get(doc_id=5535)).data
+# for x in DocsObjectA.items():
+#     print(x)
+
+
 
 # ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id=17126237))
 # ActivitiesObjectA_JSON = JSONRenderer().render(ActivitiesObjectA.data)

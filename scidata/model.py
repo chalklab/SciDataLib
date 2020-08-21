@@ -34,7 +34,6 @@ def denester(q, r):
     denest(q, r)
     return denestered
 
-
 def is_number(n):
     """Function used for determining datatype"""
 
