@@ -26,12 +26,20 @@ targetchembl = 'CHEMBL240'
 '''Special Cases. Leave False for general use'''
 populateall = False #Generate data for all fields that have crosswalk entry
 fast_doc = False #Test script quickly by only processing one unspecified doc_id
-fast_mol = True #Test script quickly by only processing one unspecified molregno
+fast_mol = False #Test script quickly by only processing one unspecified molregno
 specific_document = 72215 #internal doc_id for specific document
 specific_molregno = 5638 #molregno of molecule of interest
-specific_activity = 12645960 #activity_id of specific activity of interest
+specific_activity = False #activity_id of specific activity of interest
 specific_target_organism = 'Homo sapiens' #assay target organism
 
+# '''Special Cases. Leave False for general use'''
+# populateall = False #Generate data for all fields that have crosswalk entry
+# fast_doc = False #Test script quickly by only processing one unspecified doc_id
+# fast_mol = True #Test script quickly by only processing one unspecified molregno
+# specific_document = 5535 #internal doc_id for specific document
+# specific_molregno = False #molregno of molecule of interest
+# specific_activity = False #activity_id of specific activity of interest
+# specific_target_organism = 'Homo sapiens' #assay target organism
 
 
 unique_id = '<uniqueID>'
@@ -204,7 +212,8 @@ for DocumentNumber in Documents:
                     def chemblidmod2(a,b):
                         dictB = {}
                         for c,d in b.items():
-                            if c == "chembl_id_lookup":
+                            # if c == "chembl_id_lookup":
+                            if c in ["chembl_id_lookup", "bioassay_ontology"]:
                                 # new = b.items().copy()
                                 # new[c].update(d)
                                 dictB.update(d)
@@ -223,7 +232,7 @@ for DocumentNumber in Documents:
                     return dictA
 
                 serializedpre = chemblidmod(serializedprepre)
-                # print(json.dumps(serializedpre))
+                print(json.dumps(serializedpre))
 
                 '''creates list of crosswalks tables that crosswalk entries are sorted into after merging based on crosswalks category value if present'''
                 serializedsetpre = set()
@@ -315,7 +324,7 @@ for DocumentNumber in Documents:
                         for dat in datapoint_set:
                             datapointA = {}
                             meta = {}
-                            exptmeta = {'table_name__placeholder':''}
+                            exptmeta = {}
                             experimentaldata = {}
                             exptdataall = {}
 
@@ -341,8 +350,7 @@ for DocumentNumber in Documents:
                                                                     if cross['meta'] != '1':
                                                                         exptmeta.update({str(cross['meta']): str(v)})
                                                                 if cross['meta'] is None:
-                                                                    if not exptmeta['table_name__placeholder']:
-                                                                        exptmeta.update({'table_name__placeholder': cross['table']})
+
                                                                     experimentaldata.update({k: str(v)})
                                                                     experimentaldata.update(
                                                                         {'@id': 'value', '@type': 'sci:value'})
@@ -363,8 +371,7 @@ for DocumentNumber in Documents:
                                                                     if cross['meta'] != '1':
                                                                         exptmeta.update({str(cross['meta']): str(v)})
                                                                 if cross['meta'] is None:
-                                                                    if not exptmeta['table_name__placeholder']:
-                                                                        exptmeta.update({'table_name__placeholder': cross['table']})
+
                                                                     experimentaldata.update({k: str(v)})
                                                                     experimentaldata.update(
                                                                         {'@id': 'value', '@type': 'sci:value'})
@@ -549,7 +556,7 @@ for DocumentNumber in Documents:
                 test.doc_id("https://scidata.unf.edu/chembl/covid/"+unique_id+"/")
                 if doc_data['doi']:
                     test.source([{'title':doc_data['title'],
-                                  'doi':doc_data['doi']}])
+                                  'doi':'https://doi.org/'+doc_data['doi']}])
                 else:
                     test.source([{'title':doc_data['title'],
                                   'journal':doc_data['journal'],
@@ -561,10 +568,10 @@ for DocumentNumber in Documents:
                 put = test.output
                 if populateall:
                     # with open('populated_'+targetchemblid+'_'+documentchemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
-                    with open('populated_'+targetchemblid+'_'+documentchemblid+ '.jsonld', 'w') as f:
+                    with open('populated_'+targetchemblid+documentchemblid+ '.jsonld', 'w') as f:
 
                         json.dump(put, f)
                 else:
                     # with open(targetchemblid+'_'+documentchemblid+moleculechemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
-                    with open(targetchemblid+'_'+documentchemblid+moleculechemblid+ '.jsonld', 'w') as f:
+                    with open(targetchemblid+documentchemblid+moleculechemblid+ '.jsonld', 'w') as f:
                         json.dump(put, f)
