@@ -136,7 +136,7 @@ class DocsSerializer(serializers.ModelSerializer):
             return expanded_fields
 
 
-# x = ActivitiesSerializer()
+x = ActivitiesSerializer()
 # x = DocsSerializer()
 # x = MoleculeDictionarySerializer()
 # print(repr(x))
