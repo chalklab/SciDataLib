@@ -23,23 +23,23 @@ query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
 '''Filter Docs by Target ChemblID, HERG gene is 240, SARS-COV-2 is 4303835, PSEN1 is 2473'''
 targetchembl = 'CHEMBL240'
 
-'''Special Cases. Leave False for general use'''
-populateall = False #Generate data for all fields that have crosswalk entry
-fast_doc = False #Test script quickly by only processing one unspecified doc_id
-fast_mol = False #Test script quickly by only processing one unspecified molregno
-specific_document = 72215 #internal doc_id for specific document
-specific_molregno = 5638 #molregno of molecule of interest
-specific_activity = False #activity_id of specific activity of interest
-specific_target_organism = 'Homo sapiens' #assay target organism
-
 # '''Special Cases. Leave False for general use'''
 # populateall = False #Generate data for all fields that have crosswalk entry
 # fast_doc = False #Test script quickly by only processing one unspecified doc_id
-# fast_mol = True #Test script quickly by only processing one unspecified molregno
-# specific_document = 5535 #internal doc_id for specific document
-# specific_molregno = False #molregno of molecule of interest
+# fast_mol = False #Test script quickly by only processing one unspecified molregno
+# specific_document = 72215 #internal doc_id for specific document
+# specific_molregno = 5638 #molregno of molecule of interest
 # specific_activity = False #activity_id of specific activity of interest
 # specific_target_organism = 'Homo sapiens' #assay target organism
+
+'''Special Cases. Leave False for general use'''
+populateall = False #Generate data for all fields that have crosswalk entry
+fast_doc = False #Test script quickly by only processing one unspecified doc_id
+fast_mol = True #Test script quickly by only processing one unspecified molregno
+specific_document = 5535 #internal doc_id for specific document
+specific_molregno = False #molregno of molecule of interest
+specific_activity = False #activity_id of specific activity of interest
+specific_target_organism = 'Homo sapiens' #assay target organism
 
 
 unique_id = '<uniqueID>'
@@ -186,12 +186,14 @@ for DocumentNumber in Documents:
             for ac in activity_list:
 
                 ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id=ac['activity_id']))
-                # print(ActivitiesObjectA)
+                x = (ActivitiesObjectA.data)
+                # print(json.dumps(x))
                 pre1 = {}
                 activities = {}
                 nested = {}
 
                 pre2 = dict(ActivitiesObjectA.data)
+                # print(pre2)
                 for k, v in pre2.items():
                     if v is None:
                         pass
@@ -203,8 +205,7 @@ for DocumentNumber in Documents:
                 pre1.update(nested)
                 allunsorted = json.dumps(pre1)
                 serializedprepre = json.loads(allunsorted)
-                # print(allunsorted)
-
+                assaylink = serializedprepre["assays"]["chembl_id_lookup"]["chembl_id"]
 
 
                 def chemblidmod(input):
@@ -232,7 +233,7 @@ for DocumentNumber in Documents:
                     return dictA
 
                 serializedpre = chemblidmod(serializedprepre)
-                print(json.dumps(serializedpre))
+                # print(json.dumps(serializedpre))
 
                 '''creates list of crosswalks tables that crosswalk entries are sorted into after merging based on crosswalks category value if present'''
                 serializedsetpre = set()
@@ -393,6 +394,7 @@ for DocumentNumber in Documents:
                                 '@id': 'datapoint',
                                 '@type': 'sci:datapoint',
                                 'activity_id': ac['activity_id'],
+                                'assay_link': assaylink,
                                 'data': dataall
                             })
 
@@ -566,12 +568,78 @@ for DocumentNumber in Documents:
                 test.add_source([{"url": "https://www.ebi.ac.uk/chembl/document_report_card/"+serializedpre['docs']['chembl_id']+"/"}])
                 test.graph_uid("scidata:chembl:covid:"+unique_id)
                 put = test.output
+
+                linkinglist = ['assay_link']
+
+                def link(input):
+                    def finddict(a, f):
+                        for key, value in a.items():
+                            if value == f:
+                                if key not in linkinglist:
+                                    return(a["@id"])
+
+                            if isinstance(value, list):
+                                if findlist(value, f):
+                                    return findlist(value, f)
+                            if isinstance(value, dict):
+                                if finddict(value, f):
+                                    return finddict(value, f)
+
+                    def findlist(a, f):
+                        for x in a:
+                            if isinstance(x, dict):
+                                if finddict(x, f):
+                                    return finddict(x,f)
+                            if isinstance(x, list):
+                                if findlist(x, f):
+                                    return findlist(x, f)
+
+                    def finder(f):
+                        for key, value in input["@graph"].items():
+                            if value == f:
+                                return input["@graph"]["@id"]
+                            if isinstance(value, dict):
+                                if finddict(value, f):
+                                    return finddict(value, f)
+                            if isinstance(value, list):
+                                if findlist(value, f):
+                                    return findlist(value, f)
+
+                    def linkdict(a):
+                        for key, value in a.items():
+                            if key in linkinglist:
+                                a[key] = finder(value)
+                                return finder(value)
+                            if isinstance(value, list):
+                                linklist(value)
+                            if isinstance(value, dict):
+                                linkdict(value)
+
+                    def linklist(a):
+                        for x in a:
+                            if isinstance(x, dict):
+                                linkdict(x)
+                            if isinstance(x, list):
+                                linklist(x)
+
+                    for key, value in input['@graph'].items():
+                        if isinstance(value, dict):
+                            linkdict(value)
+                        if isinstance(value, list):
+                            linklist(value)
+                    return input
+
+
+                newput = link(put)
+                # print(json.dumps(newput))
+
+
                 if populateall:
                     # with open('populated_'+targetchemblid+'_'+documentchemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
                     with open('populated_'+targetchemblid+documentchemblid+ '.jsonld', 'w') as f:
 
-                        json.dump(put, f)
+                        json.dump(newput, f)
                 else:
                     # with open(targetchemblid+'_'+documentchemblid+moleculechemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
                     with open(targetchemblid+documentchemblid+moleculechemblid+ '.jsonld', 'w') as f:
-                        json.dump(put, f)
+                        json.dump(newput, f)
