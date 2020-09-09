@@ -23,23 +23,23 @@ query_crosswalks_nspaces = list(Nspaces.objects.using('crosswalks').values())
 '''Filter Docs by Target ChemblID, HERG gene is 240, SARS-COV-2 is 4303835, PSEN1 is 2473'''
 targetchembl = 'CHEMBL240'
 
-# '''Special Cases. Leave False for general use'''
-# populateall = False #Generate data for all fields that have crosswalk entry
-# fast_doc = False #Test script quickly by only processing one unspecified doc_id
-# fast_mol = False #Test script quickly by only processing one unspecified molregno
-# specific_document = 72215 #internal doc_id for specific document
-# specific_molregno = 5638 #molregno of molecule of interest
-# specific_activity = False #activity_id of specific activity of interest
-# specific_target_organism = 'Homo sapiens' #assay target organism
-
 '''Special Cases. Leave False for general use'''
 populateall = False #Generate data for all fields that have crosswalk entry
 fast_doc = False #Test script quickly by only processing one unspecified doc_id
-fast_mol = True #Test script quickly by only processing one unspecified molregno
-specific_document = 5535 #internal doc_id for specific document
-specific_molregno = False #molregno of molecule of interest
+fast_mol = False #Test script quickly by only processing one unspecified molregno
+specific_document = 72215 #internal doc_id for specific document
+specific_molregno = 5638 #molregno of molecule of interest
 specific_activity = False #activity_id of specific activity of interest
 specific_target_organism = 'Homo sapiens' #assay target organism
+
+# '''Special Cases. Leave False for general use'''
+# populateall = False #Generate data for all fields that have crosswalk entry
+# fast_doc = False #Test script quickly by only processing one unspecified doc_id
+# fast_mol = True #Test script quickly by only processing one unspecified molregno
+# specific_document = 5535 #internal doc_id for specific document
+# specific_molregno = False #molregno of molecule of interest
+# specific_activity = False #activity_id of specific activity of interest
+# specific_target_organism = 'Homo sapiens' #assay target organism
 
 
 unique_id = '<uniqueID>'
