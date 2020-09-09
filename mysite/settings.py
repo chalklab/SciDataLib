@@ -82,7 +82,7 @@ DATABASES = {
         'HOST': '127.0.0.1',
         'PASSWORD': 'letthedatafl0w',
         'PORT': '3307',
-        'unix_socket': '/var/run/mariadb/mariadb.pid'
+        'unix_socket': '/var/run/mariadb/mariadb.pid',
     },
     'crosswalks': {
         'ENGINE': 'django.db.backends.mysql',
