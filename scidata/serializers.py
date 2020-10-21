@@ -102,7 +102,7 @@ class MoleculeDictionarySerializer(serializers.ModelSerializer):
     #         return expanded_fields
 
 class ActivitiesSerializer(serializers.ModelSerializer):
-    activity_supp_map = ActivitySuppMapSerializer(many=True, required=False)
+    activity_supp_map = ActivitySuppMapSerializer(source="activitysuppmap_set", many=True)
     molecule_dictionary = MoleculeDictionarySerializer()
     class Meta:
         model = Activities
@@ -136,7 +136,7 @@ class DocsSerializer(serializers.ModelSerializer):
             return expanded_fields
 
 
-x = ActivitiesSerializer()
+# x = ActivitiesSerializer()
 # x = DocsSerializer()
 # x = MoleculeDictionarySerializer()
 # print(repr(x))
@@ -145,7 +145,7 @@ x = ActivitiesSerializer()
 # test = MoleculeDictionarySerializer(MoleculeDictionary.objects.first())
 # print(json.dumps(test.data, indent=4))
 
-# ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id='12645960'))
+ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id='12645960'))
 # print(json.dumps(ActivitiesObjectA.data, indent=4))
 # DocsObjectA = DocsSerializer(Docs.objects.get(doc_id=5535)).data
 # for x in DocsObjectA.items():
@@ -154,7 +154,6 @@ x = ActivitiesSerializer()
 
 
 # ActivitiesObjectA = ActivitiesSerializer(Activities.objects.get(activity_id=17126237))
-# ActivitiesObjectA_JSON = JSONRenderer().render(ActivitiesObjectA.data)
 # print(ActivitiesObjectA_JSON)
 # print(json.dumps(ActivitiesObjectA.data))
 
