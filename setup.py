@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(
-   name='SciData',
+   name='SciDataLib',
    version='0.1',
    description='Python library for development of SciData JSON-LD files',
    author='Dylan Johnson',

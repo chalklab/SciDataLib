@@ -101,6 +101,15 @@ DATABASES = {
         'PASSWORD': 'nerd4life*',
         'PORT': '3307',
         'unix_socket': '/var/run/mariadb/mariadb.pid'
+    },
+    'sciflow': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'sciflow',
+        'USER': 'sciflow',
+        'HOST': '127.0.0.1',
+        'PASSWORD': 'letthedatafl0w',
+        'PORT': '3307',
+        'unix_socket': '/var/run/mariadb/mariadb.pid'
     }
 }
 

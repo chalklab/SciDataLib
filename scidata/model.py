@@ -75,6 +75,8 @@ class SciData:
         "@graph": {
             "@id": "",
             "@type": "",
+            "sourcecode": "",
+            "datasetname": "",
             "uid": "",
             "title": "",
             "author": [],
@@ -180,6 +182,18 @@ class SciData:
         """Make or replace the unique id for the graph"""
 
         self.meta['@graph']['uid'] = i
+        return self.meta
+
+    def sourcecode(self, i: str) -> dict:
+        """Make or replace the sourcecode for the graph"""
+
+        self.meta['@graph']['sourcecode'] = i
+        return self.meta
+
+    def datasetname(self, i: str) -> dict:
+        """Make or replace the sourcecode for the graph"""
+
+        self.meta['@graph']['datasetname'] = i
         return self.meta
 
     def author(self, author: list) -> dict:
@@ -544,7 +558,7 @@ class SciData:
             elif e in self.meta['@graph'].keys():
                 self.meta['@graph'].pop(e)
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
-        # print(temp)
+        print(temp)
 
         print('complete')
         return self.meta
