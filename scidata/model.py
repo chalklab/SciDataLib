@@ -72,6 +72,8 @@ class SciData:
     meta = {
         "@context": [],
         "@id": "",
+        "generatedAt": "",
+        "version": "",
         "@graph": {
             "@id": "",
             "@type": "",
@@ -84,7 +86,7 @@ class SciData:
             "publisher": "",
             "version": "",
             "keywords": [],
-            "starttime": "",
+            "dateTime": "",
             "permalink": "",
             "related": [],
             "toc": [],
@@ -196,6 +198,18 @@ class SciData:
         self.meta['@graph']['datasetname'] = i
         return self.meta
 
+    def generatedAt(self, i: str) -> dict:
+        """Make or replace the sourcecode for the graph"""
+
+        self.meta['generatedAt'] = i
+        return self.meta
+
+    def version(self, i: str) -> dict:
+        """Make or replace the sourcecode for the graph"""
+
+        self.meta['version'] = i
+        return self.meta
+
     def author(self, author: list) -> dict:
         """Make or replace the author"""
 
@@ -228,7 +242,7 @@ class SciData:
         self.meta['@graph']['publisher'] = publisher
         return self.meta
 
-    def version(self, version: str) -> dict:
+    def graphversion(self, version: str) -> dict:
         """Make or replace the document version"""
 
         self.meta['@graph']['version'] = version
@@ -259,10 +273,10 @@ class SciData:
                     keys.append(k)
         return self.meta
 
-    def starttime(self) -> dict:
-        """initiate the start time"""
+    def dateTime(self) -> dict:
+        """initiate the date time"""
 
-        self.meta['@graph']['starttime'] = str(datetime.datetime.now())
+        self.meta['@graph']['dateTime'] = "datetime from GraphDB"
         return self.meta
 
     def permalink(self, link: str) -> dict:
