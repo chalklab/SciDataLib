@@ -100,17 +100,19 @@ for DocumentNumber in Documents:
     test.base({"@base": "https://scidata.unf.edu/chembl/covid/"+unique_id+"/"})
     # test.doc_id("@ID HERE")
     test.graph_id("")
+    test.generatedAt(str(datetime.datetime.now()))
+    test.version('1')
+    test.dateTime()
     test.graph_type("sdo:scidata")
     test.title(doc_data['title'])
     test.author(authors)
     test.description(doc_data['abstract'])
     test.publisher(doc_data['journal'])
-    test.version('1.0')
+    test.graphversion('version from GraphDB')
     test.permalink("https://scidata.unf.edu/chembl/covid/"+unique_id+"/")
     # test.related("http://RELATED.jsonld")
     test.discipline('w3i:Chemistry')
     test.subdiscipline('w3i:MedicinalChemistry')
-    # test.source([{"citation1": "Johnson Research Group http://CITATION.edu", "url": "http://CITATION.jsonld"}])
     test.rights("https://creativecommons.org/licenses/by-nc-nd/4.0/","European Bioinformatics Institute")
     addnamespace = {'sdo': 'https://stuchalk.github.io/scidata/ontology/scidata.owl#','w3i':'https://w3id.org/skgo/modsci#'}
 
@@ -557,7 +559,6 @@ for DocumentNumber in Documents:
             if datapoint:
 
                 test.toc()
-                test.starttime()
                 documentchemblid = str(serializedpre['docs']['chembl_id'].replace("CHEMBL", "_"))
                 moleculechemblid = str(serializedpre['molecule_dictionary']['chembl_id'].replace("CHEMBL", "_"))
                 assaychemblid = str(serializedpre['assays']['assay_id'])
@@ -565,15 +566,17 @@ for DocumentNumber in Documents:
 
                 test.doc_id("https://scidata.unf.edu/chembl/covid/"+unique_id+"/")
                 if doc_data['doi']:
-                    test.source([{'title':doc_data['title'],
-                                  'doi':'https://doi.org/'+doc_data['doi']}])
+                    test.source([{'title': doc_data['title'],
+                                  'doi':'https://doi.org/'+doc_data['doi'],
+                                  'type': doc_data['doc_type']}])
                 else:
                     test.source([{'title':doc_data['title'],
+                                  'type': doc_data['doc_type'],
                                   'journal':doc_data['journal'],
                                   'year':doc_data['year'],
                                   'volume':doc_data['volume'],
                                   'issue':doc_data['issue']}])
-                test.add_source([{"url": "https://www.ebi.ac.uk/chembl/document_report_card/"+serializedpre['docs']['chembl_id']+"/"}])
+                test.add_source([{'type': 'database', "url": "https://www.ebi.ac.uk/chembl/document_report_card/"+serializedpre['docs']['chembl_id']+"/"}])
                 # test.graph_uid("scidata:chembl:covid:"+unique_id)
                 test.graph_uid("scidata:"+sourcecode+":"+datasetname+":"+unique_id)
                 test.sourcecode(sourcecode)
