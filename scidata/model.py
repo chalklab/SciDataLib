@@ -1,13 +1,8 @@
 """ This module contains the Scidata class used in generating Scidata JSON-LD documents """
-import json
-import datetime
-from itertools import count
 from collections import defaultdict
-import django
-import os
+from itertools import count
+import json
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
-django.setup()
 
 
 def denester(q, r):
@@ -572,7 +567,7 @@ class SciData:
             elif e in self.meta['@graph'].keys():
                 self.meta['@graph'].pop(e)
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
-        print(temp)
+        # print(temp)
 
         print('complete')
         return self.meta

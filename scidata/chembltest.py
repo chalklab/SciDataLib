@@ -1,17 +1,14 @@
-
-from scidata.model import *
-
-import os
 import django
+import os
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
 django.setup()
 
-from rest_framework.renderers import JSONRenderer
-from scidata.chembldb27 import *
+from scidata.model import *
 from scidata.sciflowdb import Datasets
 from scidata.crosswalks import *
 from scidata.serializers import *
-from django.core import serializers
+from pyld import jsonld
+import datetime
 
 path = r"/Users/n01448636/Documents/GoogleDrive/PycharmProjects/SciDataLib/scidata/JSON_dumps"
 os.chdir(path)
@@ -28,14 +25,15 @@ sourcecode = Datasets.objects.using('sciflow').values('sourcecode').get(datasetn
 
 '''Filter Docs by Target ChemblID, HERG gene is 240, SARS-COV-2 is 4303835, PSEN1 is 2473'''
 targetchembl = 'CHEMBL2176846'
-# targetchembl = 'CHEMBL240'
+targetchemblid = targetchembl.replace("CHEMBL","")
+
 
 '''Special Cases. Leave False for general use'''
 populateall = False #Generate data for all fields that have crosswalk entry
 fast_doc = False #Test script quickly by only processing one unspecified doc_id
 fast_mol = False #Test script quickly by only processing one unspecified molregno
 specific_document = 92795 #internal doc_id for specific document
-specific_molregno = 1953061 #molregno of molecule of interest
+specific_molregno = False #molregno of molecule of interest
 specific_activity = False #activity_id of specific activity of interest
 specific_target_organism = False #assay target organism
 
@@ -49,7 +47,7 @@ specific_target_organism = False #assay target organism
 # specific_target_organism = 'Homo sapiens' #assay target organism
 
 
-unique_id = '<uniqueID>'
+
 # DocSer = DocsSerializer(Docs.objects.get(doc_id=specific_document, activities__herg=1))
 
 # x = JSONRenderer().render(DocSer.data)
@@ -59,7 +57,6 @@ unique_id = '<uniqueID>'
 
 
 
-targetchemblid = targetchembl.replace("CHEMBL","")
 Documents = set()
 for x in TargetDictionary.objects.values().filter(chembl_id_lookup=targetchembl):
     for y in Assays.objects.values().filter(target_dictionary=x['tid']):
@@ -97,7 +94,6 @@ for DocumentNumber in Documents:
     test = SciData(doc_data['doc_id'])
 
     test.context(['https://stuchalk.github.io/scidata/contexts/chembl.jsonld','https://stuchalk.github.io/scidata/contexts/scidata.jsonld'])
-    test.base({"@base": "https://scidata.unf.edu/chembl/covid/"+unique_id+"/"})
     # test.doc_id("@ID HERE")
     test.graph_id("")
     test.generatedAt(str(datetime.datetime.now()))
@@ -109,7 +105,6 @@ for DocumentNumber in Documents:
     test.description(doc_data['abstract'])
     test.publisher(doc_data['journal'])
     test.graphversion('version from GraphDB')
-    test.permalink("https://scidata.unf.edu/chembl/covid/"+unique_id+"/")
     # test.related("http://RELATED.jsonld")
     test.discipline('w3i:Chemistry')
     test.subdiscipline('w3i:MedicinalChemistry')
@@ -562,9 +557,12 @@ for DocumentNumber in Documents:
                 documentchemblid = str(serializedpre['docs']['chembl_id'].replace("CHEMBL", "_"))
                 moleculechemblid = str(serializedpre['molecule_dictionary']['chembl_id'].replace("CHEMBL", "_"))
                 assaychemblid = str(serializedpre['assays']['assay_id'])
+                unique_id = targetchemblid+documentchemblid+moleculechemblid
 
+                test.base({"@base": "https://scidata.unf.edu/" + sourcecode + "/" + datasetname + unique_id + "/"})
+                test.permalink("https://scidata.unf.edu/" + sourcecode + "/" + datasetname + unique_id + "/")
 
-                test.doc_id("https://scidata.unf.edu/chembl/covid/"+unique_id+"/")
+                test.doc_id("https://scidata.unf.edu/" + sourcecode + "/"+ datasetname + unique_id+"/")
                 if doc_data['doi']:
                     test.source([{'title': doc_data['title'],
                                   'doi':'https://doi.org/'+doc_data['doi'],
@@ -577,7 +575,6 @@ for DocumentNumber in Documents:
                                   'volume':doc_data['volume'],
                                   'issue':doc_data['issue']}])
                 test.add_source([{'type': 'database', "url": "https://www.ebi.ac.uk/chembl/document_report_card/"+serializedpre['docs']['chembl_id']+"/"}])
-                # test.graph_uid("scidata:chembl:covid:"+unique_id)
                 test.graph_uid("scidata:"+sourcecode+":"+datasetname+":"+unique_id)
                 test.sourcecode(sourcecode)
                 test.datasetname(datasetname)
@@ -646,15 +643,21 @@ for DocumentNumber in Documents:
 
 
                 newput = link(put)
-                # print(json.dumps(newput))
+
+                try:
+                    # jsonld.to_rdf(json.dumps(newput), {"processingMode": "json-ld-1.0"})
+
+                    if populateall:
+                        # with open('populated_'+targetchemblid+'_'+documentchemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
+                        with open('populated_' + targetchemblid + documentchemblid + '.jsonld', 'w') as f:
+
+                            json.dump(newput, f)
+                    else:
+                        # with open(targetchemblid+'_'+documentchemblid+moleculechemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
+                        with open(targetchemblid + documentchemblid + moleculechemblid + '.jsonld', 'w') as f:
+                            json.dump(newput, f)
+                except:
+                    print('Invalid JSON-LD')
 
 
-                if populateall:
-                    # with open('populated_'+targetchemblid+'_'+documentchemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
-                    with open('populated_'+targetchemblid+documentchemblid+ '.jsonld', 'w') as f:
 
-                        json.dump(newput, f)
-                else:
-                    # with open(targetchemblid+'_'+documentchemblid+moleculechemblid+'_'+assaychemblid+ '.jsonld', 'w') as f:
-                    with open(targetchemblid+documentchemblid+moleculechemblid+ '.jsonld', 'w') as f:
-                        json.dump(newput, f)
