@@ -107,7 +107,7 @@ class SciData:
 
     contexts = []
     nspaces = {}
-    bass = {}
+    base = {}
 
     def context(self, context: list) -> dict:
         """Make or replace the external context files"""
@@ -137,14 +137,18 @@ class SciData:
         self.make_context()
         return self.meta
 
-    def base(self, base: dict) -> dict:
-        """Make or replace the base"""
+    def add_base(self, base: str) -> dict:
+        """
+        Make or replace the JSON-LD base URL
+        https://www.w3.org/TR/json-ld/#base-iri
+        :param base base URL for a JSON-LD file
+        """
 
         if base == "":
-            self.bass = {"@base": "http://BASE.jsonld"}
-            self.make_context()
+            self.base = {"@base": "https://scidata.unf.edu/update_your_base_URL"}
         else:
-            self.bass = base
+            self.base = {"@base": base}
+        self.make_context()
         return self.meta
 
     def make_context(self) -> dict:
@@ -152,7 +156,7 @@ class SciData:
 
         c = self.contexts
         n = self.nspaces
-        b = self.bass
+        b = self.base
         con = c + [n, b]
         self.meta["@context"] = con
         return self.meta
