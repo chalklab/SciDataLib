@@ -1,16 +1,8 @@
-asgiref==3.2.7
+asgiref @ file:///tmp/build/80754af9/asgiref_1602513567813/work
 certifi==2020.6.20
-Django==3.0.3
-djangorestframework==3.11.0
-et-xmlfile==1.0.1
-jdcal==1.4.1
-mysqlclient==1.4.6
-numpy @ file:///Users/runner/miniforge3/conda-bld/numpy_1597938353960/work
-openpyxl @ file:///home/conda/feedstock_root/build_artifacts/openpyxl_1598029012711/work
-pandas @ file:///Users/runner/miniforge3/conda-bld/pandas_1592422011735/work
-pycurl==7.43.0.5
-python-dateutil==2.8.1
+Django @ file:///tmp/build/80754af9/django_1601563330930/work
+djangorestframework @ file:///home/conda/feedstock_root/build_artifacts/djangorestframework_1601312268278/work
+mysqlclient @ file:///opt/concourse/worker/volumes/live/ffe3be1b-74a1-477e-6e7e-2b823d22e730/volume/mysqlclient_1594308772154/work
+psycopg2 @ file:///opt/concourse/worker/volumes/live/c8a4b965-959f-4e6c-7792-4aa881d63c8d/volume/psycopg2_1594305121341/work
 pytz==2020.1
-simplejson==3.17.0
-six @ file:///home/conda/feedstock_root/build_artifacts/six_1590081179328/work
-sqlparse==0.3.1
+sqlparse @ file:///tmp/build/80754af9/sqlparse_1602184451250/work
