@@ -24,7 +24,7 @@ sourcecode = Datasets.objects.using('sciflow').values('sourcecode').get(datasetn
 
 
 '''Filter Docs by Target ChemblID, HERG gene is 240, SARS-COV-2 is 4303835, PSEN1 is 2473'''
-targetchembl = 'CHEMBL2176846'
+targetchembl = 'CHEMBL240'
 targetchemblid = targetchembl.replace("CHEMBL","")
 
 
@@ -32,10 +32,18 @@ targetchemblid = targetchembl.replace("CHEMBL","")
 populateall = False #Generate data for all fields that have crosswalk entry
 fast_doc = False #Test script quickly by only processing one unspecified doc_id
 fast_mol = False #Test script quickly by only processing one unspecified molregno
-specific_document = 92795 #internal doc_id for specific document
-specific_molregno = False #molregno of molecule of interest
+specific_document = 58578 #internal doc_id for specific document
+# specific_document = 39380 #internal doc_id for specific document
+# specific_document = False #internal doc_id for specific document
+
+
+specific_molregno = 21697 #molregno of molecule of interest
+# specific_molregno = 428371 #molregno of molecule of interest
+# specific_molregno = False #molregno of molecule of interest
+
+
 specific_activity = False #activity_id of specific activity of interest
-specific_target_organism = False #assay target organism
+specific_target_organism = 'homo sapiens' #assay target organism
 
 # '''Special Cases. Leave False for general use'''
 # populateall = False #Generate data for all fields that have crosswalk entry
@@ -95,16 +103,14 @@ for DocumentNumber in Documents:
 
     test.context(['https://stuchalk.github.io/scidata/contexts/chembl.jsonld','https://stuchalk.github.io/scidata/contexts/scidata.jsonld'])
     # test.doc_id("@ID HERE")
-    test.graph_id("")
     test.generatedAt(str(datetime.datetime.now()))
     test.version('1')
-    test.dateTime()
-    test.graph_type("sdo:scidata")
+    # test.startTime('1')
+    # test.graph_type("sdo:scidataFramework")
     test.title(doc_data['title'])
     test.author(authors)
     test.description(doc_data['abstract'])
     test.publisher(doc_data['journal'])
-    test.graphversion('version from GraphDB')
     # test.related("http://RELATED.jsonld")
     test.discipline('w3i:Chemistry')
     test.subdiscipline('w3i:MedicinalChemistry')
@@ -359,7 +365,7 @@ for DocumentNumber in Documents:
 
                                                                     experimentaldata.update({k: str(v)})
                                                                     experimentaldata.update(
-                                                                        {'@id': 'value', '@type': 'sci:value'})
+                                                                        {'@id': 'value', '@type': 'sdo:value'})
                                         else:
                                             if cross['table'] == serial_table:
                                                 for k, v in serial_dict.items():
@@ -380,14 +386,14 @@ for DocumentNumber in Documents:
 
                                                                     experimentaldata.update({k: str(v)})
                                                                     experimentaldata.update(
-                                                                        {'@id': 'value', '@type': 'sci:value'})
+                                                                        {'@id': 'value', '@type': 'sdo:value'})
 
                             if experimentaldata:
 
                                 exptdataall.update(exptmeta)
                                 exptdataall.update({
                                     '@id': 'datum',
-                                    '@type': 'sci:' + dat,
+                                    '@type': 'sdo:' + dat,
                                     'value': experimentaldata
                                 })
 
@@ -397,14 +403,14 @@ for DocumentNumber in Documents:
                             datapointA.update(meta)
                             datapointA.update({
                                 '@id': 'datapoint',
-                                '@type': 'sci:datapoint',
+                                '@type': 'sdo:datapoint',
                                 'activity_id': ac['activity_id'],
-                                'assay_link': assaylink,
+                                'assay': assaylink,
                                 'data': dataall
                             })
 
                         if datapointA:
-                            datapoint.append(datapointA)
+                            datapoint.append(dict(sorted(datapointA.items())))
                             datagroupA.append('datapoint')
                             datapointA={}
 
@@ -435,10 +441,10 @@ for DocumentNumber in Documents:
                                                             nspacestoc.add(cross['url'])
                                                             methodologyA.update({
                                                                 '@id': met,
-                                                                '@type': 'sci:' + met})
+                                                                '@type': 'sdo:' + met})
                                                             methodologyA.update({k: str(v)})
                     if methodologyA:
-                        methodology.append(methodologyA)
+                        methodology.append(dict(sorted(methodologyA.items())))
                 methodologyx = [i for n, i in enumerate(methodology) if i not in methodology[n + 1:]]
 
                 system_set = set()
@@ -472,17 +478,18 @@ for DocumentNumber in Documents:
                                                                     systemA.update({cross['sdsubsubsection']: {}})
                                                                     systemA[cross['sdsubsubsection']].update({
                                                                         "@id": cross['sdsubsubsection'],
-                                                                        "@type": "sci:"+cross['sdsubsubsection'],
+                                                                        "@type": "sdo:"+cross['sdsubsubsection'],
                                                                         k: v})
                                                             else:
                                                                 nspaces.add(cross['nspace_id'])
                                                                 nspacestoc.add(cross['url'])
                                                                 systemA.update({
                                                                     '@id': sys,
-                                                                    '@type': 'sci:' + sys})
+                                                                    '@type': 'sdo:' + sys})
                                                                 systemA.update({k:v})
                     if systemA:
-                        system.append(systemA)
+                        system.append(dict(sorted(systemA.items())))
+
                 systemx = [i for n, i in enumerate(system) if i not in system[n + 1:]]
 
                 metadata = []
@@ -497,7 +504,7 @@ for DocumentNumber in Documents:
 
             if datagroupA:
                 datagroup.append(
-                    {'@id': 'datagroup', '@type': 'sci:datagroup', 'chembl_id': serializedpre['molecule_dictionary']['chembl_id'], 'datapoints': datagroupA})
+                    {'@id': 'datagroup', '@type': 'sdo:datagroup', 'chembl_id': serializedpre['molecule_dictionary']['chembl_id'], 'datapoints': datagroupA})
 
             if methodology:
                 test.aspects(methodologyx)
@@ -559,14 +566,19 @@ for DocumentNumber in Documents:
                 assaychemblid = str(serializedpre['assays']['assay_id'])
                 unique_id = targetchemblid+documentchemblid+moleculechemblid
 
-                test.base({"@base": "https://scidata.unf.edu/" + sourcecode + "/" + datasetname + unique_id + "/"})
-                test.permalink("https://scidata.unf.edu/" + sourcecode + "/" + datasetname + unique_id + "/")
+                test.add_base("https://scidata.unf.edu/" + sourcecode + ":" + datasetname + ":" + unique_id + "/")
+                test.permalink("https://scidata.unf.edu/" + sourcecode + ":" + datasetname + ":" + unique_id + "/")
 
-                test.doc_id("https://scidata.unf.edu/" + sourcecode + "/"+ datasetname + unique_id+"/")
+                test.doc_id("")
                 if doc_data['doi']:
-                    test.source([{'title': doc_data['title'],
-                                  'doi':'https://doi.org/'+doc_data['doi'],
-                                  'type': doc_data['doc_type']}])
+                    if doc_data['doc_type'] == "PUBLICATION":
+                        test.source([{'title': doc_data['title'],
+                                      'doi':'https://doi.org/'+doc_data['doi'],
+                                      'type': 'journal article'}])
+                    else:
+                        test.source([{'title': doc_data['title'],
+                                      'doi': 'https://doi.org/' + doc_data['doi'],
+                                      'type': doc_data['doc_type']}])
                 else:
                     test.source([{'title':doc_data['title'],
                                   'type': doc_data['doc_type'],
@@ -575,13 +587,15 @@ for DocumentNumber in Documents:
                                   'volume':doc_data['volume'],
                                   'issue':doc_data['issue']}])
                 test.add_source([{'type': 'database', "url": "https://www.ebi.ac.uk/chembl/document_report_card/"+serializedpre['docs']['chembl_id']+"/"}])
-                test.graph_uid("scidata:"+sourcecode+":"+datasetname+":"+unique_id)
-                test.sourcecode(sourcecode)
-                test.datasetname(datasetname)
+                test.graph_uid(sourcecode+":"+datasetname+":"+unique_id)
+                test.graph_id("https://scidata.unf.edu/" + sourcecode + ":" + datasetname + ":" + unique_id + "/")
+                test.graphversion('ChEMBL release 27')
+                # test.sourcecode(sourcecode)
+                # test.datasetname(datasetname)
 
                 put = test.output
 
-                linkinglist = ['assay_link']
+                linkinglist = ['assay']
 
                 def link(input):
                     def finddict(a, f):

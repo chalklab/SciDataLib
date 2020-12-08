@@ -71,9 +71,9 @@ class SciData:
         "version": "",
         "@graph": {
             "@id": "",
-            "@type": "",
-            "sourcecode": "",
-            "datasetname": "",
+            "@type": "sdo:scidataFramework",
+            # "sourcecode": "",
+            # "datasetname": "",
             "uid": "",
             "title": "",
             "author": [],
@@ -81,14 +81,14 @@ class SciData:
             "publisher": "",
             "version": "",
             "keywords": [],
-            "dateTime": "",
+            "startTime": "",
             "permalink": "",
             "related": [],
             "toc": [],
             "ids": [],
             "scidata": {
                 "@id": "scidata",
-                "@type": "sci:scientificData",
+                "@type": "sdo:scientificData",
                 "discipline": "",
                 "subdiscipline": "",
                 "methodology": {
@@ -185,17 +185,17 @@ class SciData:
         self.meta['@graph']['uid'] = i
         return self.meta
 
-    def sourcecode(self, i: str) -> dict:
-        """Make or replace the sourcecode for the graph"""
-
-        self.meta['@graph']['sourcecode'] = i
-        return self.meta
-
-    def datasetname(self, i: str) -> dict:
-        """Make or replace the sourcecode for the graph"""
-
-        self.meta['@graph']['datasetname'] = i
-        return self.meta
+    # def sourcecode(self, i: str) -> dict:
+    #     """Make or replace the sourcecode for the graph"""
+    #
+    #     self.meta['@graph']['sourcecode'] = i
+    #     return self.meta
+    #
+    # def datasetname(self, i: str) -> dict:
+    #     """Make or replace the sourcecode for the graph"""
+    #
+    #     self.meta['@graph']['datasetname'] = i
+    #     return self.meta
 
     def generatedAt(self, i: str) -> dict:
         """Make or replace the sourcecode for the graph"""
@@ -272,10 +272,10 @@ class SciData:
                     keys.append(k)
         return self.meta
 
-    def dateTime(self) -> dict:
-        """initiate the date time"""
+    def startTime(self, st: str) -> dict:
+        """initiate the start time"""
 
-        self.meta['@graph']['dateTime'] = "datetime from GraphDB"
+        self.meta['@graph']['startTime'] = st
         return self.meta
 
     def permalink(self, link: str) -> dict:
@@ -328,7 +328,7 @@ class SciData:
         if "@id" not in s:
             self.meta['@graph']['scidata']['methodology']['@id'] = "methodology/"
         if "@type" not in s:
-            self.meta['@graph']['scidata']['methodology']['@type'] = "sci:methodology"
+            self.meta['@graph']['scidata']['methodology']['@type'] = "sdo:methodology"
         if "datapoint" not in s:
             self.meta['@graph']['scidata']['methodology']['aspects'] = []
         count_index = defaultdict(lambda: count(1))
@@ -345,7 +345,7 @@ class SciData:
                 categoryx = 'undefined'
             index = next(count_index[category])
             it['@id'] = '{category}/{index}/'.format(category=category, index=index)
-            it['@type'] = 'sci:{category}'.format(category=categoryx)
+            it['@type'] = 'sdo:{category}'.format(category=categoryx)
             for x in it.values():
                 if isinstance(x, list):
                     for y in x:
@@ -368,7 +368,7 @@ class SciData:
         if "@id" not in s:
             self.meta['@graph']['scidata']['system']['@id'] = "system/"
         if "@type" not in s:
-            self.meta['@graph']['scidata']['system']['@type'] = "sci:system"
+            self.meta['@graph']['scidata']['system']['@type'] = "sdo:system"
         if "datapoint" not in s:
             self.meta['@graph']['scidata']['system']['facets'] = []
         count_index = defaultdict(lambda: count(1))
@@ -385,7 +385,7 @@ class SciData:
                 categoryx = 'undefined'
             index = next(count_index[category])
             it['@id'] = '{category}/{index}/'.format(category=category, index=index)
-            it['@type'] = 'sci:{category}'.format(category=categoryx)
+            it['@type'] = 'sdo:{category}'.format(category=categoryx)
             for x in it.values():
                 if isinstance(x, list):
                     for y in x:
@@ -407,7 +407,7 @@ class SciData:
         if "@id" not in s:
             self.meta['@graph']['scidata']['dataset']['@id'] = "dataset/1/"
         if "@type" not in s:
-            self.meta['@graph']['scidata']['dataset']['@type'] = "sci:dataset"
+            self.meta['@graph']['scidata']['dataset']['@type'] = "sdo:dataset"
         if "datapoint" not in s:
             self.meta['@graph']['scidata']['dataset']['datapoint'] = []
         count_index = defaultdict(lambda: count(1))
@@ -573,5 +573,5 @@ class SciData:
         temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
         # print(temp)
 
-        print('complete')
+        print('complete: '+ str(self.meta['@graph']['uid']))
         return self.meta
