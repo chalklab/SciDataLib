@@ -32,18 +32,22 @@ targetchemblid = targetchembl.replace("CHEMBL","")
 populateall = False #Generate data for all fields that have crosswalk entry
 fast_doc = False #Test script quickly by only processing one unspecified doc_id
 fast_mol = False #Test script quickly by only processing one unspecified molregno
-specific_document = 58578 #internal doc_id for specific document
+# specific_document = 58578 #internal doc_id for specific document
 # specific_document = 39380 #internal doc_id for specific document
 # specific_document = False #internal doc_id for specific document
+specific_document = 51887 #internal doc_id for specific document
 
 
-specific_molregno = 21697 #molregno of molecule of interest
+# specific_molregno = 21697 #molregno of molecule of interest
 # specific_molregno = 428371 #molregno of molecule of interest
 # specific_molregno = False #molregno of molecule of interest
+specific_molregno = 803005 #molregno of molecule of interest
 
 
 specific_activity = False #activity_id of specific activity of interest
-specific_target_organism = 'homo sapiens' #assay target organism
+# specific_target_organism = 'homo sapiens' #assay target organism
+specific_target_organism = False #assay target organism
+
 
 # '''Special Cases. Leave False for general use'''
 # populateall = False #Generate data for all fields that have crosswalk entry

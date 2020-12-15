@@ -380,6 +380,9 @@ class SciData:
             if '@id' in it:
                 category = prefix[-1] + it['@id']
                 categoryx = it['@id']
+            elif 'descriptors' in it or 'identifiers' in it:
+                category = prefix[-1] + 'compound'
+                categoryx = 'compound'
             else:
                 category = 'undefined'
                 categoryx = 'undefined'
@@ -395,6 +398,7 @@ class SciData:
                     prefix.append(it['@id'])
                     iteratefacets(x)
         for item in facets:
+            print(item)
             iteratefacets(item)
             prefix = ['']
             self.meta['@graph']['scidata']['system']['facets'].append(item)
