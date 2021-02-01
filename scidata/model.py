@@ -87,7 +87,7 @@ class SciData:
             "toc": [],
             "ids": [],
             "scidata": {
-                "@id": "scidata",
+                "@id": "scidata/",
                 "@type": "sdo:scientificData",
                 "discipline": "",
                 "subdiscipline": "",
@@ -398,7 +398,7 @@ class SciData:
                     prefix.append(it['@id'])
                     iteratefacets(x)
         for item in facets:
-            print(item)
+            # print(item)
             iteratefacets(item)
             prefix = ['']
             self.meta['@graph']['scidata']['system']['facets'].append(item)
