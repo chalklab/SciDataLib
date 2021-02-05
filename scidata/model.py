@@ -210,16 +210,27 @@ class SciData:
         return self.meta
 
     def author(self, author: list) -> dict:
-        """Make or replace the author"""
+        """Make or replace the author
+        Expects either:
+         1) a list of dictionaries where each dictionary contains a minimum of a key that is 'name'
+            ie. [{'name': 'George Washington', 'ORCID': 1}, {'name': 'John Adams', 'ORCID': 2}]
+
+         2) a list of strings which are author names ie. ['George Washington', 'John Adams'] """
+
 
         a = []
         if isinstance(author, list):
             for c, au in enumerate(author):
-                auth = {'@id': ('author/' + str(c + 1) + '/')}
-                t = {'@type': 'dc:author'}
-                auth.update(t)
-                auth.update(au)
-                a.append(auth)
+                if type(au) is dict:
+                    if 'name' in au:
+                        auth = {'@id': ('author/' + str(c + 1) + '/')}
+                        auth.update({'@type': 'dc:creator'})
+                        auth.update(au)
+                        a.append(auth)
+                if type(au) is str:
+                    auth = {'@id': ('author/' + str(c + 1) + '/')}
+                    auth.update({'@type': 'dc:creator'})
+                    auth.update({'name':au})
             self.meta['@graph']['author'] = a
         return self.meta
 
