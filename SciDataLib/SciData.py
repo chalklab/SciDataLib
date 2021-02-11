@@ -1,10 +1,11 @@
+"""Python library for writing SciData JSON-LD files"""
 from collections import defaultdict
 from itertools import count
-import json
+from datetime import datetime
 
 
 class SciData:
-    """This class generates the Scidata JSON-LD document"""
+    """This class generates the SciData JSON-LD document"""
 
     def __init__(self, uid: str):
         """Initialize the instance using a unique id"""
@@ -19,8 +20,6 @@ class SciData:
         "@graph": {
             "@id": "",
             "@type": "sdo:scidataFramework",
-            # "sourcecode": "",
-            # "datasetname": "",
             "uid": "",
             "title": "",
             "author": [],
@@ -39,12 +38,16 @@ class SciData:
                 "discipline": "",
                 "subdiscipline": "",
                 "methodology": {
+                    "@id": "methodology/",
+                    "@type": "sdo:methodology",
                     "aspects": []},
                 "system": {
+                    "@id": "system/",
+                    "@type": "sdo:system",
                     "facets": []},
                 "dataset": {
-                    "datagroup": [],
-                    "datapoint": []
+                    "@id": "dataset/",
+                    "@type": "sdo:dataset"
                 },
             },
             "sources": [],
@@ -52,12 +55,21 @@ class SciData:
         }
     }
 
-    contexts = []
-    nspaces = {}
+    contexts = ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+    nspaces = {
+            "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
+            "sub": "https://stuchalk.github.io/scidata/ontology/substance.owl#",
+            "chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#",
+            "w3i": "https://w3id.org/skgo/modsci#",
+            "qudt": "http://qudt.org/vocab/unit/",
+            "obo": "http://purl.obolibrary.org/obo/",
+            "dc": "http://purl.org/dc/terms/",
+            "xsd": "http://www.w3.org/2001/XMLSchema#"
+    }
     base = {}
 
     def context(self, context: list) -> dict:
-        """Make or replace the external context files"""
+        """Create or replace the external context files"""
         self.contexts = []
         self.contexts = context
         self.make_context()
@@ -71,7 +83,7 @@ class SciData:
         return self.meta
 
     def namespace(self, namespace: dict) -> dict:
-        """Make or replace the namespace"""
+        """Create or replace the namespace"""
 
         self.nspaces = namespace
         self.make_context()
@@ -109,61 +121,52 @@ class SciData:
         return self.meta
 
     def doc_id(self, i: str) -> dict:
-        """Make or replace the document id"""
+        """Create or replace the document id"""
 
         self.meta['@id'] = i
         return self.meta
 
     def graph_id(self, i: str) -> dict:
-        """Make or replace the graph id"""
+        """Create or replace the graph id"""
 
         self.meta['@graph']['@id'] = i
         return self.meta
 
     def graph_type(self, i: str) -> dict:
-        """Make or replace the graph type"""
+        """Create or replace the graph type"""
 
         self.meta['@graph']['@type'] = i
         return self.meta
 
     def graph_uid(self, i: str) -> dict:
-        """Make or replace the unique id for the graph"""
+        """Create or replace the unique id for the graph"""
 
         self.meta['@graph']['uid'] = i
         return self.meta
 
-    # def sourcecode(self, i: str) -> dict:
-    #     """Make or replace the sourcecode for the graph"""
-    #
-    #     self.meta['@graph']['sourcecode'] = i
-    #     return self.meta
-    #
-    # def datasetname(self, i: str) -> dict:
-    #     """Make or replace the sourcecode for the graph"""
-    #
-    #     self.meta['@graph']['datasetname'] = i
-    #     return self.meta
+    def generatedat(self, i: str) -> dict:
+        """Create or replace the sourcecode for the graph"""
 
-    def generatedAt(self, i: str) -> dict:
-        """Make or replace the sourcecode for the graph"""
-
-        self.meta['generatedAt'] = i
+        if i != '':
+            self.meta['generatedAt'] = i
+        else:
+            dt = datetime.now()
+            self.meta['generatedAt'] = dt.strftime("%m-%d-%y %H:%M:%S")
         return self.meta
 
     def version(self, i: str) -> dict:
-        """Make or replace the sourcecode for the graph"""
+        """Create or replace the sourcecode for the graph"""
 
         self.meta['version'] = i
         return self.meta
 
     def author(self, author: list) -> dict:
-        """Make or replace the author
+        """Create or replace the author
         Expects either:
          1) a list of dictionaries where each dictionary contains a minimum of a key that is 'name'
             ie. [{'name': 'George Washington', 'ORCID': 1}, {'name': 'John Adams', 'ORCID': 2}]
 
          2) a list of strings which are author names ie. ['George Washington', 'John Adams'] """
-
 
         a = []
         if isinstance(author, list):
@@ -178,42 +181,41 @@ class SciData:
                     # print(au)
                     auth = {'@id': ('author/' + str(c + 1) + '/')}
                     auth.update({'@type': 'dc:creator'})
-                    auth.update({'name':au})
+                    auth.update({'name': au})
                     a.append(auth)
             self.meta['@graph']['author'] = a
         return self.meta
 
     def title(self, title: str) -> dict:
-        """Make or replace document title"""
+        """Create or replace document title"""
 
         self.meta['@graph']['title'] = title
         return self.meta
 
     def description(self, description: str) -> dict:
-        """Make or replace document description"""
+        """Create or replace document description"""
 
         self.meta['@graph']['description'] = description
         return self.meta
 
     def publisher(self, publisher: str) -> dict:
-        """Make or replace document publisher"""
+        """Create or replace document publisher"""
 
         self.meta['@graph']['publisher'] = publisher
         return self.meta
 
     def graphversion(self, version: str) -> dict:
-        """Make or replace the document version"""
+        """Create or replace the document version"""
 
         self.meta['@graph']['version'] = version
         return self.meta
 
     def keywords(self, keywords: str or list) -> dict:
-        """Make or replace the keywords of the instance"""
+        """Create or replace the keywords of the instance"""
 
         keys = self.meta['@graph']['keywords']
         if isinstance(keywords, str):
-            keys = []
-            keys.append(keywords)
+            keys = [keywords]
         elif isinstance(keywords, list):
             keys = keywords
         keys.sort()
@@ -232,170 +234,214 @@ class SciData:
                     keys.append(k)
         return self.meta
 
-    def startTime(self, st: str) -> dict:
+    def starttime(self, st: str) -> dict:
         """initiate the start time"""
 
         self.meta['@graph']['startTime'] = st
         return self.meta
 
     def permalink(self, link: str) -> dict:
-        """Make or replace the document permanent link"""
+        """Create or replace the document permanent link"""
 
         self.meta['@graph']['permalink'] = link
         return self.meta
 
     def related(self, related: str) -> dict:
-        """Make or replace the related URIs (adds to array)"""
+        """Create or replace the related URIs (adds to array)"""
 
         self.meta['@graph']['related'] = related
         return self.meta
 
     def add_related(self, related: str) -> dict:
-        """Make or replace the related URIs (adds to array)"""
+        """Create or replace the related URIs (adds to array)"""
 
         self.meta['@graph']['related'].append(related)
         return self.meta
 
     def ids(self, ids: str) -> dict:
-        """Make or replace the ids (adds to array)"""
+        """Create or replace the ids (adds to array)"""
 
         self.meta['@graph']['ids'] = sorted(set(ids))
         return self.meta
 
     def add_ids(self, ids: str) -> dict:
-        """Make or replace the ids (adds to array)"""
-
-        self.meta['@graph']['ids'].append(ids)
-        self.meta['@graph']['ids'] = sorted(set(ids))
+        """Create or replace the ids (adds to array)"""
+        curr_ids = self.meta['@graph']['ids']
+        curr_ids.append(ids)
+        self.meta['@graph']['ids'] = sorted(set(curr_ids))
         return self.meta
 
     def discipline(self, disc: str) -> dict:
-        """Make or replace discipline"""
-
-        self.meta['@graph']['scidata']['discipline'] = disc
+        """
+        Make or replace discipline
+        :param disc:
+        :return:
+        """
+        scidata: dict = self.meta['@graph']['scidata']
+        scidata['discipline'] = disc
+        self.meta['@graph']['scidata'] = scidata
         return self.meta
 
     def subdiscipline(self, subdisc: str) -> dict:
-        """Make or replace subdiscipline"""
-
-        self.meta['@graph']['scidata']['subdiscipline'] = subdisc
+        """
+        Make or replace subdiscipline
+        :param subdisc:
+        :return:
+        """
+        scidata: dict = self.meta['@graph']['scidata']
+        scidata['subdiscipline'] = subdisc
+        self.meta['@graph']['scidata'] = scidata
         return self.meta
 
     def aspects(self, aspects: list) -> dict:
-        """Make or replace the aspects of the instance"""
+        """Create or replace the aspects of the file"""
+        cnt_index = {}
 
-        s = self.meta['@graph']['scidata']['methodology']
-        if "@id" not in s:
-            self.meta['@graph']['scidata']['methodology']['@id'] = "methodology/"
-        if "@type" not in s:
-            self.meta['@graph']['scidata']['methodology']['@type'] = "sdo:methodology"
-        if "datapoint" not in s:
-            self.meta['@graph']['scidata']['methodology']['aspects'] = []
-        count_index = defaultdict(lambda: count(1))
-        prefix = ['']
-        data = []
-
-        def iterateaspects(it):
+        def iterateaspects(it, level):
             """ iterateaspects function """
             if '@id' in it:
-                category = prefix[-1] + it['@id']
-                categoryx = it['@id']
+                category = it['@id']
             else:
                 category = 'undefined'
-                categoryx = 'undefined'
-            index = next(count_index[category])
-            it['@id'] = '{category}/{index}/'.format(category=category, index=index)
-            it['@type'] = 'sdo:{category}'.format(category=categoryx)
-            for x in it.values():
-                if isinstance(x, list):
-                    for y in x:
-                        prefix.append(it['@id'])
-                        iterateaspects(y)
-                if isinstance(x, dict):
-                    prefix.append(it['@id'])
-                    iterateaspects(x)
-        for item in aspects:
-            iterateaspects(item)
-            prefix = ['']
-            self.meta['@graph']['scidata']['methodology']['aspects'].append(item)
+            if category in cnt_index:
+                cnt_index[category] += 1
+            else:
+                cnt_index[category] = 1
+            cat_index.update({level: category})
+            uid = ''
+            for cat in cat_index.values():
+                uid += cat + '/' + str(cnt_index[category]) + '/'
+            temp: dict = {'@id': uid, '@type': 'sdo:' + category}
+            for k, v in it.items():
+                if k != '@id':
+                    temp[k] = v
+            for k, v in temp.items():
+                if isinstance(v, list):
+                    level += 1
+                    for i, y in enumerate(v):
+                        v[i] = iterateaspects(y, level)
+                    temp[k] = v
+                    level -= 1
+                elif isinstance(v, dict):
+                    level += 1
+                    temp[k] = iterateaspects(v, level)
+                    level -= 1
+            return temp
 
+        scidata: dict = self.meta['@graph']['scidata']
+        meth: dict = scidata['methodology']
+        curr_aspects: list = meth['aspects']
+
+        for item in aspects:
+            cat_index = {}
+            item = iterateaspects(item, 1)
+            curr_aspects.append(item)
+
+        meth['aspects'] = curr_aspects
+        scidata['methodology'] = meth
+        self.meta['@graph']['scidata'] = scidata
         return self.meta
 
     def facets(self, facets: list) -> dict:
-        """Make or replace the facets of the instance"""
+        """Create or replace the facets of the instance"""
+        cnt_index = {}
 
-        s = self.meta['@graph']['scidata']['system']
-        if "@id" not in s:
-            self.meta['@graph']['scidata']['system']['@id'] = "system/"
-        if "@type" not in s:
-            self.meta['@graph']['scidata']['system']['@type'] = "sdo:system"
-        if "datapoint" not in s:
-            self.meta['@graph']['scidata']['system']['facets'] = []
-        count_index = defaultdict(lambda: count(1))
-        prefix = ['']
-        data = []
-
-        def iteratefacets(it):
+        def iteratefacets(it, level):
             """ iteratefacets function """
             if '@id' in it:
-                category = prefix[-1] + it['@id']
-                categoryx = it['@id']
+                category = it['@id']
             elif 'descriptors' in it or 'identifiers' in it:
-                category = prefix[-1] + 'compound'
-                categoryx = 'compound'
+                category = 'compound'
             else:
                 category = 'undefined'
-                categoryx = 'undefined'
-            index = next(count_index[category])
-            it['@id'] = '{category}/{index}/'.format(category=category, index=index)
-            it['@type'] = 'sdo:{category}'.format(category=categoryx)
-            for x in it.values():
-                if isinstance(x, list):
-                    for y in x:
-                        prefix.append(it['@id'])
-                        iteratefacets(y)
-                if isinstance(x, dict):
-                    prefix.append(it['@id'])
-                    iteratefacets(x)
+            if category in cnt_index:
+                cnt_index[category] += 1
+            else:
+                cnt_index[category] = 1
+            cat_index.update({level: category})
+            uid = ''
+            for cat in cat_index.values():
+                uid += cat + '/' + str(cnt_index[cat]) + '/'
+            temp: dict = {'@id': uid, '@type': 'sdo:' + category}
+            for k, v in it.items():
+                if k != '@id':
+                    temp[k] = v
+            for k, v in temp.items():
+                if isinstance(v, list):
+                    level += 1
+                    for i, y in enumerate(v):
+                        v[i] = iteratefacets(y, level)
+                    temp[k] = v
+                    level -= 1
+                elif isinstance(v, dict):
+                    level += 1
+                    temp[k] = iteratefacets(v, level)
+                    level -= 1
+            del cat_index[level]
+            return temp
+
+        scidata: dict = self.meta['@graph']['scidata']
+        system: dict = scidata['system']
+        curr_facets: list = system['facets']
+
         for item in facets:
-            # print(item)
-            iteratefacets(item)
-            prefix = ['']
-            self.meta['@graph']['scidata']['system']['facets'].append(item)
+            cat_index = {}
+            item = iteratefacets(item, 1)
+            curr_facets.append(item)
+
+        system['facets'] = curr_facets
+        scidata['system'] = system
+        self.meta['@graph']['scidata'] = scidata
         return self.meta
 
-    def datapoint(self, datapoint: list) -> dict:
-        """ create or replace the datapoint """
+    def datapoint(self, points: list) -> dict:
+        """Create or replace datapoints"""
+        cnt_index = {}
 
-        s = self.meta['@graph']['scidata']['dataset']
-        if "@id" not in s:
-            self.meta['@graph']['scidata']['dataset']['@id'] = "dataset/1/"
-        if "@type" not in s:
-            self.meta['@graph']['scidata']['dataset']['@type'] = "sdo:dataset"
-        if "datapoint" not in s:
-            self.meta['@graph']['scidata']['dataset']['datapoint'] = []
-        count_index = defaultdict(lambda: count(1))
-        prefix = ['']
-        data = []
-
-        def iteratedatapoint(it):
+        def iteratedatapoint(it, level):
             """ iteratedatapoint function """
-            category = prefix[-1] + it['@id']
-            index = next(count_index[category])
-            it['@id'] = '{category}/{index}/'.format(category=category, index=index)
-            for x in it.values():
-                if isinstance(x, list):
-                    for y in x:
-                        prefix.append(it['@id'])
-                        iteratedatapoint(y)
-                if isinstance(x, dict):
-                    prefix.append(it['@id'])
-                    iteratedatapoint(x)
-        for item in datapoint:
-            iteratedatapoint(item)
-            prefix = ['']
-            data.append(item)
-            self.meta['@graph']['scidata']['dataset']['datapoint'] = data
+            category = it['@id']
+            if category in cnt_index:
+                cnt_index[category] += 1
+            else:
+                cnt_index[category] = 1
+            cat_index.update({level: category})
+            uid = ''
+            for cat in cat_index.values():
+                uid += cat + '/' + str(cnt_index[cat]) + '/'
+            temp: dict = {'@id': uid, '@type': 'sdo:' + category}
+            for k, v in it.items():
+                if k != '@id':
+                    temp[k] = v
+            for k, v in temp.items():
+                if isinstance(v, list):
+                    level += 1
+                    for i, y in enumerate(v):
+                        v[i] = iteratedatapoint(y, level)
+                    temp[k] = v
+                    level -= 1
+                elif isinstance(v, dict):
+                    level += 1
+                    temp[k] = iteratedatapoint(v, level)
+                    level -= 1
+            del cat_index[level]
+            return temp
+
+        scidata: dict = self.meta['@graph']['scidata']
+        dataset: dict = scidata['dataset']
+        if 'datapoint' in dataset.keys():
+            curr_points: list = dataset['datapoint']
+        else:
+            curr_points = []
+
+        for item in points:
+            cat_index = {}
+            item = iteratedatapoint(item, 1)
+            curr_points.append(item)
+
+        dataset['datapoint'] = curr_points
+        scidata['dataset'] = dataset
+        self.meta['@graph']['scidata'] = scidata
         return self.meta
 
     def datagroup(self, datagroup: list) -> dict:
@@ -420,20 +466,8 @@ class SciData:
             self.meta['@graph']['scidata']['dataset']['datagroup'] = data
         return self.meta
 
-    # rewritten by SJC 081219
-    '''def add_source(self, source):
-        srcs = self.meta['@graph']['sources']
-        ld = {
-            '@id': 'source/' + str(len(srcs) + 1) + '/',
-            '@type': 'dc:source'
-        }
-        src = dict(ld, *source)
-        srcs.append(src)
-        self.meta['@graph']['sources'] = srcs
-        return self.meta'''
-
     def source(self, source: list) -> dict:
-        """Make or replace the source"""
+        """Create or replace the source list"""
 
         srcs = []
         for x in source:
@@ -447,7 +481,7 @@ class SciData:
         return self.meta
 
     def add_source(self, source: list) -> dict:
-        """ add to the sources list"""
+        """Add to the sources list"""
 
         srcs = self.meta['@graph']['sources']
         for x in source:
@@ -460,28 +494,27 @@ class SciData:
         self.meta['@graph']['sources'] = srcs
         return self.meta
 
-    def rights(self, r: str, s: str) -> dict:
+    def rights(self, holder: str, license: str) -> dict:
         """ create or replace the rights """
 
-        right = []
-        right.append({
-            '@id': 'rights/' + str(len(right) + 1) + '/',
+        right = [{
+            '@id': 'rights/1/',
             '@type': 'dc:rights',
-            'license': r,
-            'holder': s,
-        })
+            'holder': holder,
+            'license': license,
+        }]
         self.meta['@graph']['rights'] = right
         return self.meta
 
-    def add_rights(self, r: str, s: str) -> dict:
+    def add_rights(self, holder: str, license: str) -> dict:
         """ add to the rights list """
 
         rights = self.meta['@graph']['rights']
         rights.append({
             '@id': 'rights/' + str(len(self.meta['@graph']['rights']) + 1) + '/',
             '@type': 'dc:rights',
-            'license': r,
-            'holder': s,
+            'holder': holder,
+            'license': license,
         })
         return self.meta
 
@@ -489,13 +522,13 @@ class SciData:
         """ toc function """
         def tocdict(a):
             """ tocdict function """
-            for key, value in a.items():
-                if key == '@type':
-                    self.meta['@graph']['toc'].append(value)
-                if isinstance(value, list):
-                    toclist(value)
-                if isinstance(value, dict):
-                    tocdict(value)
+            for k, v in a.items():
+                if k == '@type':
+                    self.meta['@graph']['toc'].append(v)
+                if isinstance(v, list):
+                    toclist(v)
+                if isinstance(v, dict):
+                    tocdict(v)
 
         def toclist(a):
             """ toclist function """
@@ -534,7 +567,8 @@ class SciData:
                 self.meta['@graph']['scidata'].pop(e)
             elif e in self.meta['@graph'].keys():
                 self.meta['@graph'].pop(e)
-        temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
+
+        # temp = json.dumps(self.meta, indent=4, ensure_ascii=False)
         # print(temp)
 
         # print('complete: '+ str(self.meta['@graph']['uid']))
