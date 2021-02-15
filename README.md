@@ -131,3 +131,4 @@ SciData Project Website: [http://stuchalk.github.io/scidata/](http://stuchalk.gi
 SciData Project GitHub Repository: [https://github.com/stuchalk/scidata](https://github.com/stuchalk/scidata)
 
 # Licensing
+[MIT](https://choosealicense.com/licenses/mit/)
