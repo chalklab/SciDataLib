@@ -7,19 +7,30 @@ Python library for development of [SciData](http://stuchalk.github.io/scidata/) 
 *coming soon*!!!
 
 ### Manual (from source)
-Clone the repository
+Clone the repository either via:
+ - HTTP:
 ```
 git clone git@github.com:ChalkLab/SciDataLib.git
 ```
-or
+ - SSH:
 ```
 git clone https://github.com/ChalkLab/SciDataLib.git
 ```
 
-Create a virtual environment and activate to install package in.
+Create a virtual environment and activate to install the package in the isolated environment:
 ```
 python -m venv <name of env>
 source <env>/bin/activate
+```
+
+To [install the package from the local source tree into the environment](https://packaging.python.org/tutorials/installing-packages/#installing-from-a-local-src-tree), run:
+```
+python -m pip install .
+```
+
+Or to do so in ["Development Mode"](https://setuptools.readthedocs.io/en/latest/setuptools.html#development-mode), you can run:
+```
+python -m pip install -e .
 ```
 
 To deactivate the virtual environment
@@ -126,9 +137,9 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 Please make sure to update tests as appropriate.
 
 # Links
-SciData Research Paper: [https://doi.org/10.1186/s13321-016-0168-9](https://doi.org/10.1186/s13321-016-0168-9)
-SciData Project Website: [http://stuchalk.github.io/scidata/](http://stuchalk.github.io/scidata/) 
-SciData Project GitHub Repository: [https://github.com/stuchalk/scidata](https://github.com/stuchalk/scidata)
+* SciData Research Paper: [https://doi.org/10.1186/s13321-016-0168-9](https://doi.org/10.1186/s13321-016-0168-9)
+* SciData Project Website: [http://stuchalk.github.io/scidata/](http://stuchalk.github.io/scidata/) 
+* SciData Project GitHub Repository: [https://github.com/stuchalk/scidata](https://github.com/stuchalk/scidata)
 
 # Licensing
 [MIT](https://choosealicense.com/licenses/mit/)
