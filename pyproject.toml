@@ -1,6 +1,19 @@
-[build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
+[tool.poetry]
+name = "SciDataLib"
+version = "0.0.1"
+description = "Python library for development of SciData JSON-LD files"
+authors = [
+    "Stuart Chalk <schalk@unf.edu>",
+    "Dylan Johnson <n01448636@unf.edu>",
 ]
-build-backend = "setuptools.build_meta"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+flake8 = "^3.8.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
