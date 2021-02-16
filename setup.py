@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="SciDataLib-JohnsonDylan", # Replace with your own username
+    name="SciDataLib-JohnsonDylan",  # Replace with your own username
     version="0.1.0",
     author="Chalk",
     author_email="schalk@unf.edu",

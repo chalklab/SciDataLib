@@ -57,14 +57,14 @@ class SciData:
 
     contexts = ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
     nspaces = {
-            "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
-            "sub": "https://stuchalk.github.io/scidata/ontology/substance.owl#",
-            "chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#",
-            "w3i": "https://w3id.org/skgo/modsci#",
-            "qudt": "http://qudt.org/vocab/unit/",
-            "obo": "http://purl.obolibrary.org/obo/",
-            "dc": "http://purl.org/dc/terms/",
-            "xsd": "http://www.w3.org/2001/XMLSchema#"
+        "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
+        "sub": "https://stuchalk.github.io/scidata/ontology/substance.owl#",
+        "chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#",
+        "w3i": "https://w3id.org/skgo/modsci#",
+        "qudt": "http://qudt.org/vocab/unit/",
+        "obo": "http://purl.obolibrary.org/obo/",
+        "dc": "http://purl.org/dc/terms/",
+        "xsd": "http://www.w3.org/2001/XMLSchema#"
     }
     base = {}
 
@@ -104,14 +104,19 @@ class SciData:
         """
 
         if base == "":
-            self.base = {"@base": "https://scidata.unf.edu/update_your_base_URL"}
+            self.base = {
+                "@base": "https://scidata.unf.edu/update_your_base_URL"
+            }
         else:
             self.base = {"@base": base}
         self.make_context()
         return self.meta
 
     def make_context(self) -> dict:
-        """Recreate the context when something is added to contexts, nspaces or base"""
+        """
+        Recreate the context when something is added to contexts, nspaces
+        or base
+        """
 
         c = self.contexts
         n = self.nspaces
@@ -163,10 +168,18 @@ class SciData:
     def author(self, author: list) -> dict:
         """Create or replace the author
         Expects either:
-         1) a list of dictionaries where each dictionary contains a minimum of a key that is 'name'
-            ie. [{'name': 'George Washington', 'ORCID': 1}, {'name': 'John Adams', 'ORCID': 2}]
+         1) a list of dictionaries where each dictionary contains a minimum of
+            a key that is 'name'
 
-         2) a list of strings which are author names ie. ['George Washington', 'John Adams'] """
+            Example:
+            [
+                {'name': 'George Washington', 'ORCID': 1},
+                {'name': 'John Adams', 'ORCID': 2}
+            ]
+
+         2) a list of strings which are author names
+            Example: ['George Washington', 'John Adams']
+        """
 
         a = []
         if isinstance(author, list):
@@ -453,12 +466,17 @@ class SciData:
             """ iteratedatagroup function """
             category = it['@id']
             index = next(count_index[category])
-            it['@id'] = '{category}/{index}/'.format(category=category, index=index)
+            it['@id'] = '{category}/{index}/'.format(
+                category=category,
+                index=index)
             pointlist = []
             for x in it['datapoints']:
                 category = x
                 index = next(count_index[category])
-                pointlist.append('{category}/{index}/'.format(category=category, index=index))
+                pointlist.append(
+                    '{category}/{index}/'.format(
+                        category=category,
+                        index=index))
             it['datapoints'] = pointlist
         for item in datagroup:
             iteratedatagroup(item)
@@ -510,8 +528,9 @@ class SciData:
         """ add to the rights list """
 
         rights = self.meta['@graph']['rights']
+        rights_length = len(self.meta['@graph']['rights'])
         rights.append({
-            '@id': 'rights/' + str(len(self.meta['@graph']['rights']) + 1) + '/',
+            '@id': 'rights/{}/'.format(rights_length + 1),
             '@type': 'dc:rights',
             'holder': holder,
             'license': license,
