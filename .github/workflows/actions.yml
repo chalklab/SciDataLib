@@ -2,7 +2,7 @@ name: scidatalib_ci
 
 env:
   PYTHON_MAIN_VERSION: 3.6
-  POETRY_VERSION: 1.2.3
+  POETRY_VERSION: 1.1.4
 
 on:
   push:
