@@ -10,5 +10,3 @@ def test_discipline():
 
 def test_subdiscipline():
     assert sd.subdiscipline('physicalchemistry') == 'physicalchemistry'
-
-

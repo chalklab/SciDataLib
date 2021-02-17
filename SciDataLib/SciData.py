@@ -288,7 +288,7 @@ class SciData:
         """
         Make or replace discipline
         :param disc: a discipline name or identifier (preferred)
-            e.g. use ModSci (Modern Science Ontology) https://w3id.org/skgo/modsci#
+            e.g. use the Modern Science Ontology https://w3id.org/skgo/modsci#
         :returns: str
         """
         self.meta['@graph']['scidata']['discipline'] = disc
@@ -298,7 +298,7 @@ class SciData:
         """
         Make or replace subdiscipline
         :param subdisc: a subdiscipline name or identifier (preferred)
-            e.g. use ModSci (Modern Science Ontology) https://w3id.org/skgo/modsci#
+            e.g. use the Modern Science Ontology https://w3id.org/skgo/modsci#
         :returns: str
         """
         self.meta['@graph']['scidata']['subdiscipline'] = subdisc
