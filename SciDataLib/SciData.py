@@ -284,27 +284,25 @@ class SciData:
         self.meta['@graph']['ids'] = sorted(set(curr_ids))
         return self.meta
 
-    def discipline(self, disc: str) -> dict:
+    def discipline(self, disc: str) -> str:
         """
         Make or replace discipline
-        :param disc:
-        :return:
+        :param disc: a discipline name or identifier (preferred)
+            e.g. use ModSci (Modern Science Ontology) https://w3id.org/skgo/modsci#
+        :returns: str
         """
-        scidata: dict = self.meta['@graph']['scidata']
-        scidata['discipline'] = disc
-        self.meta['@graph']['scidata'] = scidata
-        return self.meta
+        self.meta['@graph']['scidata']['discipline'] = disc
+        return self.meta['@graph']['scidata']['discipline']
 
-    def subdiscipline(self, subdisc: str) -> dict:
+    def subdiscipline(self, subdisc: str) -> str:
         """
         Make or replace subdiscipline
-        :param subdisc:
-        :return:
+        :param subdisc: a subdiscipline name or identifier (preferred)
+            e.g. use ModSci (Modern Science Ontology) https://w3id.org/skgo/modsci#
+        :returns: str
         """
-        scidata: dict = self.meta['@graph']['scidata']
-        scidata['subdiscipline'] = subdisc
-        self.meta['@graph']['scidata'] = scidata
-        return self.meta
+        self.meta['@graph']['scidata']['subdiscipline'] = subdisc
+        return self.meta['@graph']['scidata']['subdiscipline']
 
     def aspects(self, aspects: list) -> dict:
         """Create or replace the aspects of the file"""
@@ -513,7 +511,7 @@ class SciData:
         return self.meta
 
     def rights(self, holder: str, license: str) -> dict:
-        """ create or replace the rights """
+        """Create or replace the rights section"""
 
         right = [{
             '@id': 'rights/1/',
