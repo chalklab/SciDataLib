@@ -36,3 +36,8 @@ jobs:
         if: ${{ matrix.python-version == env.PYTHON_MAIN_VERSION }}
         run: |
             poetry run flake8
+
+      - name: Coverage
+        if: ${{ matrix.python-version == env.PYTHON_MAIN_VERSION }}
+        run: |
+            poetry run pytest --cov=SciDataLib --cov-report=term-missing tests/
