@@ -75,3 +75,5 @@ fabric.properties
 # any other files in the .idea folder
 .idea/*
 
+# coverage report
+.coverage
