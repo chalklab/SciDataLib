@@ -131,6 +131,13 @@ Run tests using [pytest](https://docs.pytest.org/en/stable/):
 poetry run pytest tests/
 ```
 
+#### Code coverage
+
+Get code coverage reporting using the [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/) plugin:
+```
+poetry run pytest --cov=SciDataLib --cov-report=term-missing tests/
+```
+
 # Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
