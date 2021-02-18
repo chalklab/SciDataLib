@@ -9,6 +9,7 @@ authors = [
 
 [tool.poetry.dependencies]
 python = "^3.6"
+pytest-cov = "^2.11.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
