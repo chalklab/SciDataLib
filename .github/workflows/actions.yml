@@ -1,4 +1,4 @@
-name: scidatalib_ci
+name: GitHub Actions 
 
 env:
   PYTHON_MAIN_VERSION: 3.6
@@ -35,7 +35,7 @@ jobs:
       - name: Lint
         if: ${{ matrix.python-version == env.PYTHON_MAIN_VERSION }}
         run: |
-            poetry run flake8
+            poetry run flake8 --count
 
       - name: Coverage
         if: ${{ matrix.python-version == env.PYTHON_MAIN_VERSION }}
