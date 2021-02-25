@@ -1,4 +1,4 @@
-name: scidatalib_ci
+name: GitHub Actions 
 
 env:
   PYTHON_MAIN_VERSION: 3.6
