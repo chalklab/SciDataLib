@@ -1,4 +1,9 @@
 # SciDataLib
+
+| Health |
+|--------|
+| [![GitHub Actions](https://github.com/ChalkLab/SciDataLib/actions/workflows/actions.yml/badge.svg?branch=master)](https://github.com/ChalkLab/SciDataLib/actions/workflows/actions.yml) |
+
 Python library for development of [SciData](http://stuchalk.github.io/scidata/) [JSON-LD](https://json-ld.org/) files
 
 # Installation
