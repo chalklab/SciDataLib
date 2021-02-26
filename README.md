@@ -15,11 +15,11 @@ Python library for development of [SciData](http://stuchalk.github.io/scidata/) 
 Clone the repository either via:
  - HTTP:
 ```
-git clone git@github.com:ChalkLab/SciDataLib.git
+git clone https://github.com/ChalkLab/SciDataLib.git
 ```
  - SSH:
 ```
-git clone https://github.com/ChalkLab/SciDataLib.git
+git clone git@github.com:ChalkLab/SciDataLib.git
 ```
 
 Create a virtual environment and activate to install the package in the isolated environment:
