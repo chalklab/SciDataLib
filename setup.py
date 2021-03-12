@@ -5,10 +5,10 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="scidata",
+    name="SciDataLib",
     version="0.1.0",
-    author="Chalk",
-    author_email="schalk@unf.edu",
+    author="Dylan Johnson, Stuart Chalk",
+    author_email="n01448636@unf.edu, schalk@unf.edu",
     description="Python library for development of SciData JSON-LD files",
     long_description=long_description,
     long_description_content_type="text/markdown",
