@@ -31,12 +31,12 @@ class SciData:
             "@type": "sdo:scidataFramework",
             "uid": "",
             "title": "",
-            "author": [],
+            "authors": [],
             "description": "",
             "publisher": "",
             "version": "",
             "keywords": [],
-            "startTime": "",
+            "starttime": "",
             "permalink": "",
             "related": [],
             "toc": [],
@@ -251,7 +251,7 @@ class SciData:
                     auth.update({'@type': 'dc:creator'})
                     auth.update({'name': au})
                     a.append(auth)
-            self.meta['@graph']['author'] = a
+            self.meta['@graph']['authors'] = a
         return self.meta
 
     def title(self, title: str) -> dict:
