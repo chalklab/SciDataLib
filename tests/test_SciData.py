@@ -5,105 +5,106 @@ sd = SciData('example')
 
 
 def test_context():
-    assert sd.context(['https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
-                       'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']) == \
-            ['https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
-                'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+    assert sd.context(
+        ['https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
+         'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']) == \
+           ['https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
+            'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+
+
+# def test_add_context():
+#     assert sd.add_context('chemistry') == 'chemistry'
 #
 #
-# def add_context(self, context: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_namespace():
+#     assert sd.namespace('chemistry') == 'chemistry'
 #
 #
-# def namespace(self, namespace: dict) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_add_namespace():
+#     assert sd.add_namespace('chemistry') == 'chemistry'
 #
 #
-# def add_namespace(self, namespace: dict) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_add_base():
+#     assert sd.add_base('chemistry') == 'chemistry'
 #
 #
-# def add_base(self, base: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_make_context():
+#     assert sd.make_context('chemistry') == 'chemistry'
 #
 #
-# def make_context(self) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_doc_id():
+#     assert sd.doc_id('chemistry') == 'chemistry'
 #
 #
-# def doc_id(self, i: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_generatedat():
+#     assert sd.generatedat('chemistry') == 'chemistry'
 #
 #
-# def generatedat(self, i: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_version():
+#     assert sd.version('chemistry') == 'chemistry'
 #
 #
-# def version(self, i: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_graph_id():
+#     assert sd.graph_id('chemistry') == 'chemistry'
+#
+# def test_graph_type():
+#     assert sd.graph_type('chemistry') == 'chemistry'
 #
 #
-# def graph_id(self, i: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
-#
-# def graph_type(self, i: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_graph_uid():
+#     assert sd.graph_uid('chemistry') == 'chemistry'
 #
 #
-# def graph_uid(self, i: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_author():
+#     assert sd.author('chemistry') == 'chemistry'
 #
 #
-# def author(self, author: list) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_title():
+#     assert sd.title('chemistry') == 'chemistry'
 #
 #
-# def title(self, title: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_description():
+#     assert sd.description('chemistry') == 'chemistry'
 #
 #
-# def description(self, description: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_publisher():
+#     assert sd.publisher('chemistry') == 'chemistry'
 #
 #
-# def publisher(self, publisher: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_graphversion():
+#     assert sd.graphversion('chemistry') == 'chemistry'
 #
 #
-# def graphversion(self, version: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_keywords():
+#     assert sd.keywords('chemistry') == 'chemistry'
 #
 #
-# def keywords(self, keywords: str or list) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_add_keyword():
+#     assert sd.add_keyword('chemistry') == 'chemistry'
 #
 #
-# def add_keyword(self, keyword: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_starttime():
+#     assert sd.starttime('chemistry') == 'chemistry'
 #
 #
-# def starttime(self, st: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_permalink():
+#     assert sd.permalink('chemistry') == 'chemistry'
 #
 #
-# def permalink(self, link: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_related():
+#     assert sd.related('chemistry') == 'chemistry'
 #
 #
-# def related(self, related: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_add_related():
+#     assert sd.add_related('chemistry') == 'chemistry'
 #
 #
-# def add_related(self, related: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_ids():
+#     assert sd.ids('chemistry') == 'chemistry'
 #
 #
-# def ids(self, ids: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
-#
-#
-# def add_ids(self, ids: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_add_ids():
+#     assert sd.add_ids('chemistry') == 'chemistry'
 
 
 def test_discipline():
@@ -114,37 +115,37 @@ def test_subdiscipline():
     assert sd.subdiscipline('physicalchemistry') == 'physicalchemistry'
 #
 #
-# def aspects(self, aspects: list) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_aspects():
+#     assert sd.aspects('chemistry') == 'chemistry'
 #
 #
-# def facets(self, facets: list) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_facets():
+#     assert sd.facets('chemistry') == 'chemistry'
 #
 #
-# def datapoint(self, points: list) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_datapoint():
+#     assert sd.datapoint('chemistry') == 'chemistry'
 #
 #
-# def datagroup(self, datagroup: list) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_datagroup():
+#     assert sd.datagroup('chemistry') == 'chemistry'
 #
 #
-# def source(self, source: list) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_source():
+#     assert sd.source('chemistry') == 'chemistry'
 #
 #
-# def add_source(self, source: list) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_add_source():
+#     assert sd.add_source('chemistry') == 'chemistry'
 #
 #
-# def rights(self, holder: str, license: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_rights():
+#     assert sd.rights('chemistry') == 'chemistry'
 #
 #
-# def add_rights(self, holder: str, license: str) -> dict:
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_add_rights():
+#     assert sd.add_rights('chemistry') == 'chemistry'
 #
 #
-# def toc(self):
-#     assert sd.discipline('chemistry') == 'chemistry'
+# def test_toc():
+#     assert sd.toc('chemistry') == 'chemistry'
