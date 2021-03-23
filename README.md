@@ -51,12 +51,12 @@ rm -rf <name of env>
 # Usage
 After installation, import the `SciData` class to start creating SciData JSON-LD:
 ```python
-from SciDataLib.SciData import SciData
+from scidatalib.scidata import SciData
 ```
 
 Example:
 ```python
-from SciDataLib.SciData import SciData
+from scidatalib.scidata import SciData
 import json
 
 uid = 'chalk:example:jsonld'
@@ -119,7 +119,7 @@ poetry install
 
 Then, run commands via poetry:
 ```
-poetry run python -c "import SciDataLib"
+poetry run python -c "import scidatalib"
 ```
 
 ### Tests / Linting
@@ -127,7 +127,7 @@ poetry run python -c "import SciDataLib"
 #### Flake8 linting
 Run linting over the package with [flake8](https://flake8.pycqa.org/en/latest/) via:
 ```
-poetry run flake8 SciDataLib/ tests/
+poetry run flake8 scidatalib/ tests/
 ```
 
 #### Pytest testing
@@ -140,7 +140,7 @@ poetry run pytest tests/
 
 Get code coverage reporting using the [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/) plugin:
 ```
-poetry run pytest --cov=SciDataLib --cov-report=term-missing tests/
+poetry run pytest --cov=scidatalib --cov-report=term-missing tests/
 ```
 
 # Contributing
