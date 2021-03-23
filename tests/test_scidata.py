@@ -1,9 +1,10 @@
 """pytest test class"""
-from SciDataLib.SciData import SciData
+import pytest
+from scidatalib.scidata import SciData
 
 sd = SciData('example')
 
-
+@pytest.mark.skip
 def test_context():
     assert sd.context(
         ['https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
