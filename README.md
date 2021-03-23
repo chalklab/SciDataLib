@@ -49,6 +49,28 @@ rm -rf <name of env>
 ```
 
 # Usage
+
+SciDataLib consists of both a command line interface (CLI)
+and a library for constructing and modifying SciData JSON-LD files
+
+### Command Line Interface
+
+The CLI tool is `scidatalib`.
+You can use it to create SciData JSON-LD files
+via specifying an output JSON-LD filename
+and additional options to create the content of the file.
+
+Example to create "bare" SciData JSON-LD file:
+```
+scidatalib output.jsonld
+```
+
+You can access the additional functionality via the `--help` option:
+```
+scidata --help
+```
+
+### SciDataLib library
 After installation, import the `SciData` class to start creating SciData JSON-LD:
 ```python
 from scidatalib.scidata import SciData
@@ -120,6 +142,14 @@ poetry install
 Then, run commands via poetry:
 ```
 poetry run python -c "import scidatalib"
+```
+
+### CLI
+
+Run the CLI in using poetry via:
+```
+poetry install
+poetry run scidatalib --help
 ```
 
 ### Tests / Linting
