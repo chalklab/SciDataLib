@@ -77,7 +77,7 @@ class SciData:
     }
     base = {}
 
-    def context(self, context: list) -> dict:
+    def context(self, context: [str, list], replace=False) -> list:
         """Used to create or replace the list of external context files
 
         When called, the content of the @context key of the meta variable will
@@ -86,25 +86,22 @@ class SciData:
             ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
         )
         """
-
-        self.contexts = []
-        self.contexts = context
+        if replace:
+            self.contexts = []
+            if isinstance(context, str):
+                self.contexts = [context]
+            if isinstance(context, list):
+                self.contexts = context
+        if not replace:
+            if isinstance(context, str):
+                self.contexts.append(context)
+            if isinstance(context, list):
+                self.contexts = self.contexts + context
+        self.contexts = list(set(self.contexts))
         self.make_context()
-        return self.meta
+        return self.contexts
 
-    def add_context(self, context: str) -> dict:
-        """Used to add to the list of external context files
-
-        When called, the supplied list of context files will be appended
-        to the list of any context files already present in the @context
-        key of the meta variable
-        """
-
-        self.contexts.append(context)
-        self.make_context()
-        return self.meta
-
-    def namespace(self, namespace: dict) -> dict:
+    def namespace(self, namespace: dict, replace=False) -> dict:
         """Used to create or replace dictionary of namespaces within @context
 
         When called, the dictionary of namespaces within the @context key
@@ -115,21 +112,13 @@ class SciData:
             {"sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"}
         )
         """
-
-        self.nspaces = namespace
+        if replace:
+            self.nspaces = {}
+            self.nspaces = namespace
+        if not replace:
+            self.nspaces.update(namespace)
         self.make_context()
-        return self.meta
-
-    def add_namespace(self, namespace: dict) -> dict:
-        """Used to add to the dictionary of namespaces within @context
-
-        When called, the supplied dictionary of namespaces will be added to the
-        dictionary of namespaces within the @context key of the meta variable
-        """
-
-        self.nspaces.update(namespace)
-        self.make_context()
-        return self.meta
+        return self.nspaces
 
     def add_base(self, base: str) -> dict:
         """
@@ -145,7 +134,7 @@ class SciData:
         else:
             self.base = {"@base": base}
         self.make_context()
-        return self.meta
+        return self.base
 
     def make_context(self) -> dict:
         """
@@ -160,9 +149,9 @@ class SciData:
         c = self.contexts
         n = self.nspaces
         b = self.base
-        con = c + [n, b]
-        self.meta["@context"] = con
-        return self.meta
+        # con = c + [n, b]
+        self.meta["@context"] = c + [n, b]
+        return self.meta["@context"]
 
     # TODO May be unneccesary if always an empty string that is populated later
     def doc_id(self, i: str) -> dict:

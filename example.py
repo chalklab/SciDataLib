@@ -1,11 +1,15 @@
 """file to create an example JSON-LD file"""
-from scidatalib.scidata import SciData
+from SciDataLib.scidata import SciData
 import json
 
 uid = 'chalk:example:jsonld'
 example = SciData(uid)
 
 # context parameters
+example.context(
+            ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+        )
+example.context('https://stuchalk.github.io/scidata/contexts/scidata2.jsonld', True)
 base = 'https://scidata.unf.edu/' + uid + '/'
 example.add_base(base)
 
@@ -29,7 +33,7 @@ example.publisher(
 example.permalink('https://stuchalk.github.io/scidata/examples/ph_min.jsonld')
 
 # add to scidata discipline and subdiscipline
-example.add_namespace({'w3i': 'https://w3id.org/skgo/modsci#'})
+example.namespace({'test': 'https://test.org/test#'})
 example.discipline('w3i:Chemistry')
 example.subdiscipline('w3i:ChemicalInformatics')
 
@@ -165,7 +169,7 @@ facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
 example.facets(facets)
 
 # add to dataset (goes into dataseries, datagroup, and/or datapoint
-example.add_namespace({'gb': 'https://goldbook.iupac.org/'})
+example.namespace({'gb': 'https://goldbook.iupac.org/'})
 val4 = {'@id': 'value', 'number': 10.03}
 val5 = {
     '@id': 'textvalue',
