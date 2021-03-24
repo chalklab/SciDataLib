@@ -9,7 +9,8 @@ example = SciData(uid)
 example.context(
             ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
         )
-example.context('https://stuchalk.github.io/scidata/contexts/scidata2.jsonld', True)
+example.context(
+    'https://stuchalk.github.io/scidata/contexts/scidata2.jsonld', True)
 base = 'https://scidata.unf.edu/' + uid + '/'
 example.add_base(base)
 
