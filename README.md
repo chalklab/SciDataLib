@@ -49,14 +49,36 @@ rm -rf <name of env>
 ```
 
 # Usage
+
+SciDataLib consists of both a command line interface (CLI)
+and a library for constructing and modifying SciData JSON-LD files
+
+### Command Line Interface
+
+The CLI tool is `scidatalib`.
+You can use it to create SciData JSON-LD files
+via specifying an output JSON-LD filename
+and additional options to create the content of the file.
+
+Example to create "bare" SciData JSON-LD file:
+```
+scidatalib output.jsonld
+```
+
+You can access the additional functionality via the `--help` option:
+```
+scidata --help
+```
+
+### SciDataLib library
 After installation, import the `SciData` class to start creating SciData JSON-LD:
 ```python
-from SciDataLib.SciData import SciData
+from scidatalib.scidata import SciData
 ```
 
 Example:
 ```python
-from SciDataLib.SciData import SciData
+from scidatalib.scidata import SciData
 import json
 
 uid = 'chalk:example:jsonld'
@@ -119,7 +141,15 @@ poetry install
 
 Then, run commands via poetry:
 ```
-poetry run python -c "import SciDataLib"
+poetry run python -c "import scidatalib"
+```
+
+### CLI
+
+Run the CLI in using poetry via:
+```
+poetry install
+poetry run scidatalib --help
 ```
 
 ### Tests / Linting
@@ -127,7 +157,7 @@ poetry run python -c "import SciDataLib"
 #### Flake8 linting
 Run linting over the package with [flake8](https://flake8.pycqa.org/en/latest/) via:
 ```
-poetry run flake8 SciDataLib/ tests/
+poetry run flake8 scidatalib/ tests/
 ```
 
 #### Pytest testing
@@ -140,7 +170,7 @@ poetry run pytest tests/
 
 Get code coverage reporting using the [pytest-cov](https://pytest-cov.readthedocs.io/en/latest/) plugin:
 ```
-poetry run pytest --cov=SciDataLib --cov-report=term-missing tests/
+poetry run pytest --cov=scidatalib --cov-report=term-missing tests/
 ```
 
 # Contributing

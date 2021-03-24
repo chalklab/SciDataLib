@@ -1,5 +1,5 @@
 """pytest test class"""
-from SciDataLib.SciData import SciData
+from scidatalib.scidata import SciData
 
 sd = SciData('example')
 
