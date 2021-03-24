@@ -1,5 +1,5 @@
 """file to create an example JSON-LD file"""
-from SciDataLib.SciData import SciData
+from scidatalib.scidata import SciData
 import json
 
 uid = 'chalk:example:jsonld'

@@ -7,6 +7,9 @@ authors = [
     "Dylan Johnson <n01448636@unf.edu>",
 ]
 
+[tool.poetry.scripts]
+scidatalib = "scidatalib.cli:cli"
+
 [tool.poetry.dependencies]
 python = "^3.6"
 pytest-cov = "^2.11.1"
