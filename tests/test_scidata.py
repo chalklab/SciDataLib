@@ -1,27 +1,35 @@
 """pytest test class"""
-from scidatalib.scidata import SciData
+from SciDataLib.scidata import SciData
 
 sd = SciData('example')
 
 
 def test_context():
-    assert sd.context(
-        ['https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
-         'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']) == \
-           ['https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
-            'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+    existing_contexts = sd.contexts
+    new_contexts = [
+        'https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
+        'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+    out_contexts = list(set(existing_contexts + new_contexts))
+    assert sd.context(new_contexts) == out_contexts
 
 
-# def test_add_context():
-#     assert sd.add_context('chemistry') == 'chemistry'
-#
-#
-# def test_namespace():
-#     assert sd.namespace('chemistry') == 'chemistry'
-#
-#
-# def test_add_namespace():
-#     assert sd.add_namespace('chemistry') == 'chemistry'
+def test_context_replace():
+    new_contexts = [
+        'https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
+        'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+    assert sd.context(new_contexts, True) == new_contexts
+
+
+def test_namespace():
+    existing_nspaces = sd.nspaces
+    new_nspaces = {'test': 'https://test.org/test#'}
+    existing_nspaces.update(new_nspaces)
+    assert sd.namespace(new_nspaces) == existing_nspaces
+
+
+def test_namespace_replace():
+    new_nspaces = {'test': 'https://test.org/test#'}
+    assert sd.namespace(new_nspaces, True) == new_nspaces
 #
 #
 # def test_add_base():

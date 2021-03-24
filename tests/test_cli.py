@@ -1,5 +1,5 @@
 import json
-from scidatalib.cli import cli
+from SciDataLib.cli import cli
 
 
 def test_scidatalib_cli(tmp_path):
