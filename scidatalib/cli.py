@@ -1,12 +1,12 @@
 import argparse
 import json
 
-from SciDataLib.scidata import SciData
+from scidatalib.scidata import SciData
 
 
 def get_parser():
     parser = argparse.ArgumentParser(
-        prog="SciDataLib",
+        prog="scidatalib",
         description="SciDataLib - Library for SciData JSON-LD",
         allow_abbrev=False)
 
