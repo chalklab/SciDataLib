@@ -38,7 +38,7 @@ def cli(input_args=None):
     if input_args:
         args = parser.parse_args(input_args)
     else:
-        args = parser.parse_args()
+        args = parser.parse_args()  # pragma: no cover
 
     sd = SciData(args.uid)
     with open(args.output, 'w') as out:
@@ -47,4 +47,4 @@ def cli(input_args=None):
 
 
 if __name__ == "__main__":
-    cli()
+    cli()  # pragma: no cover
