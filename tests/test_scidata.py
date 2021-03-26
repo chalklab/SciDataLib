@@ -17,7 +17,7 @@ def test_context_replace():
     new_contexts = [
         'https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
         'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
-    assert sd.context(new_contexts, True) == new_contexts
+    assert sd.context(new_contexts, True) == list(set(new_contexts))
 
 
 def test_namespace():
