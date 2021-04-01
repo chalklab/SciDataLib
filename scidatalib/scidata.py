@@ -49,6 +49,7 @@ class SciData:
                 "methodology": {
                     "@id": "methodology/",
                     "@type": "sdo:methodology",
+                    "evaluation": "",
                     "aspects": []},
                 "system": {
                     "@id": "system/",
@@ -67,8 +68,6 @@ class SciData:
     contexts = ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
     nspaces = {
         "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
-        "sub": "https://stuchalk.github.io/scidata/ontology/substance.owl#",
-        "chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#",
         "w3i": "https://w3id.org/skgo/modsci#",
         "qudt": "http://qudt.org/vocab/unit/",
         "obo": "http://purl.obolibrary.org/obo/",
@@ -241,7 +240,7 @@ class SciData:
                     auth.update({'name': au})
                     a.append(auth)
             self.meta['@graph']['authors'] = a
-        return self.meta
+        return self.meta['@graph']['authors']
 
     def title(self, title: str) -> dict:
         """Used to create or replace title key within @graph of meta variable
@@ -363,6 +362,16 @@ class SciData:
         self.meta['@graph']['scidata']['subdiscipline'] = subdisc
         return self.meta['@graph']['scidata']['subdiscipline']
 
+    def evaluation(self, evalmode: str) -> str:
+        """
+        Make or replace the evaluation field
+        :param evalmode: the method of evaluation of research data
+            e.g. experimental, theoretical, computational
+        :returns: str
+        """
+        self.meta['@graph']['scidata']['methodology']['evaluation'] = evalmode
+        return self.meta['@graph']['scidata']['methodology']['evaluation']
+
     def aspects(self, aspects: list) -> dict:
         """Create or replace the aspects of the file"""
         cnt_index = {}
@@ -408,6 +417,7 @@ class SciData:
             curr_aspects.append(item)
 
         meth['aspects'] = curr_aspects
+
         scidata['methodology'] = meth
         self.meta['@graph']['scidata'] = scidata
         return self.meta
