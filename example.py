@@ -41,6 +41,7 @@ example.subdiscipline('w3i:ChemicalInformatics')
 # add to methodology (data goes into the aspects array)
 # for any field values using namespaces
 # makes sure to add them using .add_namespace
+example.evaluation('experimental')
 measurement = {
     '@id': 'measurement',
     'scope': 'resource/1/',
