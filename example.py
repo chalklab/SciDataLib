@@ -121,8 +121,8 @@ prp2 = {
     'quantity': 'volume',
     'property': 'Volume of solution',
     'value': val2}
-example.namespaces({"chm":
-                    "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
+example.namespaces(
+    {"chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
 con1 = {
     '@id': 'constituent',
     'source': 'compound/1/',

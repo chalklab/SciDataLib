@@ -60,7 +60,8 @@ class SciData:
                 "rights": []
             }
         }
-        self.contexts = ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+        self.contexts = [
+            'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
         self.nspaces = {
             "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
             "w3i": "https://w3id.org/skgo/modsci#",
@@ -772,7 +773,7 @@ class SciData:
         for key in list(self.meta['@graph']['scidata']):
             if not self.meta['@graph']['scidata'][key]:
                 del self.meta['@graph']['scidata'][key]
-        sects = ['methodology','system','dataset']
+        sects = ['methodology', 'system', 'dataset']
         for sect in sects:
             for key in list(self.meta['@graph']['scidata'][sect]):
                 if not self.meta['@graph']['scidata'][sect][key]:
