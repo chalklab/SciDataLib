@@ -24,12 +24,12 @@ def test_namespace():
     existing_nspaces = sd.nspaces
     new_nspaces = {'test': 'https://test.org/test#'}
     existing_nspaces.update(new_nspaces)
-    assert sd.namespace(new_nspaces) == existing_nspaces
+    assert sd.namespaces(new_nspaces) == existing_nspaces
 
 
 def test_namespace_replace():
     new_nspaces = {'test': 'https://test.org/test#'}
-    assert sd.namespace(new_nspaces, True) == new_nspaces
+    assert sd.namespaces(new_nspaces, True) == new_nspaces
 #
 #
 # def test_add_base():
