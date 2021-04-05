@@ -17,62 +17,60 @@ class SciData:
     def __init__(self, uid: str):
         """Initialize the instance using a unique id"""
 
-        self.meta['@graph']['uid'] = uid
-
-    # class variables
-    meta = {
-        "@context": [],
-        "@id": "",
-        "generatedAt": "",
-        "version": "",
-        "@graph": {
+        self.meta = {
+            "@context": [],
             "@id": "",
-            "@type": "sdo:scidataFramework",
-            "uid": "",
-            "title": "",
-            "authors": [],
-            "description": "",
-            "publisher": "",
+            "generatedAt": "",
             "version": "",
-            "keywords": [],
-            "starttime": "",
-            "permalink": "",
-            "related": [],
-            "toc": [],
-            "ids": [],
-            "scidata": {
-                "@id": "scidata/",
-                "@type": "sdo:scientificData",
-                "discipline": "",
-                "subdiscipline": "",
-                "methodology": {
-                    "@id": "methodology/",
-                    "@type": "sdo:methodology",
-                    "evaluation": "",
-                    "aspects": []},
-                "system": {
-                    "@id": "system/",
-                    "@type": "sdo:system",
-                    "facets": []},
-                "dataset": {
-                    "@id": "dataset/",
-                    "@type": "sdo:dataset",
-                    "scope": ""},
-            },
-            "sources": [],
-            "rights": []
+            "@graph": {
+                "@id": "",
+                "@type": "sdo:scidataFramework",
+                "uid": "",
+                "title": "",
+                "authors": [],
+                "description": "",
+                "publisher": "",
+                "version": "",
+                "keywords": [],
+                "starttime": "",
+                "permalink": "",
+                "related": [],
+                "toc": [],
+                "ids": [],
+                "scidata": {
+                    "@id": "scidata/",
+                    "@type": "sdo:scientificData",
+                    "discipline": "",
+                    "subdiscipline": "",
+                    "methodology": {
+                        "@id": "methodology/",
+                        "@type": "sdo:methodology",
+                        "evaluation": "",
+                        "aspects": []},
+                    "system": {
+                        "@id": "system/",
+                        "@type": "sdo:system",
+                        "facets": []},
+                    "dataset": {
+                        "@id": "dataset/",
+                        "@type": "sdo:dataset",
+                        "scope": ""},
+                },
+                "sources": [],
+                "rights": []
+            }
         }
-    }
-    contexts = ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
-    nspaces = {
-        "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
-        "w3i": "https://w3id.org/skgo/modsci#",
-        "qudt": "http://qudt.org/vocab/unit/",
-        "obo": "http://purl.obolibrary.org/obo/",
-        "dc": "http://purl.org/dc/terms/",
-        "xsd": "http://www.w3.org/2001/XMLSchema#"
-    }
-    base = {}
+        self.contexts = ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+        self.nspaces = {
+            "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
+            "w3i": "https://w3id.org/skgo/modsci#",
+            "qudt": "http://qudt.org/vocab/unit/",
+            "obo": "http://purl.obolibrary.org/obo/",
+            "dc": "http://purl.org/dc/terms/",
+            "xsd": "http://www.w3.org/2001/XMLSchema#"
+        }
+        self.baseurl = {}
+        self.meta['@graph']['uid'] = uid
 
     # public class methods
     def context(self, context: [str, list], replace=False) -> list:
@@ -137,9 +135,9 @@ class SciData:
         if isinstance(base, str):
             if base == "":
                 base = "https://scidata.unf.edu/update_your_base_URL"
-            self.base = {"@base": base}
+            self.baseurl = {"@base": base}
         self.__make_context()
-        return self.base
+        return self.baseurl
 
     def docid(self, docid: str) -> dict:
         """
@@ -343,7 +341,7 @@ class SciData:
         self.meta['@graph']['related'] = rels
         return self.meta['@graph']['related']
 
-    def ids(self, ids: str) -> list:
+    def ids(self, ids: [str, list]) -> list:
         """
         Add to the ids list
         :param ids - string or list of strings that are external
@@ -361,11 +359,18 @@ class SciData:
         """
         curr_ids = self.meta['@graph']['ids']
         if isinstance(ids, list):
-            for id in ids:
-                if ':' in id:
-                    curr_ids.append(id)
+            for idee in ids:
+                if ':' in idee:
+                    if idee.split(':')[0] not in self.nspaces.keys():
+                        print('Namespace ' + idee.split(':')[0] + ' not set')
+                        raise EnvironmentError
+                    curr_ids.append(idee)
         elif isinstance(ids, str):
             if ':' in ids:
+                if ids.split(':')[0] not in self.nspaces.keys():
+                    print('Namespace ' + ids.split(':')[0] +
+                          ' not set ' + str(self.nspaces.keys()))
+                    raise EnvironmentError
                 curr_ids.append(ids)
         self.meta['@graph']['ids'] = sorted(set(curr_ids))
         return self.meta['@graph']['ids']
@@ -700,7 +705,7 @@ class SciData:
         if isinstance(text, str) and '://' in text:
             return False
         elif isinstance(text, str) and ':' in text:
-            self.ids([text])
+            self.ids(text)
             return True
         else:
             return False
@@ -746,7 +751,7 @@ class SciData:
 
         c = self.contexts
         n = self.nspaces
-        b = self.base
+        b = self.baseurl
         # con = c + [n, b]
         self.meta["@context"] = c + [n, b]
         return self.meta["@context"]
@@ -767,14 +772,10 @@ class SciData:
         for key in list(self.meta['@graph']['scidata']):
             if not self.meta['@graph']['scidata'][key]:
                 del self.meta['@graph']['scidata'][key]
-        for key in list(self.meta['@graph']['scidata']['methodology']):
-            if not self.meta['@graph']['scidata']['methodology'][key]:
-                del self.meta['@graph']['scidata']['methodology'][key]
-        for key in list(self.meta['@graph']['scidata']['system']):
-            if not self.meta['@graph']['scidata']['system'][key]:
-                del self.meta['@graph']['scidata']['system'][key]
-        for key in list(self.meta['@graph']['scidata']['dataset']):
-            if not self.meta['@graph']['scidata']['dataset'][key]:
-                del self.meta['@graph']['scidata']['dataset'][key]
+        sects = ['methodology','system','dataset']
+        for sect in sects:
+            for key in list(self.meta['@graph']['scidata'][sect]):
+                if not self.meta['@graph']['scidata'][sect][key]:
+                    del self.meta['@graph']['scidata'][sect][key]
 
         return self.meta
