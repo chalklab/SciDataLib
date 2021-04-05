@@ -33,7 +33,7 @@ example.publisher(
 example.permalink('https://stuchalk.github.io/scidata/examples/ph_min.jsonld')
 
 # add to scidata discipline and subdiscipline
-example.namespaces({'test': 'https://test.org/test#'})
+example.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
 example.discipline('w3i:Chemistry')
 example.subdiscipline('w3i:ChemicalInformatics')
 
@@ -121,7 +121,8 @@ prp2 = {
     'quantity': 'volume',
     'property': 'Volume of solution',
     'value': val2}
-
+example.namespaces({"chm":
+                    "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
 con1 = {
     '@id': 'constituent',
     'source': 'compound/1/',
@@ -149,6 +150,9 @@ con6 = {
     'role': 'chm:solvent'}
 cons = [con1, con2, con3, con4, con5, con6]
 
+example.namespaces(
+    {'sub': 'https://stuchalk.github.io/scidata/ontology/substance.owl#',
+     'gb': 'https://goldbook.iupac.org/'})
 sub1 = {
     '@id': 'substance',
     'title': '3 ppm cyanide standard solution',
@@ -170,7 +174,6 @@ facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
 example.facets(facets)
 
 # add to dataset (goes into dataseries, datagroup, and/or datapoint
-example.namespaces({'gb': 'https://goldbook.iupac.org/'})
 val4 = {'@id': 'value', 'number': 10.03}
 val5 = {
     '@id': 'textvalue',
