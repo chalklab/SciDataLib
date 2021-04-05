@@ -191,7 +191,7 @@ class SciData:
             self.meta['@graph']['uid'] = guid
         return self.meta['@graph']['uid']
 
-    def author(self, authors: list, replace=False) -> dict:
+    def author(self, authors: list, replace=False) -> list:
         """
         Add to or replace the list of authors within the @graph authors section
         :param authors - list of names, or list of dicts with multiple fields
