@@ -127,7 +127,8 @@ def test_author():
     org = 'University of North Florida'
     orcid = 'https://orcid.org/0000-0002-0703-7776'
     au = [{'name': 'Stuart Chalk', 'organization': org, 'orcid': orcid}]
-    out = [{'@id': 'author/1/', '@type': 'dc:creator', 'name': 'Stuart Chalk', 'organization': org, 'orcid': orcid}]
+    out = [{'@id': 'author/1/', '@type': 'dc:creator',
+            'name': 'Stuart Chalk', 'organization': org, 'orcid': orcid}]
     assert sd.author(au) == out
 #
 #

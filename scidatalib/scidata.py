@@ -1,6 +1,6 @@
 """Python library for writing SciData JSON-LD files"""
 from datetime import datetime
-import json
+
 
 class SciData:
     """
@@ -400,19 +400,19 @@ class SciData:
             self.meta['@graph']['scidata']['subdiscipline'] = subdisc
         return self.meta['@graph']['scidata']['subdiscipline']
 
-    def evaluation(self, evalmode: str) -> str:
+    def evaluation(self, evaln: str) -> str:
         """
         Assign the evaluation field
-        :param evalmode: the method of evaluation of research data
+        :param evaln: the method of evaluation of research data
 
         Recommended values of this field are: experimental,
         theoretical, computational
         Example:
         SciDataObject.evaluation('experimental')
         """
-        if isinstance(evalmode, str):
-            self.__addid(evalmode)
-            self.meta['@graph']['scidata']['methodology']['evaluation'] = evalmode
+        if isinstance(evaln, str):
+            self.__addid(evaln)
+            self.meta['@graph']['scidata']['methodology']['evaluation'] = evaln
         return self.meta['@graph']['scidata']['methodology']['evaluation']
 
     def aspects(self, aspects: list) -> dict:
@@ -623,8 +623,9 @@ class SciData:
                 temp.update({'source': it['source']})
             pointlist = []
             for x in it['datapoints']:
-                if 'datapoint' in self.meta['@graph']['scidata']['dataset']:
-                    cnt = len(self.meta['@graph']['scidata']['dataset']['datapoint'])
+                dset = self.meta['@graph']['scidata']['dataset']
+                if 'datapoint' in dset:
+                    cnt = len(dset['datapoint'])
                 else:
                     cnt = 0
                 pointlist.append('datapoint/' + str(cnt + 1) + '/')
