@@ -63,7 +63,7 @@ class SciData:
         self.contexts = [
             'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
         self.nspaces = {
-            "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
+            "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
             "w3i": "https://w3id.org/skgo/modsci#",
             "qudt": "http://qudt.org/vocab/unit/",
             "obo": "http://purl.obolibrary.org/obo/",
