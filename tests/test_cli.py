@@ -18,7 +18,6 @@ def test_scidatalib_cli(tmp_path):
     assert '@graph' in jsonld
 
     graph = jsonld.get('@graph')
-    assert '@id' in graph
     assert '@type' in graph
     assert graph.get('@type') == 'sdo:scidataFramework'
     assert 'uid' in graph
@@ -28,8 +27,6 @@ def test_scidatalib_cli(tmp_path):
     scidata = graph.get('scidata')
     assert '@type' in scidata
     assert scidata.get('@type') == 'sdo:scientificData'
-    assert 'discipline' in scidata
-    assert 'subdiscipline' in scidata
     assert 'dataset' in scidata
 
     dataset = scidata.get('dataset')
