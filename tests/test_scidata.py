@@ -1,6 +1,6 @@
 """pytest test class for scidata.py"""
 from scidatalib.scidata import SciData
-from datetime import *
+from datetime import datetime
 
 sd = SciData('example')
 
@@ -205,9 +205,10 @@ def test_datagroup():
             'qudt': 'http://qudt.org/vocab/unit/'
         }
     )
-    val1 = {'@id': 'numericvalue', 'number': 0.99913, 'unitref': 'qudt:GM-PER-MilliL'}
-    val2 = {'@id': 'numericvalue', 'number': 0.99823, 'unitref': 'qudt:GM-PER-MilliL'}
-    val3 = {'@id': 'numericvalue', 'number': 0.99707, 'unitref': 'qudt:GM-PER-MilliL'}
+    atid = 'numericvalue'
+    val1 = {'@id': atid, 'number': 0.99913, 'unitref': 'qudt:GM-PER-MilliL'}
+    val2 = {'@id': atid, 'number': 0.99823, 'unitref': 'qudt:GM-PER-MilliL'}
+    val3 = {'@id': atid, 'number': 0.99707, 'unitref': 'qudt:GM-PER-MilliL'}
     pnt1 = {
         '@id': 'datapoint',
         'quantity': 'gb:D01590',
@@ -231,7 +232,8 @@ def test_datagroup():
         'source': 'chemicalsystem/1/',
         'datapoints': [pnt1, pnt2, pnt3]
     }
-    # datapoint indexes start at 2 because of the datapoint added in the datapoint test above
+    # datapoint indexes start at 2 because of the
+    # datapoint added in the datapoint test above
     out = {
         "@id": "datagroup/1/",
         "@type": "sdo:datagroup",
@@ -246,10 +248,12 @@ def test_datagroup():
 
 
 def test_source():
-    cite = 'The Meaning of Liff, Douglas Adams and John Lloyd, ISBN 0-330-28121-6, 1983'
+    cite = 'The Meaning of Liff, Douglas Adams and John Lloyd, ' \
+           'ISBN 0-330-28121-6, 1983'
     url = 'https://en.wikipedia.org/wiki/The_Meaning_of_Liff'
     src = [{'citation': cite, 'url': url}]
-    out = [{"@id": "source/1/", "@type": "dc:source", "citation": cite, "url": url}]
+    out = [{"@id": "source/1/", "@type": "dc:source",
+            "citation": cite, "url": url}]
     assert sd.sources(src) == out
 
 
@@ -257,5 +261,6 @@ def test_rights():
     holder = 'Megadodo Productions'
     licurl = 'https://creativecommons.org/licenses/by/4.0/'
     lic = 'Creative Commons, Attribution 4.0 Galactic (CC BY 4.0) ' + licurl
-    out = [{"@id": "rights/1/", "@type": "dc:rights", "holder": holder, "license": lic}]
+    out = [{"@id": "rights/1/", "@type": "dc:rights",
+            "holder": holder, "license": lic}]
     assert sd.rights(holder, lic) == out
