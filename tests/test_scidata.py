@@ -21,6 +21,11 @@ def test_context_replace():
     assert sd.context(new_contexts, True) == list(set(new_contexts))
 
 
+def test_context_replace_string():
+    new_contexts = 'https://stuchalk.github.io/scidata/contexts/chembl.jsonld'
+    assert sd.context(new_contexts, True) == [new_contexts]
+
+
 def test_namespace():
     existing_nspaces = sd.nspaces
     new_nspaces = {'dna': 'https://en.wikipedia.org/wiki/Douglas_Adams#'}
