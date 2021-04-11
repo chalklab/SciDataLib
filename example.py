@@ -2,7 +2,7 @@
 from scidatalib.scidata import SciData
 import json
 
-uid = 'chalk:example:jsonld'
+uid = 'example'
 example = SciData(uid)
 
 # context parameters
@@ -15,11 +15,10 @@ base = 'https://scidata.unf.edu/' + uid + '/'
 example.base(base)
 
 # named graph parameters
-example.docid('example1')
+example.docid('pH')
 example.version('1')
 
 # inside @graph
-example.graph_id(base)
 example.title('pH of cyanide standard')
 sjc = {'name': 'Stuart Chalk',
        'organization': 'University of North Florida',
@@ -44,8 +43,8 @@ example.evaluation('experimental')
 measurement = {
     '@id': 'measurement',
     'scope': 'resource/1/',
-    'techniqueType': 'obo:OMIT_0005812',
-    'technique': 'obo:NCIT_C142343'}
+    'technique': 'Potentiometry',
+    'techniqueref': 'obo:OMIT_0005812'}
 value = {
     '@id': 'textvalue',
     'text': 'true'}

@@ -1,5 +1,6 @@
-"""pytest test class"""
+"""pytest test class for scidata.py"""
 from scidatalib.scidata import SciData
+from datetime import *
 
 sd = SciData('example')
 
@@ -22,147 +23,234 @@ def test_context_replace():
 
 def test_namespace():
     existing_nspaces = sd.nspaces
-    new_nspaces = {'test': 'https://test.org/test#'}
+    new_nspaces = {'dna': 'https://en.wikipedia.org/wiki/Douglas_Adams#'}
     existing_nspaces.update(new_nspaces)
     assert sd.namespaces(new_nspaces) == existing_nspaces
 
 
 def test_namespace_replace():
-    new_nspaces = {'test': 'https://test.org/test#'}
+    new_nspaces = {'dna': 'https://en.wikipedia.org/wiki/Douglas_Adams#'}
     assert sd.namespaces(new_nspaces, True) == new_nspaces
-#
-#
-# def test_add_base():
-#     assert sd.add_base('chemistry') == 'chemistry'
-#
-#
-# def test_make_context():
-#     assert sd.make_context('chemistry') == 'chemistry'
-#
-#
-# def test_doc_id():
-#     assert sd.doc_id('chemistry') == 'chemistry'
-#
-#
-# def test_generatedat():
-#     assert sd.generatedat('chemistry') == 'chemistry'
-#
-#
-# def test_version():
-#     assert sd.version('chemistry') == 'chemistry'
-#
-#
-# def test_graph_id():
-#     assert sd.graph_id('chemistry') == 'chemistry'
-#
-# def test_graph_type():
-#     assert sd.graph_type('chemistry') == 'chemistry'
-#
-#
-# def test_graph_uid():
-#     assert sd.graph_uid('chemistry') == 'chemistry'
-#
-#
-# def test_author():
-#     assert sd.author('chemistry') == 'chemistry'
-#
-#
-# def test_title():
-#     assert sd.title('chemistry') == 'chemistry'
-#
-#
-# def test_description():
-#     assert sd.description('chemistry') == 'chemistry'
-#
-#
-# def test_publisher():
-#     assert sd.publisher('chemistry') == 'chemistry'
-#
-#
-# def test_graphversion():
-#     assert sd.graphversion('chemistry') == 'chemistry'
-#
-#
-# def test_keywords():
-#     assert sd.keywords('chemistry') == 'chemistry'
-#
-#
-# def test_add_keyword():
-#     assert sd.add_keyword('chemistry') == 'chemistry'
-#
-#
-# def test_starttime():
-#     assert sd.starttime('chemistry') == 'chemistry'
-#
-#
-# def test_permalink():
-#     assert sd.permalink('chemistry') == 'chemistry'
-#
-#
-# def test_related():
-#     assert sd.related('chemistry') == 'chemistry'
-#
-#
-# def test_add_related():
-#     assert sd.add_related('chemistry') == 'chemistry'
-#
-#
-# def test_ids():
-#     assert sd.ids('chemistry') == 'chemistry'
-#
-#
-# def test_add_ids():
-#     assert sd.add_ids('chemistry') == 'chemistry'
 
 
-def test_discipline():
-    assert sd.discipline('chemistry') == 'chemistry'
+def test_base():
+    base = 'https://douglasadams.com/'
+    assert sd.base(base) == {'@base': base}
 
 
-def test_subdiscipline():
-    assert sd.subdiscipline('physicalchemistry') == 'physicalchemistry'
+def test_doc_id():
+    assert sd.docid('example1') == 'example1'
+
+
+def test_version():
+    assert sd.version('1') == '1'
+    assert sd.version(2) == '1'
+
+
+def test_graph_uid():
+    assert sd.graph_uid('<uniqueid>') == '<uniqueid>'
 
 
 def test_author():
-    org = 'University of North Florida'
-    orcid = '0000-0002-0703-7776'
-    au = [{'name': 'Stuart Chalk', 'organization': org, 'orcid': orcid}]
+    org = 'Whooshing Deadline Productions'
+    orcid = '0042-0042-0042-0042'
+    name = 'Douglas Adams'
+    au = [{'name': name, 'organization': org, 'orcid': orcid}]
     out = [{'@id': 'author/1/', '@type': 'dc:creator',
-            'name': 'Stuart Chalk', 'organization': org, 'orcid': orcid}]
+            'name': name, 'organization': org, 'orcid': orcid}]
     assert sd.author(au) == out
-#
-#
-# def test_aspects():
-#     assert sd.aspects('chemistry') == 'chemistry'
-#
-#
-# def test_facets():
-#     assert sd.facets('chemistry') == 'chemistry'
-#
-#
-# def test_datapoint():
-#     assert sd.datapoint('chemistry') == 'chemistry'
-#
-#
-# def test_datagroup():
-#     assert sd.datagroup('chemistry') == 'chemistry'
-#
-#
-# def test_source():
-#     assert sd.source('chemistry') == 'chemistry'
-#
-#
-# def test_add_source():
-#     assert sd.add_source('chemistry') == 'chemistry'
-#
-#
-# def test_rights():
-#     assert sd.rights('chemistry') == 'chemistry'
-#
-#
-# def test_add_rights():
-#     assert sd.add_rights('chemistry') == 'chemistry'
-#
-#
-# def test_toc():
-#     assert sd.toc('chemistry') == 'chemistry'
+
+
+def test_title():
+    title = 'The Hitchhiker\'s Guide to the Galaxy'
+    assert sd.title(title) == title
+
+
+def test_description():
+    desc = 'Mostly harmless'
+    assert sd.description(desc) == desc
+
+
+def test_publisher():
+    pub = 'Megadodo Publications'
+    assert sd.publisher(pub) == pub
+
+
+def test_graphversion():
+    version = "Guide Mark II"
+    assert sd.graphversion(version) == version
+
+
+def test_keywords():
+    key1 = 'Don\'t panic'
+    key2 = 'Infinite improbability drive'
+    key3 = 'Bowl of petunias'
+    sd.keywords(key1)
+    sd.keywords(key2)
+    keys = [key1, key2, key3]
+    keys.sort()
+    assert sd.keywords(key3) == keys
+
+
+def test_starttime():
+    now = datetime.now()
+    timestr = now.strftime("%d/%m/%Y %H:%M:%S")
+    assert sd.starttime(timestr) == timestr
+
+
+def test_permalink():
+    url = 'https://en.wikipedia.org/wiki/Douglas_Adams'
+    assert sd.permalink(url) == url
+
+
+def test_related():
+    url = 'https://hitchhikers.fandom.com/'
+    assert sd.related(url) == [url]
+
+
+def test_ids():
+    sd.namespaces({'hhgttg': 'https://hitchhikers.fandom.com/wiki/'})
+    id42 = 'hhgttg:42'
+    assert sd.ids(id42) == [id42]
+
+
+def test_discipline():
+    sd.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
+    disc = 'w3i:ScienceFiction'
+    assert sd.discipline(disc) == disc
+
+
+def test_subdiscipline():
+    sd.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
+    subdisc = 'w3i:ScienceHumor'
+    assert sd.subdiscipline(subdisc) == subdisc
+
+
+def test_evaluation():
+    evaln = 'probability'
+    assert sd.subdiscipline(evaln) == evaln
+
+
+def test_aspects():
+    sd.namespaces({'obo': 'http://purl.obolibrary.org/obo/'})
+    meas = {
+        '@id': 'measurement',
+        'scope': 'resource/1/',
+        'technique': 'Potentiometry',
+        'techniqueref': 'obo:OMIT_0005812'}
+    out = {
+        '@id': 'measurement/1/',
+        '@type': 'sdo:measurement',
+        'scope': 'resource/1/',
+        'technique': 'Potentiometry',
+        'techniqueref': 'obo:OMIT_0005812'}
+    assert sd.aspects([meas]) == [out]
+
+
+def test_facets():
+    sd.namespaces({'obo': 'http://purl.obolibrary.org/obo/'})
+    compd = {
+        '@id': 'compound',
+        'name': 'cyanide ion',
+        'inchi': 'InChI=1S/CN/c1-2/q-1',
+        'chebi': 'obo:CHEBI_17514'
+    }
+    out = {
+        '@id': 'compound/1/',
+        "@type": 'sdo:compound',
+        'name': 'cyanide ion',
+        'inchi': 'InChI=1S/CN/c1-2/q-1',
+        'chebi': 'obo:CHEBI_17514'
+    }
+    assert sd.facets([compd]) == [out]
+
+
+def test_scope():
+    scope = 'solarsystem/1/'
+    assert sd.scope(scope) == scope
+
+
+def test_datapoint():
+    sd.namespaces({'gb': 'https://goldbook.iupac.org/terms/view/'})
+    val = {'@id': 'numericvalue', 'number': 10.03}
+    pnt = {
+        '@id': 'datapoint',
+        'quantity': 'gb:P04524',
+        'conditions': 'condition/1/',
+        'value': val
+    }
+    out = {
+        '@id': 'datapoint/1/',
+        '@type': 'sdo:datapoint',
+        'quantity': 'gb:P04524',
+        'conditions': 'condition/1/',
+        'value': {
+            '@id': 'datapoint/1/numericvalue/1/',
+            '@type': 'sdo:numericvalue',
+            'number': 10.03
+        }
+    }
+    assert sd.datapoint([pnt]) == [out]
+
+
+def test_datagroup():
+    sd.namespaces(
+        {
+            'gb': 'https://goldbook.iupac.org/terms/view/',
+            'qudt': 'http://qudt.org/vocab/unit/'
+        }
+    )
+    val1 = {'@id': 'numericvalue', 'number': 0.99913, 'unitref': 'qudt:GM-PER-MilliL'}
+    val2 = {'@id': 'numericvalue', 'number': 0.99823, 'unitref': 'qudt:GM-PER-MilliL'}
+    val3 = {'@id': 'numericvalue', 'number': 0.99707, 'unitref': 'qudt:GM-PER-MilliL'}
+    pnt1 = {
+        '@id': 'datapoint',
+        'quantity': 'gb:D01590',
+        'conditions': 'condition/1/',
+        'value': val1
+    }
+    pnt2 = {
+        '@id': 'datapoint',
+        'quantity': 'gb:D01590',
+        'conditions': 'condition/2/',
+        'value': val2
+    }
+    pnt3 = {
+        '@id': 'datapoint',
+        'quantity': 'gb:D01590',
+        'conditions': 'condition/3/',
+        'value': val3
+    }
+    grp = {
+        '@id': 'datagroup',
+        'source': 'chemicalsystem/1/',
+        'datapoints': [pnt1, pnt2, pnt3]
+    }
+    # datapoint indexes start at 2 because of the datapoint added in the datapoint test above
+    out = {
+        "@id": "datagroup/1/",
+        "@type": "sdo:datagroup",
+        "source": "chemicalsystem/1/",
+        "datapoints": [
+            "datapoint/2/",
+            "datapoint/3/",
+            "datapoint/4/"
+            ]
+        }
+    assert sd.datagroup([grp]) == [out]
+
+
+def test_source():
+    cite = 'The Meaning of Liff, Douglas Adams and John Lloyd, ISBN 0-330-28121-6, 1983'
+    url = 'https://en.wikipedia.org/wiki/The_Meaning_of_Liff'
+    src = [{'citation': cite, 'url': url}]
+    out = [{"@id": "source/1/", "@type": "dc:source", "citation": cite, "url": url}]
+    assert sd.sources(src) == out
+
+
+def test_rights():
+    holder = 'Megadodo Productions'
+    licurl = 'https://creativecommons.org/licenses/by/4.0/'
+    lic = 'Creative Commons, Attribution 4.0 Galactic (CC BY 4.0) ' + licurl
+    out = [{"@id": "rights/1/", "@type": "dc:rights", "holder": holder, "license": lic}]
+    assert sd.rights(holder, lic) == out

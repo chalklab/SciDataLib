@@ -130,21 +130,30 @@ class SciData:
     def base(self, base: str) -> dict:
         """
         Assign the JSON-LD @base URL
+        (also defines '@id' under '@graph' for consistency)
         See: https://www.w3.org/TR/json-ld/#base-iri
         :param base - @base URL for a JSON-LD file
+
+        Defines the base url for all internal unique identifiers
+        (define though '@id's). For consistency, the codes also
+        sets the '@id' field under '@graph' so that all triple
+        subjects are unique and associated with the same graph
+        Example:
+        SciDataObject.graph_uid("<uniqueidentifier>")
         """
         if isinstance(base, str):
             if base == "":
                 base = "https://scidata.unf.edu/update_your_base_URL"
             self.baseurl = {"@base": base}
         self.__make_context()
+        self.__graphid(base)
         return self.baseurl
 
     def docid(self, docid: str) -> dict:
         """
         Assign the document identifier.  This will become the
         graph name if the file is uploaded to a graph database
-        :param docid - the top level @id value
+        :param docid - the root level @id value
         """
         if isinstance(docid, str):
             self.meta['@id'] = docid
@@ -159,31 +168,14 @@ class SciData:
             self.meta['version'] = version
         return self.meta['version']
 
-    def graph_id(self, gid: str) -> dict:
-        """
-        Assign the @id value within the @graph JSON object
-        :param gid - the @graph @id value, normally kept the same as @base
-
-        In the context of creating SciData JSON-LD documents for a project
-        this should be a unique URL that represents your data, and if
-        needed, points to the data online, i.e.,
-
-        SciDataObject.graph_id(
-            "https://scidata.unf.edu/<uniqueidentifier>/"
-        )
-        """
-        if isinstance(gid, str):
-            self.meta['@graph']['@id'] = gid
-        return self.meta['@graph']['@id']
-
     def graph_uid(self, guid: str) -> dict:
         """
         Assign the uid value within the @graph JSON object
         :param guid - the @graph uid value
 
-        Normally the same as the unique id used in the @graph @id value
-        and used to easily find the data in a file system, i.e.,
-
+        Normally the same as the unique id used in the @graph @id
+        value and used to easily find the data in a file system.
+        Example:
         SciDataObject.graph_uid("<uniqueidentifier>")
         """
         if isinstance(guid, str):
@@ -321,9 +313,9 @@ class SciData:
         """
         if isinstance(link, str):
             self.meta['@graph']['permalink'] = link
-        return self.meta
+        return self.meta['@graph']['permalink']
 
-    def related(self, related: [str, list], replace=False) -> dict:
+    def related(self, related: [str, list], replace=False) -> list:
         """
         Add to or replace the related URLs
         :param related - URLs to other data related to this dataset
@@ -411,8 +403,8 @@ class SciData:
         Assign the evaluation field
         :param evaln: the method of evaluation of research data
 
-        Recommended values of this field are: experimental,
-        theoretical, computational
+        Recommended values of this field are:
+        experimental, theoretical, computational
         Example:
         SciDataObject.evaluation('experimental')
         """
@@ -421,7 +413,7 @@ class SciData:
             self.meta['@graph']['scidata']['methodology']['evaluation'] = evaln
         return self.meta['@graph']['scidata']['methodology']['evaluation']
 
-    def aspects(self, aspects: list) -> dict:
+    def aspects(self, aspects: list) -> list:
         """Add to or replace the aspects of the file"""
         cnt_index = {}
 
@@ -473,9 +465,9 @@ class SciData:
 
         scidata['methodology'] = meth
         self.meta['@graph']['scidata'] = scidata
-        return self.meta
+        return curr_aspects
 
-    def facets(self, facets: list) -> dict:
+    def facets(self, facets: list) -> list:
         """Add to or replace the facets of the file"""
         cnt_index = {}
 
@@ -528,7 +520,7 @@ class SciData:
         system['facets'] = curr_facets
         scidata['system'] = system
         self.meta['@graph']['scidata'] = scidata
-        return self.meta
+        return curr_facets
 
     def scope(self, scope: [str, list]) -> str:
         """
@@ -546,7 +538,7 @@ class SciData:
             self.meta['@graph']['scidata']['dataset']['scope'] = scope
         return self.meta['@graph']['scidata']['dataset']['scope']
 
-    def datapoint(self, points: list) -> dict:
+    def datapoint(self, points: list) -> list:
         """Add one or more datapoints"""
         cnt_index = {}
 
@@ -601,9 +593,9 @@ class SciData:
         dataset['datapoint'] = curr_points
         scidata['dataset'] = dataset
         self.meta['@graph']['scidata'] = scidata
-        return self.meta
+        return curr_points
 
-    def datagroup(self, groups: list) -> dict:
+    def datagroup(self, groups: list) -> list:
         """Add one or more datagroups"""
         cnt_index = {}
 
@@ -654,7 +646,7 @@ class SciData:
         dataset['datagroup'] = curr_groups
         scidata['dataset'] = dataset
         self.meta['@graph']['scidata'] = scidata
-        return self.meta
+        return curr_groups
 
     def sources(self, sources: list, replace=False) -> dict:
         """
@@ -681,7 +673,7 @@ class SciData:
             }
             ld.update(x)
             srcs.append(ld)
-        return self.meta
+        return self.meta['@graph']['sources']
 
     def rights(self, holder: str, license: str) -> dict:
         """
@@ -698,7 +690,7 @@ class SciData:
                 'license': license,
             }]
         self.meta['@graph']['rights'] = rights
-        return self.meta
+        return self.meta['@graph']['rights']
 
     # private class functions
     def __addid(self, text: str) -> bool:
@@ -710,6 +702,14 @@ class SciData:
             return True
         else:
             return False
+
+    def __graphid(self, gid: str) -> bool:
+        """
+        Assigns the @id value within the @graph JSON object.
+        Automatically set as the value of the '@base'
+        """
+        self.meta['@graph']['@id'] = gid
+        return True
 
     def __addtoc(self):
         """ adds entries to the toc list """
