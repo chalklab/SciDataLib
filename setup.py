@@ -6,9 +6,9 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="SciDataLib",
-    version="0.1.0",
-    author="Dylan Johnson, Stuart Chalk",
-    author_email="n01448636@unf.edu, schalk@unf.edu",
+    version="0.2",
+    author="Dylan Johnson, Marshall McDonnell, Stuart Chalk",
+    author_email="n01448636@unf.edu, mcdonnellmt@ornl.gov, schalk@unf.edu",
     description="Python library for development of SciData JSON-LD files",
     long_description=long_description,
     long_description_content_type="text/markdown",
