@@ -43,8 +43,6 @@ jobs:
 
       - name: Coverage
         if: ${{ matrix.python-version == env.PYTHON_MAIN_VERSION }}
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         run: |
             poetry run pytest --cov=scidatalib --cov-report=term-missing tests/
             pip install coverage
