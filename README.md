@@ -155,7 +155,7 @@ scidatalib output.jsonld
 
 You can access the additional functionality via the `--help` option:
 ```
-scidata --help
+scidatalib --help
 ```
 
 ### SciDataLib library
