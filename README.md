@@ -93,7 +93,9 @@ code uses the '@base' to populate this, so they are consistent. As a result,
 # Installation
 
 ### Using pip
-*coming soon*!!!
+```
+pip install scidatalib
+```
 
 ### Manual (from source)
 Clone the repository either via:
