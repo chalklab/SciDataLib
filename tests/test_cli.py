@@ -4,11 +4,13 @@ from scidatalib.cli import cli
 
 def test_scidatalib_cli(tmp_path):
     """Test for CLI 'bare' scidata jsonld"""
-    filename = tmp_path / "output.jsonld"
-    args = [filename.absolute().name]
+    output_dir = tmp_path / "scidatalib_cli"
+    output_dir.mkdir()
+    filename = output_dir / "output.jsonld"
+    args = [str(filename.resolve())]
     cli(args)
 
-    with open(filename.absolute().name, 'r') as f:
+    with open(filename.resolve(), 'r') as f:
         jsonld = json.load(f)
 
     assert '@context' in jsonld
@@ -40,10 +42,10 @@ def test_scidatalib_cli_uid(tmp_path):
     """Test for CLI changing UID"""
     filename = tmp_path / "output.jsonld"
     uid = "new_example"
-    args = [filename.absolute().name, "--uid", uid]
+    args = [str(filename.resolve()), "--uid", uid]
     cli(args)
 
-    with open(filename.absolute().name, 'r') as f:
+    with open(filename.resolve(), 'r') as f:
         jsonld = json.load(f)
 
     assert jsonld.get('@graph').get('uid') == uid
@@ -52,11 +54,11 @@ def test_scidatalib_cli_uid(tmp_path):
 def test_scidatalib_cli_indent(tmp_path):
     """Test for CLI to change indent (basic check)"""
     filename = tmp_path / "output.jsonld"
-    args = [filename.absolute().name, "--indent", "1"]
+    args = [str(filename.resolve()), "--indent", "1"]
 
     cli(args)
 
-    with open(filename.absolute().name, 'r') as f:
+    with open(filename.resolve(), 'r') as f:
         jsonld = json.load(f)
 
     assert '@context' in jsonld
