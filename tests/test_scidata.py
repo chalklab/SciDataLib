@@ -1,11 +1,15 @@
 """pytest test class for scidata.py"""
 from scidatalib.scidata import SciData
 from datetime import datetime
+import pytest
 
-sd = SciData('example')
+
+@pytest.fixture
+def sd():
+    return SciData('example')
 
 
-def test_context():
+def test_context(sd):
     existing_contexts = sd.contexts
     new_contexts = [
         'https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
@@ -14,49 +18,49 @@ def test_context():
     assert sd.context(new_contexts) == out_contexts
 
 
-def test_context_replace():
+def test_context_replace(sd):
     new_contexts = [
         'https://stuchalk.github.io/scidata/contexts/chembl.jsonld',
         'https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
     assert sd.context(new_contexts, True) == list(set(new_contexts))
 
 
-def test_context_replace_string():
+def test_context_replace_string(sd):
     new_contexts = 'https://stuchalk.github.io/scidata/contexts/chembl.jsonld'
     assert sd.context(new_contexts, True) == [new_contexts]
 
 
-def test_namespace():
+def test_namespace(sd):
     existing_nspaces = sd.nspaces
     new_nspaces = {'dna': 'https://en.wikipedia.org/wiki/Douglas_Adams#'}
     existing_nspaces.update(new_nspaces)
     assert sd.namespaces(new_nspaces) == existing_nspaces
 
 
-def test_namespace_replace():
+def test_namespace_replace(sd):
     new_nspaces = {'dna': 'https://en.wikipedia.org/wiki/Douglas_Adams#'}
     assert sd.namespaces(new_nspaces, True) == new_nspaces
 
 
-def test_base():
+def test_base(sd):
     base = 'https://douglasadams.com/'
     assert sd.base(base) == {'@base': base}
 
 
-def test_doc_id():
+def test_doc_id(sd):
     assert sd.docid('example1') == 'example1'
 
 
-def test_version():
+def test_version(sd):
     assert sd.version('1') == '1'
     assert sd.version(2) == '1'
 
 
-def test_graph_uid():
+def test_graph_uid(sd):
     assert sd.graph_uid('<uniqueid>') == '<uniqueid>'
 
 
-def test_author():
+def test_author(sd):
     org = 'Whooshing Deadline Productions'
     orcid = '0042-0042-0042-0042'
     name = 'Douglas Adams'
@@ -66,27 +70,27 @@ def test_author():
     assert sd.author(au) == out
 
 
-def test_title():
+def test_title(sd):
     title = 'The Hitchhiker\'s Guide to the Galaxy'
     assert sd.title(title) == title
 
 
-def test_description():
+def test_description(sd):
     desc = 'Mostly harmless'
     assert sd.description(desc) == desc
 
 
-def test_publisher():
+def test_publisher(sd):
     pub = 'Megadodo Publications'
     assert sd.publisher(pub) == pub
 
 
-def test_graphversion():
+def test_graphversion(sd):
     version = "Guide Mark II"
     assert sd.graphversion(version) == version
 
 
-def test_keywords():
+def test_keywords(sd):
     key1 = 'Don\'t panic'
     key2 = 'Infinite improbability drive'
     key3 = 'Bowl of petunias'
@@ -97,46 +101,46 @@ def test_keywords():
     assert sd.keywords(key3) == keys
 
 
-def test_starttime():
+def test_starttime(sd):
     now = datetime.now()
     timestr = now.strftime("%d/%m/%Y %H:%M:%S")
     assert sd.starttime(timestr) == timestr
 
 
-def test_permalink():
+def test_permalink(sd):
     url = 'https://en.wikipedia.org/wiki/Douglas_Adams'
     assert sd.permalink(url) == url
 
 
-def test_related():
+def test_related(sd):
     url = 'https://hitchhikers.fandom.com/'
     assert sd.related(url) == [url]
 
 
-def test_ids():
+def test_ids(sd):
     sd.namespaces({'hhgttg': 'https://hitchhikers.fandom.com/wiki/'})
     id42 = 'hhgttg:42'
     assert sd.ids(id42) == [id42]
 
 
-def test_discipline():
+def test_discipline(sd):
     sd.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
     disc = 'w3i:ScienceFiction'
     assert sd.discipline(disc) == disc
 
 
-def test_subdiscipline():
+def test_subdiscipline(sd):
     sd.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
     subdisc = 'w3i:ScienceHumor'
     assert sd.subdiscipline(subdisc) == subdisc
 
 
-def test_evaluation():
+def test_evaluation(sd):
     evaln = 'probability'
     assert sd.subdiscipline(evaln) == evaln
 
 
-def test_aspects():
+def test_aspects(sd):
     sd.namespaces({'obo': 'http://purl.obolibrary.org/obo/'})
     meas = {
         '@id': 'measurement',
@@ -152,7 +156,7 @@ def test_aspects():
     assert sd.aspects([meas]) == [out]
 
 
-def test_facets():
+def test_facets(sd):
     sd.namespaces({'obo': 'http://purl.obolibrary.org/obo/'})
     compd = {
         '@id': 'compound',
@@ -170,12 +174,12 @@ def test_facets():
     assert sd.facets([compd]) == [out]
 
 
-def test_scope():
+def test_scope(sd):
     scope = 'solarsystem/1/'
     assert sd.scope(scope) == scope
 
 
-def test_datapoint():
+def test_datapoint(sd):
     sd.namespaces({'gb': 'https://goldbook.iupac.org/terms/view/'})
     val = {'@id': 'numericvalue', 'number': 10.03}
     pnt = {
@@ -198,7 +202,7 @@ def test_datapoint():
     assert sd.datapoint([pnt]) == [out]
 
 
-def test_datagroup():
+def test_datagroup_with_datapoints(sd):
     sd.namespaces(
         {
             'gb': 'https://goldbook.iupac.org/terms/view/',
@@ -232,22 +236,68 @@ def test_datagroup():
         'source': 'chemicalsystem/1/',
         'datapoints': [pnt1, pnt2, pnt3]
     }
-    # datapoint indexes start at 2 because of the
-    # datapoint added in the datapoint test above
     out = {
         "@id": "datagroup/1/",
         "@type": "sdo:datagroup",
         "source": "chemicalsystem/1/",
         "datapoints": [
+            "datapoint/1/",
             "datapoint/2/",
-            "datapoint/3/",
-            "datapoint/4/"
+            "datapoint/3/"
             ]
         }
     assert sd.datagroup([grp]) == [out]
 
 
-def test_source():
+def test_datagroup_with_attributes(sd):
+    sd.namespaces(
+        {
+            'gb': 'https://goldbook.iupac.org/terms/view/',
+            'qudt': 'http://qudt.org/vocab/unit/'
+        }
+    )
+
+    # Create an X data vector
+    datax = [0.1*i for i in range(10)]
+
+    # Setup attributes of the X data
+    atid = 'numericvalue'
+    val1 = {'@id': atid, 'number': min(datax), 'unitref': 'qudt:PER-CentiM'}
+    val2 = {'@id': atid, 'number': max(datax), 'unitref': 'qudt:PER-CentiM'}
+    val3 = {'@id': atid, 'number': len(datax), 'unitref': 'qudt:PER-CentiM'}
+    pnt1 = {
+        '@id': 'attribute',
+        'quantity': 'gb:W06659',
+        'value': val1
+    }
+    pnt2 = {
+        '@id': 'attribute',
+        'quantity': 'gb:W06659',
+        'value': val2
+    }
+    pnt3 = {
+        '@id': 'attribute',
+        'quantity': 'gb:W06659',
+        'value': val3
+    }
+    grp = {
+        '@id': 'datagroup',
+        'attribute': [pnt1, pnt2, pnt3]
+    }
+    out = {
+        "@id": "datagroup/1/",
+        "@type": "sdo:datagroup",
+        "attribute": [
+            "attribute/1/",
+            "attribute/2/",
+            "attribute/3/"
+            ]
+        }
+    result = sd.datagroup([grp])
+    assert result == [out]
+
+
+def test_source(sd):
     cite = 'The Meaning of Liff, Douglas Adams and John Lloyd, ' \
            'ISBN 0-330-28121-6, 1983'
     url = 'https://en.wikipedia.org/wiki/The_Meaning_of_Liff'
@@ -257,7 +307,7 @@ def test_source():
     assert sd.sources(src) == out
 
 
-def test_rights():
+def test_rights(sd):
     holder = 'Megadodo Productions'
     licurl = 'https://creativecommons.org/licenses/by/4.0/'
     lic = 'Creative Commons, Attribution 4.0 Galactic (CC BY 4.0) ' + licurl
