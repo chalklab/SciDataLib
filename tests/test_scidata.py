@@ -236,8 +236,6 @@ def test_datagroup_with_datapoints(sd):
         'source': 'chemicalsystem/1/',
         'datapoints': [pnt1, pnt2, pnt3]
     }
-    # datapoint indexes start at 2 because of the
-    # datapoint added in the datapoint test above
     out = {
         "@id": "datagroup/1/",
         "@type": "sdo:datagroup",
@@ -286,8 +284,6 @@ def test_datagroup_with_attributes(sd):
         '@id': 'datagroup',
         'datapoints': [pnt1, pnt2, pnt3]
     }
-    # datapoint indexes start at 2 because of the
-    # datapoint added in the datapoint test above
     out = {
         "@id": "datagroup/1/",
         "@type": "sdo:datagroup",
