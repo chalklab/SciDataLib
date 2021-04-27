@@ -282,18 +282,19 @@ def test_datagroup_with_attributes(sd):
     }
     grp = {
         '@id': 'datagroup',
-        'datapoints': [pnt1, pnt2, pnt3]
+        'attribute': [pnt1, pnt2, pnt3]
     }
     out = {
         "@id": "datagroup/1/",
         "@type": "sdo:datagroup",
-        "datapoints": [
-            "datapoint/1/",
-            "datapoint/2/",
-            "datapoint/3/"
+        "attribute": [
+            "attribute/1/",
+            "attribute/2/",
+            "attribute/3/"
             ]
         }
-    assert sd.datagroup([grp]) == [out]
+    result = sd.datagroup([grp])
+    assert result == [out]
 
 
 def test_source(sd):
