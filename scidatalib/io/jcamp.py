@@ -625,7 +625,7 @@ def _read_get_aspects_section(jcamp_dict: dict) -> dict:
     measurement = {}
     if "spectrometer/data system" in jcamp_dict:
         measurement = {
-            "@id": "measurement/1/",
+            "@id": "measurement/1",
             "@type": "sdo:measurement",
             "techniqueType": "cao:spectroscopy",
             "instrument":  f'{jcamp_dict.get("spectrometer/data system")}',
@@ -1010,5 +1010,6 @@ def _read_translate_jcamp_to_scidata(jcamp_dict: dict) -> SciData:
     scidata.datagroup([datagroup])
 
     # TODO: add the dataseries
+    #   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
 
     return scidata

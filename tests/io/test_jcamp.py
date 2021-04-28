@@ -418,6 +418,99 @@ def test_read_get_graph_source_section(citation_dict):
     assert target == result
 
 
+def test_read_get_aspects_section():
+    spectrometer = "Bruker FT-Raman MultiRAM Spectrometer"
+    jcamp_dict = {
+        "spectrometer/data system": spectrometer,
+    }
+    measurement = {
+        "@id": "measurement/1",
+        "@type": "sdo:measurement",
+        "techniqueType": "cao:spectroscopy",
+        "instrument": spectrometer,
+    }
+    target = [measurement]
+    result = jcamp._read_get_aspects_section(jcamp_dict)
+    assert target == result
+
+    parameter = 5.0
+    jcamp_dict.update({"instrument parameters": parameter})
+    instrument_parameters = {
+        "@id": "setting/1",
+        "@type": "sdo:setting",
+        "property": "instrument parameters",
+        "value": {
+            "@id": "setting/1/value",
+            "number": parameter,
+        }
+    }
+    settings = {"settings": [instrument_parameters]}
+    measurement.update({"settings": [instrument_parameters]})
+    target = [measurement]
+    result = jcamp._read_get_aspects_section(jcamp_dict)
+    assert target == result
+
+    path_value = "5"
+    path_unit = "CM"
+    jcamp_dict.update({"path length": f'{path_value} {path_unit}'})
+    path_length = {
+        "@id": "setting/2",
+        "@type": "sdo:setting",
+        "quantity": "length",
+        "property": "path length",
+        "value": {
+            "@id": "setting/2/value",
+            "number": path_value,
+            "unitref": "qudt:CentiM",
+        }
+    }
+    settings = {"settings": [instrument_parameters, path_length]}
+    measurement.update(settings)
+    target = [measurement]
+    result = jcamp._read_get_aspects_section(jcamp_dict)
+    assert target == result
+
+    resolution_value = "500 nm"
+    jcamp_dict.update({"resolution": f'{resolution_value}'})
+    resolution = {
+        "@id": "setting/3",
+        "@type": "sdo:setting",
+        "quantity": "resolution",
+        "property": "resolution",
+        "value": {
+            "@id": "setting/3/value",
+            "number": f'{resolution_value}',
+        }
+    }
+    settings = {"settings": [instrument_parameters, path_length, resolution]}
+    measurement.update(settings)
+    target = [measurement]
+    result = jcamp._read_get_aspects_section(jcamp_dict)
+    assert target == result
+
+    procedure_description = "Sampled at 5 min intervals"
+    jcamp_dict.update({"sampling procedure": procedure_description})
+    procedure = {
+        "@id": "procedure/1",
+        "@type": "sdo:procedure",
+        "description": procedure_description,
+    }
+    target = [measurement, procedure]
+    result = jcamp._read_get_aspects_section(jcamp_dict)
+    assert target == result
+
+    processing_description = "Milled sample in ball mill for 20 minutes"
+    jcamp_dict.update({"data processing": processing_description})
+    processing = {
+        "@id": "resource/1",
+        "@type": "sdo:resource",
+        "description": processing_description,
+    }
+    target = [measurement, procedure, processing]
+    result = jcamp._read_get_aspects_section(jcamp_dict)
+    assert target == result
+
+
 def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
     with open(infrared_ethanol_compressed_file.absolute(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
