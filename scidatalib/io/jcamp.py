@@ -871,7 +871,8 @@ def _read_get_datagroup_subsection(jcamp_dict: dict) -> List[dict]:
     }
     return datagroup
 
-
+# TODO: add the dataseries
+#   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
 def _read_get_dataseries_subsection(jcamp_dict: dict) -> List[dict]:
     """
     Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
