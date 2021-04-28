@@ -105,6 +105,29 @@ def uvvis_toluene_file():
     return p
 
 
+@pytest.fixture
+def citation():
+    """
+    Citation dict for testing using Alpha, Beta, Gamma paper
+    """
+    author = "Alpher, R. A.; Bethe, H.; Gamow, G."
+    title = "The Origin of Chemical Elements"
+    journal = "Phys. Rev."
+    volume = "73"
+    date = "1948"
+    page = "803-804"
+
+    citation_dict = {
+        "$ref author": author,
+        "$ref title": title,
+        "$ref journal": journal,
+        "$ref volume": volume,
+        "$ref date": date,
+        "$ref page": page,
+    }
+    return citation_dict
+
+
 def xy_minmax_checker(testdict):
     tol = 1e-4
     if testdict['x'] and 'minx' in testdict:
@@ -306,37 +329,18 @@ def test_reader_exception_bad_datatype(tmp_path, infrared_ethanol_file):
             jcamp._reader(fileobj)
 
 
-def test_read_get_source_citation_section():
-    # Alpha, Beta, Gamma paper
-    author = "Alpher, R. A.; Bethe, H.; Gamow, G."
-    title = "The Origin of Chemical Elements"
-    journal = "Phys. Rev."
-    volume = "73"
-    date = "1948"
-    page = "803-804"
-
-    # Target output
-    target = [
-        f'{author} :',
-        f'{title}.',
-        f'{journal} ',
-        f'{volume}',
-        f'({date})',
-        f'{page}',
-    ]
-
+def test_read_get_source_citation_section(citation):
     # Input dictionary to parse
-    jcamp_dict = {
-        "$ref author": author,
-        "$ref title": title,
-        "$ref journal": journal,
-        "$ref volume": volume,
-        "$ref date": date,
-        "$ref page": page,
-    }
-
-    citations = jcamp._read_get_graph_source_citation_section(jcamp_dict)
-    assert target == citations
+    target = [
+        f'{citation["$ref author"]} :',
+        f'{citation["$ref title"]}.',
+        f'{citation["$ref journal"]} ',
+        f'{citation["$ref volume"]}',
+        f'({citation["$ref date"]})',
+        f'{citation["$ref page"]}',
+    ]
+    result = jcamp._read_get_graph_source_citation_section(citation)
+    assert target == result
 
 
 def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
