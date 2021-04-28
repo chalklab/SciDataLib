@@ -554,7 +554,7 @@ def _read_get_graph_source_citation_section(jcamp_dict: dict) -> List[str]:
     if "$ref title" in jcamp_dict:
         citation.append(f'{jcamp_dict["$ref title"]}.')
     if "$ref journal" in jcamp_dict:
-        citation.append(f'{jcamp_dict["$ref journal"]} ')
+        citation.append(f'{jcamp_dict["$ref journal"]}')
     if "$ref volume" in jcamp_dict:
         citation.append(f'{jcamp_dict["$ref volume"]}')
     if "$ref date" in jcamp_dict:
@@ -593,15 +593,22 @@ def _read_get_graph_source_section(jcamp_dict: dict) -> List[dict]:
         })
 
     if "$nist source" in jcamp_dict or "$nist image" in jcamp_dict:
-        citation = ""
+
+        nist_citation = []
+
         if "$nist source" in jcamp_dict:
-            citation += f'NIST SOURCE: {jcamp_dict.get("$nist source")}, '
+            nist_source = f'NIST SOURCE: {jcamp_dict.get("$nist source")}'
+            nist_citation.append(nist_source)
+
         if "$nist image" in jcamp_dict:
-            citation += f'NIST IMAGE: {jcamp_dict.get("$nist image")}, '
+            nist_image = f'NIST IMAGE: {jcamp_dict.get("$nist image")}'
+            nist_citation.append(nist_image)
+
+        nist_string = ', '.join(nist_citation)
         sources.append({
             "@id": f'source/{len(sources) + 1}',
             "@type": "dc:source",
-            "citation": citation,
+            "citation": nist_string,
         })
 
     return sources
