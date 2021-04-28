@@ -1,6 +1,7 @@
 import pathlib
 import pytest
 
+from scidatalib.scidata import SciData
 from scidatalib.io import jcamp
 from tests import TEST_DATA_DIR
 
@@ -238,22 +239,6 @@ def test_read_parse_header_line():
     assert last_key == 'xunits'
 
 
-def test_write_extract_description_section():
-    description_lines = []
-    description_lines.append("CAT: meow")
-    description_lines.append("DOG: bark")
-    description = jcamp._DESCRIPTION_KEY_SPLIT_CHAR.join(description_lines)
-
-    result = jcamp._write_extract_description_section(description, "CAT")
-    assert result == "meow"
-
-    result = jcamp._write_extract_description_section(description, "DOG")
-    assert result == "bark"
-
-    result = jcamp._write_extract_description_section(description, "EAGLE")
-    assert result is None
-
-
 def test_reader_hnmr(hnmr_ethanol_file):
     with open(hnmr_ethanol_file.absolute(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
@@ -296,6 +281,29 @@ def test_reader_infrared(infrared_ethanol_file):
     assert jcamp_dict.get('data type') == "INFRARED SPECTRUM"
     assert jcamp_dict.get('molform') == "C2 H6 O"
     assert jcamp_dict.get(jcamp._DATA_XY_TYPE_KEY) == '(X++(Y..Y))'
+
+
+def test_reader_exception_bad_datatype(tmp_path, infrared_ethanol_file):
+    # Create a "bad type" tmp file
+    jcamp_dir = tmp_path / "jcamp"
+    jcamp_dir.mkdir()
+    bad_file = jcamp_dir / "bad_data_type.jdx"
+
+    # Read input file lines and modify XYDATA file to "bad type"
+    with open(infrared_ethanol_file.absolute(), 'r') as fileobj:
+        lines = fileobj.readlines()
+        for i, line in enumerate(lines):
+            if line.startswith("##XYDATA"):
+                lines[i] = "##XYDATA=BAD_DATA_TYPE\n"
+
+    # Read modified lines to the "bad type" tmp file
+    with open(bad_file.absolute(), 'w') as fileobj:
+        fileobj.writelines(lines)
+
+    # Read in "bad file" for test
+    with open(bad_file.absolute(), 'r') as fileobj:
+        with pytest.raises(jcamp.UnsupportedDataTypeConfigException):
+            jcamp_dict = jcamp._reader(fileobj)
 
 
 def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
@@ -374,3 +382,8 @@ def test_reader_uvvis(uvvis_toluene_file):
     assert jcamp_dict.get('data type') == "UV/VIS SPECTRUM"
     assert jcamp_dict.get('molform') == "C7H8"
     assert jcamp_dict.get(jcamp._DATA_XY_TYPE_KEY) == '(XY..XY)'
+
+
+def test_read_jcamp(raman_tannic_acid_file):
+    scidata_obj = jcamp.read_jcamp(raman_tannic_acid_file)
+    assert type(scidata_obj) == SciData
