@@ -303,7 +303,40 @@ def test_reader_exception_bad_datatype(tmp_path, infrared_ethanol_file):
     # Read in "bad file" for test
     with open(bad_file.absolute(), 'r') as fileobj:
         with pytest.raises(jcamp.UnsupportedDataTypeConfigException):
-            jcamp_dict = jcamp._reader(fileobj)
+            jcamp._reader(fileobj)
+
+
+def test_read_get_source_citation_section():
+    # Alpha, Beta, Gamma paper
+    author = "Alpher, R. A.; Bethe, H.; Gamow, G."
+    title = "The Origin of Chemical Elements"
+    journal = "Phys. Rev."
+    volume = "73"
+    date = "1948"
+    page = "803-804"
+
+    # Target output
+    target = [
+        f'{author} :',
+        f'{title}.',
+        f'{journal} ',
+        f'{volume}',
+        f'({date})',
+        f'{page}',
+    ]
+
+    # Input dictionary to parse
+    jcamp_dict = {
+        "$ref author": author,
+        "$ref title": title,
+        "$ref journal": journal,
+        "$ref volume": volume,
+        "$ref date": date,
+        "$ref page": page,
+    }
+
+    citations = jcamp._read_get_graph_source_citation_section(jcamp_dict)
+    assert target == citations
 
 
 def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
