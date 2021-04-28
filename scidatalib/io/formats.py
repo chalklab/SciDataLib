@@ -12,6 +12,7 @@ class UnknownFileTypeError(Exception):
 
 
 ioformats = {
+    'jcamp': 'jcamp',
 }
 
 
