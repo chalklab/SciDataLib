@@ -877,12 +877,9 @@ def _read_get_dataseries_subsection(jcamp_dict: dict) -> List[dict]:
     Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
     'dataset' section's dataseries
 
-    Args:
-        jcamp_dict:
-            JCAMP-DX dictionary to extract dataset section's dataseries from
-
-    Returns:
-        The 'dataset' section's dataseries of SciData JSON-LD from translation
+    :param jcamp_dict: JCAMP-DX dictionary to extract dataset section's
+        dataseries from
+    :return: The 'dataset' section's dataseries of SciData
     """
     xunits = jcamp_dict.get("xunits", "")
     xunitref = _XUNIT_MAP.get(xunits)
