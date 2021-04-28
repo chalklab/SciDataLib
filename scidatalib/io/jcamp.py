@@ -985,15 +985,6 @@ def _read_translate_jcamp_to_scidata(jcamp_dict: dict) -> SciData:
     if sources:
         scidata.sources(sources)
 
-    # TODO: Figure out if we should use property and type
-    #       based on this discussion:
-    #         - https://github.com/ChalkLab/SciDataLib/discussions/54
-    """
-    scidata_dict["@graph"]["scidata"]["type"] = ["property value"]
-    data_type = jcamp_dict.get("data type")
-    scidata_dict["@graph"]["scidata"]["property"] = [data_type]
-    """
-
     # Discipline and sub-discipline
     scidata.discipline("w3i:Chemistry")
     scidata.subdiscipline("w3i:AnalyticalChemistry")
