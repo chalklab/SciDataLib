@@ -708,7 +708,7 @@ def _read_get_facets_section(jcamp_dict: dict) -> dict:
     compound_dict = {}
     if "molform" in jcamp_dict or "cas registry no" in jcamp_dict:
         compound_dict = {
-            "@id": "compound/1/",
+            "@id": "compound/1",
             "@type": ["sdo:facet", "sdo:material"],
             "name": jcamp_dict.get("title", "")
         }
@@ -721,7 +721,7 @@ def _read_get_facets_section(jcamp_dict: dict) -> dict:
     substances_dict = {}
     if "state" in jcamp_dict:
         substances_dict = {
-            "@id": "substance/1/",
+            "@id": "substance/1",
             "@type": ["sdo:constituent"],
             "name": jcamp_dict.get("title", ""),
             "phase": jcamp_dict.get("state", "")
@@ -733,7 +733,7 @@ def _read_get_facets_section(jcamp_dict: dict) -> dict:
         pp_unit = jcamp_dict.get("partial_pressure").split(" ")[1]
         pp_unitref = _PRESSURE_UNIT_MAP.get(pp_unit)
         condition_dict = {
-            "@id": "condition/1/",
+            "@id": "condition/1",
             "@type": ["sdo:condition"],
             "quantity": "pressure",
             "property": "Partial pressure",
@@ -870,6 +870,7 @@ def _read_get_datagroup_subsection(jcamp_dict: dict) -> List[dict]:
         ]
     }
     return datagroup
+
 
 # TODO: add the dataseries
 #   Issue: https://github.com/ChalkLab/SciDataLib/issues/43

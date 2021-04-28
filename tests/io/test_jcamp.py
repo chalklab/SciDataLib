@@ -419,7 +419,7 @@ def test_read_get_graph_source_section(citation_dict):
 
 
 def test_read_get_aspects_section():
-    spectrometer = "Bruker FT-Raman MultiRAM Spectrometer"
+    spectrometer = "DOW KBr FOREPRISM-GRATING"
     jcamp_dict = {
         "spectrometer/data system": spectrometer,
     }
@@ -433,7 +433,7 @@ def test_read_get_aspects_section():
     result = jcamp._read_get_aspects_section(jcamp_dict)
     assert target == result
 
-    parameter = 5.0
+    parameter = "GRATING CHANGED AT 5.0, 7.5, 15.0 MICRON"
     jcamp_dict.update({"instrument parameters": parameter})
     instrument_parameters = {
         "@id": "setting/1",
@@ -470,7 +470,7 @@ def test_read_get_aspects_section():
     result = jcamp._read_get_aspects_section(jcamp_dict)
     assert target == result
 
-    resolution_value = "500 nm"
+    resolution_value = "2"
     jcamp_dict.update({"resolution": f'{resolution_value}'})
     resolution = {
         "@id": "setting/3",
@@ -488,26 +488,83 @@ def test_read_get_aspects_section():
     result = jcamp._read_get_aspects_section(jcamp_dict)
     assert target == result
 
-    procedure_description = "Sampled at 5 min intervals"
-    jcamp_dict.update({"sampling procedure": procedure_description})
+    description = "TRANSMISSION"
+    jcamp_dict.update({"sampling procedure": description})
     procedure = {
         "@id": "procedure/1",
         "@type": "sdo:procedure",
-        "description": procedure_description,
+        "description": description,
     }
     target = [measurement, procedure]
     result = jcamp._read_get_aspects_section(jcamp_dict)
     assert target == result
 
-    processing_description = "Milled sample in ball mill for 20 minutes"
-    jcamp_dict.update({"data processing": processing_description})
+    description = "DIGITIZED BY NIST FROM HARD COPY (FROM TWO SEGMENTS)"
+    jcamp_dict.update({"data processing": description})
     processing = {
         "@id": "resource/1",
         "@type": "sdo:resource",
-        "description": processing_description,
+        "description": description,
     }
     target = [measurement, procedure, processing]
     result = jcamp._read_get_aspects_section(jcamp_dict)
+    assert target == result
+
+
+def test_read_get_facets_section():
+    title = "ETHANOL"
+    molform = "C2 H6 O"
+    jcamp_dict = {
+        "title": title,
+        "molform": molform,
+    }
+    compound = {
+        "@id": "compound/1",
+        "@type": ["sdo:facet", "sdo:material"],
+        "name": title,
+        "formula": molform,
+    }
+    target = [compound]
+    result = jcamp._read_get_facets_section(jcamp_dict)
+    assert target == result
+
+    casrn = "64-17-5"
+    jcamp_dict.update({"cas registry no": casrn})
+    compound.update({"casrn": casrn})
+    target = [compound]
+    result = jcamp._read_get_facets_section(jcamp_dict)
+    assert target == result
+
+    phase = "GAS"
+    jcamp_dict.update({"state": phase})
+    substance = {
+        "@id": "substance/1",
+        "@type": ["sdo:constituent"],
+        "name": title,
+        "phase": phase,
+    }
+    target = [compound, substance]
+    result = jcamp._read_get_facets_section(jcamp_dict)
+    assert target == result
+
+    partial_pressure_value = "30"
+    partial_pressure_unit = "mmHg"
+    partial_pressure = f'{partial_pressure_value} {partial_pressure_unit}'
+    jcamp_dict.update({"partial_pressure": partial_pressure})
+    condition = {
+        "@id": "condition/1",
+        "@type": ["sdo:condition"],
+        "quantity": "pressure",
+        "property": "Partial pressure",
+        "value": {
+            "@id": "condition/1/value",
+            "@type": "sdo:value",
+            "number": partial_pressure_value,
+            "unitref": "qudt:MilliM_HG",
+        }
+    }
+    target = [compound, substance, condition]
+    result = jcamp._read_get_facets_section(jcamp_dict)
     assert target == result
 
 
