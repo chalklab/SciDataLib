@@ -2,7 +2,7 @@ import pathlib
 import pytest
 
 from scidatalib.scidata import SciData
-from scidatalib.io import jcamp
+from scidatalib.io import jcamp, read
 from tests import TEST_DATA_DIR
 
 
@@ -417,6 +417,11 @@ def test_reader_uvvis(uvvis_toluene_file):
     assert jcamp_dict.get(jcamp._DATA_XY_TYPE_KEY) == '(XY..XY)'
 
 
-def test_read_jcamp(raman_tannic_acid_file):
+def test_read_jcamp_function(raman_tannic_acid_file):
     scidata_obj = jcamp.read_jcamp(raman_tannic_acid_file)
+    assert type(scidata_obj) == SciData
+
+
+def test_read_jcamp(raman_tannic_acid_file):
+    scidata_obj = read(raman_tannic_acid_file, ioformat="jcamp")
     assert type(scidata_obj) == SciData
