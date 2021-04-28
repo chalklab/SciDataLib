@@ -106,7 +106,7 @@ def uvvis_toluene_file():
 
 
 @pytest.fixture
-def citation():
+def citation_dict():
     """
     Citation dict for testing using Alpha, Beta, Gamma paper
     """
@@ -329,17 +329,92 @@ def test_reader_exception_bad_datatype(tmp_path, infrared_ethanol_file):
             jcamp._reader(fileobj)
 
 
-def test_read_get_source_citation_section(citation):
-    # Input dictionary to parse
+def test_read_get_graph_source_citation_section(citation_dict):
     target = [
-        f'{citation["$ref author"]} :',
-        f'{citation["$ref title"]}.',
-        f'{citation["$ref journal"]} ',
-        f'{citation["$ref volume"]}',
-        f'({citation["$ref date"]})',
-        f'{citation["$ref page"]}',
+        f'{citation_dict["$ref author"]} :',
+        f'{citation_dict["$ref title"]}.',
+        f'{citation_dict["$ref journal"]}',
+        f'{citation_dict["$ref volume"]}',
+        f'({citation_dict["$ref date"]})',
+        f'{citation_dict["$ref page"]}',
     ]
-    result = jcamp._read_get_graph_source_citation_section(citation)
+    result = jcamp._read_get_graph_source_citation_section(citation_dict)
+    assert target == result
+
+
+def test_read_get_graph_source_section(citation_dict):
+    # Citation
+    abc_citation = {
+        '@id': 'source/1',
+        '@type': 'dc:source',
+        'citation': (
+            "Alpher, R. A.; Bethe, H.; Gamow, G. : "
+            "The Origin of Chemical Elements. "
+            "Phys. Rev. 73 (1948) 803-804"),
+        'reftype': 'journal article',
+        'doi': '',
+        'url': ''
+    }
+    target = [abc_citation]
+    result = jcamp._read_get_graph_source_section(citation_dict)
+    assert target == result
+
+    # Source reference
+    citation_dict.update(
+        {
+            "source reference": (
+                "R. C. Herman "
+                "(who stubbornly refuses to change his name to Delter)")
+        }
+    )
+    d_citation = {
+        '@id': 'source/2',
+        '@type': 'dc:source',
+        'citation': f'{citation_dict["source reference"]}',
+    }
+    target.append(d_citation)
+    result = jcamp._read_get_graph_source_section(citation_dict)
+    assert target == result
+
+    # NIST source
+    citation_dict.update({"$nist source": "Source from NIST"})
+    nist_source = f'NIST SOURCE: {citation_dict["$nist source"]}'
+    nist_citation = {
+        '@id': 'source/3',
+        '@type': 'dc:source',
+        'citation': f'{nist_source}',
+    }
+    target.append(nist_citation)
+    result = jcamp._read_get_graph_source_section(citation_dict)
+    assert target == result
+
+    # NIST image
+    citation_dict.pop("$nist source")
+
+    citation_dict.update({"$nist image": "Image from NIST"})
+    nist_image = f'NIST IMAGE: {citation_dict["$nist image"]}'
+    nist_citation = {
+        '@id': 'source/3',
+        '@type': 'dc:source',
+        'citation': f'{nist_image}',
+    }
+    target[-1] = nist_citation
+    result = jcamp._read_get_graph_source_section(citation_dict)
+    assert target == result
+
+    # NIST source and image
+    citation_dict.pop("$nist image")
+
+    citation_dict.update({"$nist source": "Source from NIST"})
+    citation_dict.update({"$nist image": "Image from NIST"})
+    nist_image = f'NIST IMAGE: {citation_dict["$nist image"]}'
+    nist_citation = {
+        '@id': 'source/3',
+        '@type': 'dc:source',
+        'citation': f'{nist_source}, {nist_image}'
+    }
+    target[-1] = nist_citation
+    result = jcamp._read_get_graph_source_section(citation_dict)
     assert target == result
 
 
