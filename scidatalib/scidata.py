@@ -300,8 +300,8 @@ class SciData:
         SciDataObject.starttime('04-05-21 06:14:53')
         """
         if isinstance(stime, str):
-            self.meta['@graph']['startTime'] = stime
-        return self.meta['@graph']['startTime']
+            self.meta['@graph']['starttime'] = stime
+        return self.meta['@graph']['starttime']
 
     def permalink(self, link: str) -> dict:
         """
