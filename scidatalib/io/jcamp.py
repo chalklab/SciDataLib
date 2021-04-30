@@ -555,6 +555,23 @@ def _reader(filehandle: str) -> dict:
     return jcamp_dict
 
 
+def _read_get_description(jcamp_dict: dict, keywords: List[str]) -> str:
+    """
+    Utility function to create a description string from the JCAMP
+    dictionary
+
+    :param jcamp_dict: JCAMP-DX dictionary extracted from read
+    :return: String for the description for SciData object
+    """
+    description_lines = []
+    for key in keywords:
+        if key in jcamp_dict:
+            value = jcamp_dict.get(key)
+            description_lines.append(f'{key.upper()}: {value}')
+
+    return _DESCRIPTION_KEY_SPLIT_CHAR.join(description_lines)
+
+
 def _read_get_graph_source_citation_section(jcamp_dict: dict) -> List[str]:
     """
     Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
@@ -969,7 +986,6 @@ def _read_translate_jcamp_to_scidata(jcamp_dict: dict) -> SciData:
     scidata.starttime(f'{jcamp_date} {jcamp_time}')
 
     # Description
-    description_lines = []
     description_keywords = [
         "jcamp-dx",
         "class",
@@ -977,12 +993,7 @@ def _read_translate_jcamp_to_scidata(jcamp_dict: dict) -> SciData:
         "sample description",
         "xydata"
     ]
-    for key in description_keywords:
-        if key in jcamp_dict:
-            value = jcamp_dict.get(key)
-            description_lines.append(f'{key.upper()}: {value}')
-
-    description = _DESCRIPTION_KEY_SPLIT_CHAR.join(description_lines)
+    description = _read_get_description(jcamp_dict, description_keywords)
     scidata.description(description)
 
     # Authors
