@@ -654,3 +654,18 @@ def test_read_jcamp_function(raman_tannic_acid_file):
 def test_read_jcamp(raman_tannic_acid_file):
     scidata_obj = read(raman_tannic_acid_file, ioformat="jcamp")
     assert type(scidata_obj) == SciData
+
+
+def test_write_raman(tmp_path, raman_tannic_acid_file):
+    scidata = jcamp.read_jcamp(raman_tannic_acid_file.resolve())
+    jcamp_dir = tmp_path / "jcamp"
+    jcamp_dir.mkdir()
+    filename = jcamp_dir / "raman_tannic_acid.jdx"
+    jcamp.write_jcamp(filename.absolute(), scidata)
+    result = filename.read_text().splitlines()
+    target = raman_tannic_acid_file.read_text().splitlines()
+
+    for result_element, target_element in zip(result, target):
+        result_list = [x.strip() for x in result_element.split(',')]
+        target_list = [x.strip() for x in target_element.split(',')]
+        assert result_list == target_list
