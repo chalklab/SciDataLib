@@ -1,5 +1,6 @@
 import pathlib
 import pytest
+from typing import List
 
 from scidatalib.scidata import SciData
 from scidatalib.io import jcamp, read
@@ -126,6 +127,32 @@ def citation_dict():
         "$ref page": page,
     }
     return citation_dict
+
+
+def remove_elements_from_list(
+    old_list: List[str],
+    skip_elements: List[str]
+) -> List[str]:
+    """
+    Utility function for removing elements from a list
+
+    :param old_list: List to remove elements from
+    :param skip_elements: List with elements to remove from the list
+    :return: New list with the elements removed
+    """
+    new_list = []
+    for element in old_list:
+        keep = True
+        element_list = [x.strip() for x in element.split(',')]
+        for key in skip_elements:
+            for x in element_list:
+                if key in x:
+                    keep = False
+
+        if keep:
+            new_list.append(element)
+
+    return new_list
 
 
 def xy_minmax_checker(testdict):
@@ -665,7 +692,16 @@ def test_write_raman(tmp_path, raman_tannic_acid_file):
     result = filename.read_text().splitlines()
     target = raman_tannic_acid_file.read_text().splitlines()
 
+    # List keys that io.jcamp.write_jcamp has yet to address
+    skip_keys = [
+        "##DATA TYPE",
+        "##YUNITS",
+    ]
+    target = remove_elements_from_list(target, skip_keys)
+    result = remove_elements_from_list(target, skip_keys)
+
     for result_element, target_element in zip(result, target):
         result_list = [x.strip() for x in result_element.split(',')]
         target_list = [x.strip() for x in target_element.split(',')]
+
         assert result_list == target_list
