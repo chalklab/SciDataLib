@@ -1,3 +1,4 @@
+import numpy as np
 import pathlib
 import pytest
 from typing import List
@@ -593,6 +594,25 @@ def test_read_get_facets_section():
     target = [compound, substance, condition]
     result = jcamp._read_get_facets_section(jcamp_dict)
     assert target == result
+
+
+def test_read_get_dataseries_subsection():
+    x = np.arange(0., 10., 0.1)
+    y = np.random.random(len(x))
+    jcamp_dict = {
+        "x": x,
+        "y": y,
+        "xunits": "1/CM",
+    }
+    result = jcamp._read_get_dataseries_subsection(jcamp_dict)
+
+    result_x = result[0]["parameter"]["valuearray"]["numberarray"]
+    result_y = result[1]["parameter"]["valuearray"]["numberarray"]
+    result_xunit = result[0]["parameter"]["valuearray"]["unitref"]
+
+    assert list(x) == list(result_x)
+    assert list(y) == list(result_y)
+    assert "qudt:PER-CentiM" == result_xunit
 
 
 def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
