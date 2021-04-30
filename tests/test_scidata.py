@@ -105,6 +105,7 @@ def test_starttime(sd):
     now = datetime.now()
     timestr = now.strftime("%d/%m/%Y %H:%M:%S")
     assert sd.starttime(timestr) == timestr
+    assert sd.meta.get("@graph").get("starttime") == timestr
 
 
 def test_permalink(sd):
