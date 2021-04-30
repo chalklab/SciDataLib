@@ -1059,12 +1059,12 @@ def _write_add_header_lines_general(scidata: SciData) -> List[str]:
         lines.append(f'##DATA TYPE={graph["scidata"]["property"][0]}')
     if "publisher" in graph:
         lines.append(f'##ORIGIN={graph["publisher"]}')
-    if "author" in graph:
-        lines.append(f'##OWNER={graph["author"][0]["name"]}')
+    if "authors" in graph:
+        lines.append(f'##OWNER={graph["authors"][0]["name"]}')
 
     date_and_time = None
-    if "starttime" in scidata.output:
-        date_and_time = scidata.output.get("starttime").split(" ")
+    if "starttime" in graph:
+        date_and_time = graph.get("starttime").split(" ")
     elif "generatedAt" in scidata.output:
         date_and_time = scidata.output.get("generatedAt").split(" ")
 
@@ -1289,12 +1289,13 @@ def _write_jcamp_data_section(
     :param mode: File mode to use (i.e. 'w' for overwrite, 'a' for append, ...)
     :param precision: Floating point number for formatting the output data
     """
-    graph = scidata.output.get("@graph")
-    dataset = graph.get("scidata").get("dataset")
-    dataseries = dataset.get("dataseries")
+    pass
     # TODO: add the dataseries
     #   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
     '''
+    graph = scidata.output.get("@graph")
+    dataset = graph.get("scidata").get("dataset")
+    dataseries = dataset.get("dataseries")
     with open(filename, mode) as fileobj:
         xdata = []
         ydata = []
