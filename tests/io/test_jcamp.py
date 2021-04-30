@@ -290,7 +290,7 @@ def test_read_parse_header_line():
 
 
 def test_reader_hnmr(hnmr_ethanol_file):
-    with open(hnmr_ethanol_file.absolute(), 'r') as fileobj:
+    with open(hnmr_ethanol_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -323,7 +323,7 @@ def test_reader_hnmr(hnmr_ethanol_file):
 
 
 def test_reader_infrared(infrared_ethanol_file):
-    with open(infrared_ethanol_file.absolute(), 'r') as fileobj:
+    with open(infrared_ethanol_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -340,18 +340,18 @@ def test_reader_exception_bad_datatype(tmp_path, infrared_ethanol_file):
     bad_file = jcamp_dir / "bad_data_type.jdx"
 
     # Read input file lines and modify XYDATA file to "bad type"
-    with open(infrared_ethanol_file.absolute(), 'r') as fileobj:
+    with open(infrared_ethanol_file.resolve(), 'r') as fileobj:
         lines = fileobj.readlines()
         for i, line in enumerate(lines):
             if line.startswith("##XYDATA"):
                 lines[i] = "##XYDATA=BAD_DATA_TYPE\n"
 
     # Read modified lines to the "bad type" tmp file
-    with open(bad_file.absolute(), 'w') as fileobj:
+    with open(bad_file.resolve(), 'w') as fileobj:
         fileobj.writelines(lines)
 
     # Read in "bad file" for test
-    with open(bad_file.absolute(), 'r') as fileobj:
+    with open(bad_file.resolve(), 'r') as fileobj:
         with pytest.raises(jcamp.UnsupportedDataTypeConfigException):
             jcamp._reader(fileobj)
 
@@ -596,7 +596,7 @@ def test_read_get_facets_section():
 
 
 def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
-    with open(infrared_ethanol_compressed_file.absolute(), 'r') as fileobj:
+    with open(infrared_ethanol_compressed_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -606,7 +606,7 @@ def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
 
 
 def test_reader_infrared_compound(infrared_compound_file):
-    with open(infrared_compound_file.absolute(), 'r') as fileobj:
+    with open(infrared_compound_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -622,7 +622,7 @@ def test_reader_infrared_compound(infrared_compound_file):
 
 
 def test_reader_infrared_multiline(infrared_multiline_file):
-    with open(infrared_multiline_file.absolute(), 'r') as fileobj:
+    with open(infrared_multiline_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -632,7 +632,7 @@ def test_reader_infrared_multiline(infrared_multiline_file):
 
 
 def test_reader_mass(mass_ethanol_file):
-    with open(mass_ethanol_file.absolute(), 'r') as fileobj:
+    with open(mass_ethanol_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -643,7 +643,7 @@ def test_reader_mass(mass_ethanol_file):
 
 
 def test_reader_neutron(neutron_emodine_file):
-    with open(neutron_emodine_file.absolute(), 'r') as fileobj:
+    with open(neutron_emodine_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -653,7 +653,7 @@ def test_reader_neutron(neutron_emodine_file):
 
 
 def test_reader_raman(raman_tannic_acid_file):
-    with open(raman_tannic_acid_file.absolute(), 'r') as fileobj:
+    with open(raman_tannic_acid_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -663,7 +663,7 @@ def test_reader_raman(raman_tannic_acid_file):
 
 
 def test_reader_uvvis(uvvis_toluene_file):
-    with open(uvvis_toluene_file.absolute(), 'r') as fileobj:
+    with open(uvvis_toluene_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -683,12 +683,14 @@ def test_read_jcamp(raman_tannic_acid_file):
     assert type(scidata_obj) == SciData
 
 
-def test_write_raman(tmp_path, raman_tannic_acid_file):
+def test_write_jcamp_function(tmp_path, raman_tannic_acid_file):
     scidata = jcamp.read_jcamp(raman_tannic_acid_file.resolve())
     jcamp_dir = tmp_path / "jcamp"
     jcamp_dir.mkdir()
     filename = jcamp_dir / "raman_tannic_acid.jdx"
-    jcamp.write_jcamp(filename.absolute(), scidata)
+
+    jcamp.write_jcamp(filename.resolve(), scidata)
+
     result = filename.read_text().splitlines()
     target = raman_tannic_acid_file.read_text().splitlines()
 
