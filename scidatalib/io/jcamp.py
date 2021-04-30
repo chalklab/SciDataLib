@@ -1050,18 +1050,27 @@ def _write_add_header_lines_general(scidata: SciData) -> List[str]:
     :param scidata: SciData object to write as JCAMP-DX file
     :return: List of header lines to write to the JCAMP-DX file
     """
-    graph = scidata.meta.get("@graph")
+    graph = scidata.output.get("@graph")
     description = graph.get("description", "")
     jcamp_dx = _write_extract_description_section(description, "JCAMP-DX")
     lines = []
     lines.append(f'##JCAMP-DX={jcamp_dx}')
-    lines.append(f'##DATA TYPE={graph["scidata"]["property"][0]}')
-    lines.append(f'##ORIGIN={graph["publisher"]}')
-    lines.append(f'##OWNER={graph["author"][0]["name"]}')
+    if "property" in graph["scidata"]:
+        lines.append(f'##DATA TYPE={graph["scidata"]["property"][0]}')
+    if "publisher" in graph:
+        lines.append(f'##ORIGIN={graph["publisher"]}')
+    if "author" in graph:
+        lines.append(f'##OWNER={graph["author"][0]["name"]}')
 
-    date_and_time = graph.get("generatedAt").split("-")
-    date = date_and_time[0].strip()
-    lines.append(f'##DATE={date}')
+    date_and_time = None
+    if "starttime" in scidata.output:
+        date_and_time = scidata.output.get("starttime").split(" ")
+    elif "generatedAt" in scidata.output:
+        date_and_time = scidata.output.get("generatedAt").split(" ")
+
+    if date_and_time:
+        date = date_and_time[0].strip()
+        lines.append(f'##DATE={date}')
 
     if len(date_and_time) > 1:
         time = date_and_time[1].strip()
@@ -1101,7 +1110,8 @@ def _write_add_header_lines_methodology(scidata: SciData) -> List[str]:
     :return: List of header lines to write to the JCAMP-DX file
     """
     lines = []
-    methodology = scidata.meta.get("@graph").get("scidata").get("methodology")
+    graph = scidata.output.get("@graph")
+    methodology = graph.get("scidata").get("methodology")
 
     # Aspects
     aspects = methodology.get("aspects")
@@ -1147,7 +1157,8 @@ def _write_add_header_lines_system(scidata: SciData) -> List[str]:
     :return: List of header lines to write to the JCAMP-DX file
     """
     lines = []
-    system = scidata.meta.get("@graph").get("scidata").get("system")
+    graph = scidata.output.get("@graph")
+    system = graph.get("scidata").get("system")
 
     # Facets
     facets = system.get("facets")
@@ -1187,9 +1198,10 @@ def _write_add_header_lines_dataset(scidata: SciData) -> List[str]:
     """
     lines = []
 
-    dataset = scidata.meta.get("@graph").get("scidata").get("dataset")
+    graph = scidata.output.get("@graph")
+    dataset = graph.get("scidata").get("dataset")
 
-    attributes = dataset["datagroup"][0]["attributes"]
+    attributes = dataset["attribute"]
 
     reverse_xunit_map = {v: k for k, v in _XUNIT_MAP.items()}
     scidata_xunits = attributes[1]["value"]["unitref"]
@@ -1222,7 +1234,7 @@ def _write_add_header_lines_dataset(scidata: SciData) -> List[str]:
     lines.append(f'##MINY={min_y}')
     lines.append(f'##NPOINTS={npoints}')
 
-    description = scidata.meta.get("@graph").get("description")
+    description = graph.get("description")
     xydata = _write_extract_description_section(description, "XYDATA")
     lines.append(f'##XYDATA={xydata}')
 
@@ -1242,7 +1254,7 @@ def _write_jcamp_header_section(
     """
     lines = []
 
-    graph = scidata.meta.get("@graph")
+    graph = scidata.output.get("@graph")
     lines.append(f'##TITLE={graph.get("title")}')
 
     headers = [
@@ -1277,8 +1289,12 @@ def _write_jcamp_data_section(
     :param mode: File mode to use (i.e. 'w' for overwrite, 'a' for append, ...)
     :param precision: Floating point number for formatting the output data
     """
-    dataset = scidata.meta.get("@graph").get("scidata").get("dataset")
+    graph = scidata.output.get("@graph")
+    dataset = graph.get("scidata").get("dataset")
     dataseries = dataset.get("dataseries")
+    # TODO: add the dataseries
+    #   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
+    '''
     with open(filename, mode) as fileobj:
         xdata = []
         ydata = []
@@ -1295,3 +1311,4 @@ def _write_jcamp_data_section(
                 yline = f'{y:.{precision}f}'[0:trim]
                 line = f' {xline},   {yline}'
             fileobj.write(f'{line}\n')
+    '''
