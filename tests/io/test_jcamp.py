@@ -3,7 +3,7 @@ import pytest
 from typing import List
 
 from scidatalib.scidata import SciData
-from scidatalib.io import jcamp, read
+from scidatalib.io import jcamp, read, write
 from tests import TEST_DATA_DIR
 
 
@@ -690,6 +690,32 @@ def test_write_jcamp_function(tmp_path, raman_tannic_acid_file):
     filename = jcamp_dir / "raman_tannic_acid.jdx"
 
     jcamp.write_jcamp(filename.resolve(), scidata)
+
+    result = filename.read_text().splitlines()
+    target = raman_tannic_acid_file.read_text().splitlines()
+
+    # List keys that io.jcamp.write_jcamp has yet to address
+    skip_keys = [
+        "##DATA TYPE",
+        "##YUNITS",
+    ]
+    target = remove_elements_from_list(target, skip_keys)
+    result = remove_elements_from_list(target, skip_keys)
+
+    for result_element, target_element in zip(result, target):
+        result_list = [x.strip() for x in result_element.split(',')]
+        target_list = [x.strip() for x in target_element.split(',')]
+
+        assert result_list == target_list
+
+
+def test_write_jcamp(tmp_path, raman_tannic_acid_file):
+    scidata = jcamp.read_jcamp(raman_tannic_acid_file.resolve())
+    jcamp_dir = tmp_path / "jcamp"
+    jcamp_dir.mkdir()
+    filename = jcamp_dir / "raman_tannic_acid.jdx"
+
+    write(filename.resolve(), scidata, ioformat="jcamp")
 
     result = filename.read_text().splitlines()
     target = raman_tannic_acid_file.read_text().splitlines()
