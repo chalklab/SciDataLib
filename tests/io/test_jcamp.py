@@ -729,6 +729,7 @@ def test_write_jcamp_function(tmp_path, raman_tannic_acid_file):
         assert result_list == target_list
 
 
+@pytest.mark.skip(reason="Missing dataseries for comparison")
 def test_write_jcamp(tmp_path, raman_tannic_acid_file):
     scidata = jcamp.read_jcamp(raman_tannic_acid_file.resolve())
     jcamp_dir = tmp_path / "jcamp"
