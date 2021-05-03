@@ -746,7 +746,7 @@ def test_write_jcamp(tmp_path, raman_tannic_acid_file):
         "##YUNITS",
     ]
     target = remove_elements_from_list(target, skip_keys)
-    result = remove_elements_from_list(target, skip_keys)
+    result = remove_elements_from_list(result, skip_keys)
 
     for result_element, target_element in zip(result, target):
         result_list = [x.strip() for x in result_element.split(',')]
