@@ -1,8 +1,10 @@
+import numpy as np
 import pathlib
 import pytest
+from typing import List
 
 from scidatalib.scidata import SciData
-from scidatalib.io import jcamp, read
+from scidatalib.io import jcamp, read, write
 from tests import TEST_DATA_DIR
 
 
@@ -126,6 +128,32 @@ def citation_dict():
         "$ref page": page,
     }
     return citation_dict
+
+
+def remove_elements_from_list(
+    old_list: List[str],
+    skip_elements: List[str]
+) -> List[str]:
+    """
+    Utility function for removing elements from a list
+
+    :param old_list: List to remove elements from
+    :param skip_elements: List with elements to remove from the list
+    :return: New list with the elements removed
+    """
+    new_list = []
+    for element in old_list:
+        keep = True
+        element_list = [x.strip() for x in element.split(',')]
+        for key in skip_elements:
+            for x in element_list:
+                if key in x:
+                    keep = False
+
+        if keep:
+            new_list.append(element)
+
+    return new_list
 
 
 def xy_minmax_checker(testdict):
@@ -263,7 +291,7 @@ def test_read_parse_header_line():
 
 
 def test_reader_hnmr(hnmr_ethanol_file):
-    with open(hnmr_ethanol_file.absolute(), 'r') as fileobj:
+    with open(hnmr_ethanol_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -296,7 +324,7 @@ def test_reader_hnmr(hnmr_ethanol_file):
 
 
 def test_reader_infrared(infrared_ethanol_file):
-    with open(infrared_ethanol_file.absolute(), 'r') as fileobj:
+    with open(infrared_ethanol_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -313,18 +341,18 @@ def test_reader_exception_bad_datatype(tmp_path, infrared_ethanol_file):
     bad_file = jcamp_dir / "bad_data_type.jdx"
 
     # Read input file lines and modify XYDATA file to "bad type"
-    with open(infrared_ethanol_file.absolute(), 'r') as fileobj:
+    with open(infrared_ethanol_file.resolve(), 'r') as fileobj:
         lines = fileobj.readlines()
         for i, line in enumerate(lines):
             if line.startswith("##XYDATA"):
                 lines[i] = "##XYDATA=BAD_DATA_TYPE\n"
 
     # Read modified lines to the "bad type" tmp file
-    with open(bad_file.absolute(), 'w') as fileobj:
+    with open(bad_file.resolve(), 'w') as fileobj:
         fileobj.writelines(lines)
 
     # Read in "bad file" for test
-    with open(bad_file.absolute(), 'r') as fileobj:
+    with open(bad_file.resolve(), 'r') as fileobj:
         with pytest.raises(jcamp.UnsupportedDataTypeConfigException):
             jcamp._reader(fileobj)
 
@@ -568,8 +596,27 @@ def test_read_get_facets_section():
     assert target == result
 
 
+def test_read_get_dataseries_subsection():
+    x = np.arange(0., 10., 0.1)
+    y = np.random.random(len(x))
+    jcamp_dict = {
+        "x": x,
+        "y": y,
+        "xunits": "1/CM",
+    }
+    result = jcamp._read_get_dataseries_subsection(jcamp_dict)
+
+    result_x = result[0]["parameter"]["valuearray"]["numberarray"]
+    result_y = result[1]["parameter"]["valuearray"]["numberarray"]
+    result_xunit = result[0]["parameter"]["valuearray"]["unitref"]
+
+    assert list(x) == list(result_x)
+    assert list(y) == list(result_y)
+    assert "qudt:PER-CentiM" == result_xunit
+
+
 def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
-    with open(infrared_ethanol_compressed_file.absolute(), 'r') as fileobj:
+    with open(infrared_ethanol_compressed_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -579,7 +626,7 @@ def test_reader_infrared_compressed(infrared_ethanol_compressed_file):
 
 
 def test_reader_infrared_compound(infrared_compound_file):
-    with open(infrared_compound_file.absolute(), 'r') as fileobj:
+    with open(infrared_compound_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -595,7 +642,7 @@ def test_reader_infrared_compound(infrared_compound_file):
 
 
 def test_reader_infrared_multiline(infrared_multiline_file):
-    with open(infrared_multiline_file.absolute(), 'r') as fileobj:
+    with open(infrared_multiline_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -605,7 +652,7 @@ def test_reader_infrared_multiline(infrared_multiline_file):
 
 
 def test_reader_mass(mass_ethanol_file):
-    with open(mass_ethanol_file.absolute(), 'r') as fileobj:
+    with open(mass_ethanol_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -616,7 +663,7 @@ def test_reader_mass(mass_ethanol_file):
 
 
 def test_reader_neutron(neutron_emodine_file):
-    with open(neutron_emodine_file.absolute(), 'r') as fileobj:
+    with open(neutron_emodine_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -626,7 +673,7 @@ def test_reader_neutron(neutron_emodine_file):
 
 
 def test_reader_raman(raman_tannic_acid_file):
-    with open(raman_tannic_acid_file.absolute(), 'r') as fileobj:
+    with open(raman_tannic_acid_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -636,7 +683,7 @@ def test_reader_raman(raman_tannic_acid_file):
 
 
 def test_reader_uvvis(uvvis_toluene_file):
-    with open(uvvis_toluene_file.absolute(), 'r') as fileobj:
+    with open(uvvis_toluene_file.resolve(), 'r') as fileobj:
         jcamp_dict = jcamp._reader(fileobj)
     xy_minmax_checker(jcamp_dict)
 
@@ -654,3 +701,55 @@ def test_read_jcamp_function(raman_tannic_acid_file):
 def test_read_jcamp(raman_tannic_acid_file):
     scidata_obj = read(raman_tannic_acid_file, ioformat="jcamp")
     assert type(scidata_obj) == SciData
+
+
+def test_write_jcamp_function(tmp_path, raman_tannic_acid_file):
+    scidata = jcamp.read_jcamp(raman_tannic_acid_file.resolve())
+    jcamp_dir = tmp_path / "jcamp"
+    jcamp_dir.mkdir()
+    filename = jcamp_dir / "raman_tannic_acid.jdx"
+
+    jcamp.write_jcamp(filename.resolve(), scidata)
+
+    result = filename.read_text().splitlines()
+    target = raman_tannic_acid_file.read_text().splitlines()
+
+    # List keys that io.jcamp.write_jcamp has yet to address
+    skip_keys = [
+        "##DATA TYPE",
+        "##YUNITS",
+    ]
+    target = remove_elements_from_list(target, skip_keys)
+    result = remove_elements_from_list(target, skip_keys)
+
+    for result_element, target_element in zip(result, target):
+        result_list = [x.strip() for x in result_element.split(',')]
+        target_list = [x.strip() for x in target_element.split(',')]
+
+        assert result_list == target_list
+
+
+def test_write_jcamp(tmp_path, raman_tannic_acid_file):
+    scidata = jcamp.read_jcamp(raman_tannic_acid_file.resolve())
+    jcamp_dir = tmp_path / "jcamp"
+    jcamp_dir.mkdir()
+    filename = jcamp_dir / "raman_tannic_acid.jdx"
+
+    write(filename.resolve(), scidata, ioformat="jcamp")
+
+    result = filename.read_text().splitlines()
+    target = raman_tannic_acid_file.read_text().splitlines()
+
+    # List keys that io.jcamp.write_jcamp has yet to address
+    skip_keys = [
+        "##DATA TYPE",
+        "##YUNITS",
+    ]
+    target = remove_elements_from_list(target, skip_keys)
+    result = remove_elements_from_list(target, skip_keys)
+
+    for result_element, target_element in zip(result, target):
+        result_list = [x.strip() for x in result_element.split(',')]
+        target_list = [x.strip() for x in target_element.split(',')]
+
+        assert result_list == target_list
