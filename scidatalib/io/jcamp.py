@@ -794,7 +794,7 @@ def _read_get_datagroup_subsection(jcamp_dict: dict) -> List[dict]:
     """
     # Convert from JCAMP units -> SciData JSON-LD unitref
     xunits = jcamp_dict.get("xunits", "")
-    xunitref = _XUNIT_MAP.get(xunits)
+    xunitref = _XUNIT_MAP.get(xunits, "")
     yunitref = jcamp_dict.get("yunits", "")
 
     # Values for attributes
