@@ -653,7 +653,10 @@ class SciData:
             """ get the @type entry from a dictionary """
             for k, v in a.items():
                 if k == '@type':
-                    self.meta['@graph']['toc'].append(v)
+                    if isinstance(v, list):
+                        self.meta['@graph']['toc'].extend(v)
+                    else:
+                        self.meta['@graph']['toc'].append(v)
                 if isinstance(v, list):
                     toclist(v)
                 if isinstance(v, dict):
