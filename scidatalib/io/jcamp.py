@@ -864,22 +864,22 @@ def _read_get_datagroup_subsection(jcamp_dict: dict) -> List[dict]:
     }
     attr_ylast = {
         "@id": "attribute",
-        "property": "First Y-axis Value",
+        "property": "Last Y-axis Value",
         "value": ylast,
     }
     attr_ymin = {
         "@id": "attribute",
-        "property": "First Y-axis Value",
+        "property": "Minimum Y-axis Value",
         "value": ymin,
     }
     attr_ymax = {
         "@id": "attribute",
-        "property": "First X-axis Value",
+        "property": "Maximum X-axis Value",
         "value": ymax,
     }
     attr_yfactor = {
         "@id": "attribute",
-        "property": "First Y-axis Value",
+        "property": "Y-axis Scaling Factor",
         "value": yfactor,
     }
 
@@ -1215,20 +1215,26 @@ def _write_add_header_lines_dataset(scidata: SciData) -> List[str]:
     attributes = dataset["attribute"]
 
     reverse_xunit_map = {v: k for k, v in _XUNIT_MAP.items()}
-    scidata_xunits = attributes[1]["value"]["unitref"]
+    scidata_xunits = attributes[0]["value"]["unitref"]
     xunits = reverse_xunit_map[scidata_xunits]
 
-    yunits = attributes[5]["value"]["unitref"]
-    xfactor = attributes[9]["value"]["number"]
-    yfactor = attributes[10]["value"]["number"]
+    scidata_yunits = attributes[0]["value"]["unitref"]
+    yunits = scidata_yunits
+
+    npoints = attributes[0]["value"]["number"]
+
     first_x = attributes[1]["value"]["number"]
     last_x = attributes[2]["value"]["number"]
-    first_y = attributes[5]["value"]["number"]
-    max_x = attributes[4]["value"]["number"]
     min_x = attributes[3]["value"]["number"]
-    max_y = attributes[8]["value"]["number"]
-    min_y = attributes[7]["value"]["number"]
-    npoints = attributes[0]["value"]["number"]
+    max_x = attributes[4]["value"]["number"]
+    xfactor = attributes[5]["value"]["number"]
+
+    first_y = attributes[6]["value"]["number"]
+    # last_y = attributes[7]["value"]["number"]
+    min_y = attributes[8]["value"]["number"]
+    max_y = attributes[9]["value"]["number"]
+    yfactor = attributes[10]["value"]["number"]
+    yunits = attributes[5]["value"]["unitref"]
     delta_x = (float(last_x) - float(first_x)) / (float(npoints) - 1)
 
     lines.append(f'##XUNITS={xunits}')

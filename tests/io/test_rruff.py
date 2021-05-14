@@ -76,3 +76,22 @@ def test_read_rruff(raman_soddyite_file):
     assert len(facet["@type"]) == 2
     assert facet["materialType"] == "(UO_2_)_2_SiO_4_&#183;2H_2_O"
     assert facet["name"] == "Soddyite"
+
+
+@pytest.mark.skip(reason="Missing dataseries for comparison")
+def test_write_rruff(tmp_path, raman_soddyite_file):
+    scidata = rruff.read_rruff(raman_soddyite_file.absolute())
+    rruff_dir = tmp_path / "rruff"
+    rruff_dir.mkdir()
+    filename = rruff_dir / "raman_soddyite.rruff"
+
+    rruff.write_rruff(filename.resolve(), scidata)
+
+    result = filename.read_text().splitlines()
+    target = raman_soddyite_file.read_text().splitlines()
+
+    for result_element, target_element in zip(result, target):
+        result_list = [x.strip() for x in result_element.split(',')]
+        target_list = [x.strip() for x in target_element.split(',')]
+
+        assert result_list == target_list

@@ -22,6 +22,26 @@ def read_rruff(filename: str) -> dict:
     return scidata
 
 
+def write_rruff(filename: str, scidata: SciData):
+    """
+    Writer for SciData object to RRUFF files.
+    RRUFF URL:  https://rruff.info/
+    :param filename: Filename for RRUFF file
+    :param scidata: SciData object to write out
+    """
+    _write_rruff_header_section(filename, scidata, mode='w')
+    jcamp._write_jcamp_data_section(
+        filename,
+        scidata,
+        mode='a',
+        precision=8,
+        trim=8
+    )
+
+    with open(filename, 'a') as fileobj:
+        fileobj.write('##END=\n')
+
+
 def _reader(filehandle: TextIO) -> dict:
     """
     File reader for  RRUFF file format
@@ -204,3 +224,126 @@ def _read_translate_rruff_to_scidata(rruff_dict: dict) -> dict:
     #   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
 
     return scidata
+
+
+def _write_get_ideal_chemistry(scidata: SciData) -> str:
+    """
+    Extract ideal chemistry from SciData object
+
+    :param scidata: SciData object
+    :return: The ideal chemistry if exists in SciData object, None otherwise
+    """
+    chemistry = None
+    graph = scidata.output.get("@graph")
+    system = graph.get('scidata').get('system')
+    for facet in system.get('facets'):
+        if facet.get('@id').startswith('material'):
+            chemistry = facet.get('materialType')
+    return chemistry
+
+
+def _write_get_laser_wavelength(scidata: SciData) -> str:
+    """
+    Extract laser wavelength from SciData object
+
+    :param scidata: SciData object
+    :return: The laser wavelength if exists in SciData object, None otherwise
+    """
+    laser_wavelength = None
+    graph = scidata.output.get("@graph")
+    methodology = graph.get('scidata').get('methodology')
+    for aspect in methodology.get('aspects'):
+        if aspect.get('@id').startswith('measurement'):
+            settings = aspect.get('settings')
+            for setting in settings:
+                prop = setting.get('property').lower()
+                if prop.startswith('laser wavelength'):
+                    laser_wavelength = setting.get('value').get('number')
+    return laser_wavelength
+
+
+def _write_get_rruff_url(scidata: SciData) -> str:
+    """
+    Extract RRUFF URL from SciData object
+
+    :param scidata: SciData object
+    :return: The RRUFF URL if exists in SciData object, None otherwise
+    """
+    url = None
+    graph = scidata.output.get("@graph")
+    sources = graph.get('sources')
+    for source in sources:
+        if source.get('url').startswith('https://rruff.info'):
+            url = source.get('url').strip('https://')
+    return url
+
+
+def _write_get_header_section(scidata: SciData) -> str:
+    """
+    Get the header lines section for RRUFF file from SciData object
+
+    :param scidata: SciData object
+    :return: List of lines to write for the RRUFF header section
+    """
+    lines = []
+
+    graph = scidata.output.get("@graph")
+    lines.append(f'##NAMES={graph.get("title")}')
+
+    rruffid = graph.get("uid").strip("rruff:")
+    lines.append(f'##RRUFFID={rruffid}')
+
+    description = graph.get("description")
+
+    chemistry = _write_get_ideal_chemistry(scidata)
+    if chemistry:
+        lines.append(f'##IDEAL CHEMISTRY={chemistry}')
+
+    locality = jcamp._write_extract_description_section(
+        description,
+        "LOCALITY")
+    if locality:
+        lines.append(f'##LOCALITY={locality}')
+
+    publisher = graph.get("publisher")
+    lines.append(f'##OWNER={publisher}')
+
+    author = graph.get('authors')[0]["name"]
+    lines.append(f'##SOURCE={author}')
+
+    rruff_description = jcamp._write_extract_description_section(
+        description,
+        "DESCRIPTION")
+    if rruff_description:
+        lines.append(f'##DESCRIPTION={rruff_description}')
+
+    status = jcamp._write_extract_description_section(description, "STATUS")
+    if status:
+        lines.append(f'##STATUS={status}')
+
+    laser_wavelength = _write_get_laser_wavelength(scidata)
+    if laser_wavelength:
+        lines.append(f'##LASER_WAVELENGTH={laser_wavelength}')
+
+    url = _write_get_rruff_url(scidata)
+    if url:
+        lines.append(f'##URL={url}')
+
+    return '\n'.join(lines) + '\n'
+
+
+def _write_rruff_header_section(
+    filename: str, scidata: SciData, mode: str = 'w'
+):
+    """
+    Writes RRUFF file header to filename using the SciData object.
+    Can optionally change the mode of how to open the file.
+
+    :param filename: Name of the RRUFF file to write
+    :param scidata: SciData object to write as RRUFF file
+    :param mode: File mode. Default is 'w'.
+    """
+    lines = _write_get_header_section(scidata)
+    with open(filename, mode) as fileobj:
+        for line in lines:
+            fileobj.write(line)
