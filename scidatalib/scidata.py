@@ -518,6 +518,30 @@ class SciData:
         self.meta['@graph']['scidata'] = scidata
         return curr_points
 
+    def dataseries(self, series: list) -> list:
+        """Add one or more datapoints"""
+        cnt_index = {}
+
+        scidata: dict = self.meta['@graph']['scidata']
+        dataset: dict = scidata['dataset']
+        if 'dataseries' in dataset.keys():
+            curr_series: list = dataset['dataseries']
+        else:
+            curr_series = []
+
+        for item in series:
+            cat_index = {}
+            cnt_index = {'dataseries': len(curr_series)}
+            item, category, count, cat_index = self.__iterate_function(
+                item, 1, cnt_index, cat_index)
+            cnt_index[category] = count
+            curr_series.append(item)
+
+        dataset['dataseries'] = curr_series
+        scidata['dataset'] = dataset
+        self.meta['@graph']['scidata'] = scidata
+        return curr_series
+
     def datagroup(self, groups: list) -> list:
         """Add one or more datagroups"""
         cnt_index = {}

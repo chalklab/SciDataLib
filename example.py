@@ -1,6 +1,8 @@
 """file to create an example JSON-LD file"""
 from scidatalib.scidata import SciData
 import json
+import pandas as pd
+import numpy as np
 
 uid = 'example'
 example = SciData(uid)
@@ -188,7 +190,67 @@ pnt2 = {
     'annotation': 'gb:P04524',
     'conditions': 'Observation',
     'value': val5}
-example.datapoint([pnt1, pnt2])
+
+dps = [pnt1, pnt2]
+
+dps = [{"@id": "datapoint", "@type": "sdo:datapoint", "activity_id": 16464576, "assay": "CHEMBL3767769", "data": [{"type": "IC50", "@id": "datum", "@type": "sdo:exptdata", "value": {"relation": "=", "@id": "value", "@type": "sdo:value", "value": "19.000000000000000000000000000000", "units": "uM"}}, {"@id": "datum", "@type": "sdo:deriveddata", "value": {"standard_relation": "=", "@id": "value", "@type": "sdo:value", "standard_value": "19000.000000000000000000000000000000", "standard_units": "nM", "standard_type": "IC50", "pchembl_value": "4.72", "uo_units": "obo:UO_0000065", "qudt_units": "qudt:NanoMOL-PER-L"}}, {"@id": "datum", "@type": "sdo:None", "value": {"standard_flag": "1", "@id": "value", "@type": "sdo:value", "activity_id": "16464576"}}]}, {"@id": "datapoint", "annotation": "gb:P04524", "conditions": "Observation", "value": {"@id": "textvalue", "text": "The solution was clear, no reagent precipitation was observed.", "textype": "plain", "language": "en-us"}}]
+
+example.datapoint(dps)
+
+ser1_input = {'colA': [1, 2, 3], 'colB': [1, 2, 3]}
+ser1_dataframe = pd.DataFrame(ser1_input)
+ser1_dataframe_str = pd.DataFrame(ser1_input).applymap(str)
+ser1_dict = ser1_dataframe.reset_index().to_dict(orient='list')
+del ser1_dict['index']
+ser1_dict_str = ser1_dataframe_str.reset_index().to_dict(orient='list')
+del ser1_dict_str['index']
+ser1_json = json.loads(ser1_dataframe.to_json(orient="split"))
+ser1_numpy_array = ser1_dataframe.to_numpy()
+ser1_numpy_list = ser1_numpy_array.tolist()
+ser1_numpy_json = json.dumps(ser1_numpy_list)
+
+dataser1 = {
+    '@id': 'dataseries',
+    'annotation': 'gb:P04524',
+    'conditions': 'Spectra',
+    # 'values_pandas_json': str(ser1_json)
+    # 'values_pandas_dict': str(ser1_dict)}
+    'values_numpy_array': str(ser1_numpy_array),
+    'values_numpy_list': str(ser1_numpy_list),
+    'values_numpy_json': str(ser1_numpy_json)}
+for k,v in ser1_dict.items():
+    dataser1.update({str(k):str(v)})
+for k,v in ser1_dict_str.items():
+    dataser1.update({str('str_'+k):v})
+
+ser2_input = {'colA': [10, 20, 30]}
+ser2_dataframe = pd.DataFrame(ser2_input)
+ser2_dataframe_str = pd.DataFrame(ser2_input).applymap(str)
+ser2_dict = ser2_dataframe.reset_index().to_dict(orient='list')
+del ser2_dict['index']
+ser2_dict_str = ser2_dataframe_str.reset_index().to_dict(orient='list')
+del ser2_dict_str['index']
+ser2_json = json.loads(ser2_dataframe.to_json(orient="split"))
+ser2_numpy_array = ser2_dataframe.to_numpy()
+ser2_numpy_list = ser2_numpy_array.tolist()
+ser2_numpy_json = json.dumps(ser2_numpy_list)
+
+dataser2 = {
+    '@id': 'dataseries',
+    'annotation': 'gb:P04524',
+    'conditions': 'Spectra',
+    # 'values_pandas_json': str(ser2_json),
+    # 'values_pandas_dict': str(ser2_dict),
+    'values_numpy_array': str(ser2_numpy_array),
+    'values_numpy_list': str(ser2_numpy_list),
+    'values_numpy_json': str(ser2_numpy_json)}
+for k,v in ser2_dict.items():
+    dataser2.update({str(k):str(v)})
+for k,v in ser2_dict_str.items():
+    dataser2.update({str('str_'+k):v})
+
+example.dataseries([dataser1, dataser2])
+
 
 # add source
 src = {'citation': 'Chalk Research Group',
@@ -203,4 +265,4 @@ holder = ', '.join([
 lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
 example.rights(holder, lic)
 
-print(json.dumps(example.output, indent=4, ensure_ascii=False))
+print(json.dumps(example.output, ensure_ascii=False))
