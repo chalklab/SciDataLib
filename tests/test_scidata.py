@@ -203,6 +203,123 @@ def test_datapoint(sd):
     assert sd.datapoint([pnt]) == [out]
 
 
+def test_datapoint_nested(sd):
+    sd.namespaces({'gb': 'https://goldbook.iupac.org/terms/view/'})
+    dps = [
+        {
+            "@id": "datapoint",
+            "@type": "sdo:datapoint",
+            "activity_id": 16464576,
+            "assay": "CHEMBL3767769",
+            "data": [
+                {
+                    "type": "IC50",
+                    "@id": "datum",
+                    "@type": "sdo:exptdata",
+                    "value": {
+                        "relation": "=",
+                        "@id": "value",
+                        "@type": "sdo:value",
+                        "value": "19.000000000000000000000000000000",
+                        "units": "uM"
+                    }
+                }, {
+                    "@id": "datum",
+                    "@type": "sdo:deriveddata",
+                    "value": {
+                        "standard_relation": "=",
+                        "@id": "value",
+                        "@type": "sdo:value",
+                        "standard_value": "19000.000000000000000000000000000000",
+                        "standard_units": "nM",
+                        "standard_type": "IC50",
+                        "pchembl_value": "4.72",
+                        "uo_units": "obo:UO_0000065",
+                        "qudt_units": "qudt:NanoMOL-PER-L"
+                    }
+                }, {
+                    "@id": "datum",
+                    "@type": "sdo:None",
+                    "value": {
+                        "standard_flag": "1",
+                        "@id": "value",
+                        "@type": "sdo:value",
+                        "activity_id": "16464576"
+                    }
+                }
+            ]
+        }, {
+            "@id": "datapoint",
+            "annotation": "gb:P04524",
+            "conditions": "Observation",
+            "value": {
+                "@id": "textvalue",
+                "text": "The solution was clear, no reagent precipitation was observed.",
+                "textype": "plain",
+                "language": "en-us"
+            }
+        }
+    ]
+    out = [
+        {
+	        "@id": "datapoint/1/",
+	        "@type": "sdo:datapoint",
+	        "activity_id": 16464576,
+	        "assay": "CHEMBL3767769",
+	        "data": [
+                {
+		            "@id": "datapoint/1/datum/1/",
+		            "@type": "sdo:exptdata",
+		            "type": "IC50",
+		            "value": {
+			            "@id": "datapoint/1/datum/1/value/1/",
+			            "@type": "sdo:value",
+			            "relation": "=",
+			            "units": "uM",
+			            "value": "19.000000000000000000000000000000"
+		            }
+	            }, {
+		            "@id": "datapoint/1/datum/2/",
+		            "@type": "sdo:deriveddata",
+		            "value": {
+			            "@id": "datapoint/1/datum/2/value/1/",
+			            "@type": "sdo:value",
+			            "pchembl_value": "4.72",
+			            "qudt_units": "qudt:NanoMOL-PER-L",
+			            "standard_relation": "=",
+			            "standard_type": "IC50",
+			            "standard_units": "nM",
+			            "standard_value": "19000.000000000000000000000000000000",
+			            "uo_units": "obo:UO_0000065"
+		            }
+	            }, {
+		            "@id": "datapoint/1/datum/3",
+		            "@type": "sdo:None",
+		            "value": {
+			            "@id": "datapoint/1/datum/3/value/1/",
+			            "@type": "sdo:value",
+			            "activity_id": "16464576",
+			            "standard_flag": "1"
+		            }
+	            }
+            ]
+        }, {
+	        "@id": "datapoint/2/",
+	        "@type": "sdo:datapoint",
+            "annotation": "gb:P04524",
+	        "conditions": "Observation",
+	        "value": {
+		        "@id": "datapoint/2/textvalue/1/",
+		        "@type": "sdo:textvalue",
+		        "language": "en-us",
+		        "text": "The solution was clear, no reagent precipitation was observed.",
+		        "textype": "plain"
+	        }
+        }
+    ]
+    assert sd.datapoint(dps) == out
+
+
 def test_datagroup_with_datapoints(sd):
     sd.namespaces(
         {
