@@ -264,7 +264,8 @@ def test_datapoint_nested(sd):
         "conditions": "Observation",
         "value": {
             "@id": "textvalue",
-            "text": "The solution was clear, no reagent precipitation was observed.",
+            "text":
+                "The solution was clear, no reagent precipitation was observed.", # noqa
             "textype": "plain",
             "language": "en-us"
         }
