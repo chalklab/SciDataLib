@@ -737,10 +737,12 @@ class SciData:
         """
         new_cat_index = cat_index.copy()
 
+        # If we simply have string, return, end recursion
         if isinstance(it, str):
             self.__addid(it)
             return it, 1, cnt_index, cat_index
 
+        # Set the category
         if '@id' in it:
             category = it['@id']
         elif 'descriptors' in it or 'identifiers' in it:
@@ -748,35 +750,55 @@ class SciData:
         else:
             category = 'undefined'
 
-        count = 1
+        # Increase count if already encountered category; initialize otherwise
         if category in cnt_index:
-            count = cnt_index[category] + 1
+            cnt_index[category] += 1
+        else:
+            cnt_index[category] = 1
 
+        # Update state holding level of nesting and associated category
         new_cat_index.update({level: category})
 
+        # Set the @id and @type based on the category and count
         uid = ''
         for cat in list(new_cat_index.values()):
-            uid += cat + '/' + str(count) + '/'
+            uid += cat + '/' + str(cnt_index[cat]) + '/'
+
+        # Loop over non-id or non-type entries to recursively process
+        # sub-elements of the list of objects
         temp: dict = {'@id': uid, '@type': 'sdo:' + category}
-        for k in it.keys():
-            if k != '@id':
-                if isinstance(it[k], list):
+        for key, value in it.items():
+
+            # Already constructed the @id, so iterate only on non-@id entries
+            if key != '@id':
+                count = cnt_index[category]
+
+                # For list, recusively process elements in sub-list
+                if isinstance(value, list):
                     level += 1
-                    for i, y in enumerate(it[k]):
-                        it[k][i], category, count, new_cat_index = \
+                    for i, y in enumerate(value):
+                        value[i], category, count, new_cat_index = \
                             self.__iterate_function(
                                 y, level, cnt_index, new_cat_index)
-                    temp[k] = it[k]
+                    temp[key] = value
                     level -= 1
-                elif isinstance(it[k], dict):
+
+                # For list, recusively process key-values in sub-dict
+                elif isinstance(value, dict):
                     level += 1
-                    temp[k], category, count, new_cat_index = \
+                    temp[key], category, count, new_cat_index = \
                         self.__iterate_function(
-                            it[k], level, cnt_index, new_cat_index)
+                            value, level, cnt_index, new_cat_index)
                     level -= 1
+
+                # Simply add the value to list of objects to return
                 else:
-                    temp[k] = it[k]
-                    self.__addid(it[k])
+                    temp[key] = value
+                    self.__addid(value)
+
+        # Remove the last added "leaf" level to trim the @id value correctly
+        new_cat_index.pop(level)
+        cnt_index[category] = 0
         return temp, category, count, new_cat_index
 
     @property
