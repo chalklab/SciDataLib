@@ -260,10 +260,12 @@ def test_datapoint_nested(sd):
     # Input datapoint 2
     dp2 = {
         "@id": "datapoint",
+        "@type": "sdo:datapoint",
         "annotation": "gb:P04524",
         "conditions": "Observation",
         "value": {
             "@id": "textvalue",
+            "@type": "sdo:textvalue",
             "text":
                 "The solution was clear, no reagent precipitation was observed.", # noqa
             "textype": "plain",
@@ -291,7 +293,7 @@ def test_datapoint_nested(sd):
     out_dp2 = copy.deepcopy(dp2)
 
     out_dp2["@id"] = "datapoint/2/"
-    out_dp1_datum3["@id"] = "datapoint/2/textvalue/1/"
+    out_dp2["value"]["@id"] = "datapoint/2/textvalue/1/"
 
     assert sd.datapoint([dp1, dp2]) == [out_dp1, out_dp2]
 
