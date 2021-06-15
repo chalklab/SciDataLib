@@ -2,7 +2,6 @@
 from scidatalib.scidata import SciData
 import json
 import pandas as pd
-import numpy as np
 
 uid = 'example'
 example = SciData(uid)
@@ -193,7 +192,69 @@ pnt2 = {
 
 dps = [pnt1, pnt2]
 
-dps = [{"@id": "datapoint", "@type": "sdo:datapoint", "activity_id": 16464576, "assay": "CHEMBL3767769", "data": [{"type": "IC50", "@id": "datum", "@type": "sdo:exptdata", "value": {"relation": "=", "@id": "value", "@type": "sdo:value", "value": "19.000000000000000000000000000000", "units": "uM"}}, {"@id": "datum", "@type": "sdo:deriveddata", "value": {"standard_relation": "=", "@id": "value", "@type": "sdo:value", "standard_value": "19000.000000000000000000000000000000", "standard_units": "nM", "standard_type": "IC50", "pchembl_value": "4.72", "uo_units": "obo:UO_0000065", "qudt_units": "qudt:NanoMOL-PER-L"}}, {"@id": "datum", "@type": "sdo:None", "value": {"standard_flag": "1", "@id": "value", "@type": "sdo:value", "activity_id": "16464576"}}]}, {"@id": "datapoint", "annotation": "gb:P04524", "conditions": "Observation", "value": {"@id": "textvalue", "text": "The solution was clear, no reagent precipitation was observed.", "textype": "plain", "language": "en-us"}}]
+dp1_datum1 = {
+    "@id": "datum",
+    "@type": "sdo:exptdata",
+    "type": "IC50",
+    "value": {
+        "@id": "value",
+        "@type": "sdo:value",
+        "relation": "=",
+        "units": "uM",
+        "value": "19.000000000000000000000000000000"
+    }
+}
+
+dp1_datum2 = {
+    "@id": "datum",
+    "@type": "sdo:deriveddata",
+    "value": {
+        "standard_relation": "=",
+        "@id": "value",
+        "@type": "sdo:value",
+        "standard_value": "19000.000000000000000000000000000000",
+        "standard_units": "nM",
+        "standard_type": "IC50",
+        "pchembl_value": "4.72",
+        "uo_units": "obo:UO_0000065",
+        "qudt_units": "qudt:NanoMOL-PER-L"
+    }
+}
+
+dp1_datum3 = {
+    "@id": "datum",
+    "@type": "sdo:None",
+    "value": {
+        "standard_flag": "1",
+        "@id": "value",
+        "@type": "sdo:value",
+        "activity_id": "16464576"
+    }
+}
+
+dp1 = {
+    "@id": "datapoint",
+    "@type": "sdo:datapoint",
+    "activity_id": 16464576,
+    "assay": "CHEMBL3767769",
+    "data": [dp1_datum1, dp1_datum2, dp1_datum3]
+}
+
+# Input datapoint 2
+dp2 = {
+    "@id": "datapoint",
+    "annotation": "gb:P04524",
+    "conditions": "Observation",
+    "value": {
+        "@id": "textvalue",
+        "text":
+            "The solution was clear, no reagent precipitation was observed.",
+        "textype": "plain",
+        "language": "en-us"
+    }
+}
+
+dps = [dp1, dp2]
 
 example.datapoint(dps)
 
@@ -218,10 +279,10 @@ dataser1 = {
     'values_numpy_array': str(ser1_numpy_array),
     'values_numpy_list': str(ser1_numpy_list),
     'values_numpy_json': str(ser1_numpy_json)}
-for k,v in ser1_dict.items():
-    dataser1.update({str(k):str(v)})
-for k,v in ser1_dict_str.items():
-    dataser1.update({str('str_'+k):v})
+for k, v in ser1_dict.items():
+    dataser1.update({str(k): str(v)})
+for k, v in ser1_dict_str.items():
+    dataser1.update({str('str_'+k): v})
 
 ser2_input = {'colA': [10, 20, 30]}
 ser2_dataframe = pd.DataFrame(ser2_input)
@@ -244,10 +305,10 @@ dataser2 = {
     'values_numpy_array': str(ser2_numpy_array),
     'values_numpy_list': str(ser2_numpy_list),
     'values_numpy_json': str(ser2_numpy_json)}
-for k,v in ser2_dict.items():
-    dataser2.update({str(k):str(v)})
-for k,v in ser2_dict_str.items():
-    dataser2.update({str('str_'+k):v})
+for k, v in ser2_dict.items():
+    dataser2.update({str(k): str(v)})
+for k, v in ser2_dict_str.items():
+    dataser2.update({str('str_'+k): v})
 
 example.dataseries([dataser1, dataser2])
 

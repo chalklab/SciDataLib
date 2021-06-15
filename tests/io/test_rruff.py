@@ -73,7 +73,7 @@ def test_read_rruff(raman_soddyite_file):
     assert len(system["facets"]) == 1
     facet = system["facets"][0]
     assert facet["@id"] == "material/1/"
-    assert len(facet["@type"]) == 2
+    assert facet["@type"] == "sdo:material"
     assert facet["materialType"] == "(UO_2_)_2_SiO_4_&#183;2H_2_O"
     assert facet["name"] == "Soddyite"
 

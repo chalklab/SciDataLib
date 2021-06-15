@@ -135,7 +135,7 @@ def _read_get_facets_section(rruff_dict: dict) -> dict:
     facets = []
     material = {
         "@id": "material",
-        "@type": ["sdo:facet", "sdo:material"],
+        "@type": "sdo:material",
         "name": rruff_dict.get("names", ""),
         "materialType": rruff_dict.get("ideal chemistry", ""),
     }

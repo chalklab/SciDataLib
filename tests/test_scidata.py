@@ -1,4 +1,5 @@
 """pytest test class for scidata.py"""
+import copy
 from scidatalib.scidata import SciData
 from datetime import datetime
 import pytest
@@ -201,6 +202,100 @@ def test_datapoint(sd):
         }
     }
     assert sd.datapoint([pnt]) == [out]
+
+
+def test_datapoint_nested(sd):
+    """Test multiple, nested datum in datapoints for correct enumeration"""
+    sd.namespaces({'gb': 'https://goldbook.iupac.org/terms/view/'})
+
+    # Input datapoint 1
+    dp1_datum1 = {
+        "@id": "datum",
+        "@type": "sdo:exptdata",
+        "type": "IC50",
+        "value": {
+            "@id": "value",
+            "@type": "sdo:value",
+            "relation": "=",
+            "units": "uM",
+            "value": "19.000000000000000000000000000000"
+        }
+    }
+
+    dp1_datum2 = {
+        "@id": "datum",
+        "@type": "sdo:deriveddata",
+        "value": {
+            "standard_relation": "=",
+            "@id": "value",
+            "@type": "sdo:value",
+            "standard_value": "19000.000000000000000000000000000000",
+            "standard_units": "nM",
+            "standard_type": "IC50",
+            "pchembl_value": "4.72",
+            "uo_units": "obo:UO_0000065",
+            "qudt_units": "qudt:NanoMOL-PER-L"
+        }
+    }
+
+    dp1_datum3 = {
+        "@id": "datum",
+        "@type": "sdo:None",
+        "value": {
+            "standard_flag": "1",
+            "@id": "value",
+            "@type": "sdo:value",
+            "activity_id": "16464576"
+        }
+    }
+
+    dp1 = {
+        "@id": "datapoint",
+        "@type": "sdo:datapoint",
+        "activity_id": 16464576,
+        "assay": "CHEMBL3767769",
+        "data": [dp1_datum1, dp1_datum2, dp1_datum3]
+    }
+
+    # Input datapoint 2
+    dp2 = {
+        "@id": "datapoint",
+        "@type": "sdo:datapoint",
+        "annotation": "gb:P04524",
+        "conditions": "Observation",
+        "value": {
+            "@id": "textvalue",
+            "@type": "sdo:textvalue",
+            "text":
+                "The solution was clear, no reagent precipitation was observed.", # noqa
+            "textype": "plain",
+            "language": "en-us"
+        }
+    }
+
+    # Create target output datapoints
+    out_dp1 = copy.deepcopy(dp1)
+
+    out_dp1["@id"] = "datapoint/1/"
+
+    out_dp1_datum1 = out_dp1["data"][0]
+    out_dp1_datum1["@id"] = "datapoint/1/datum/1/"
+    out_dp1_datum1["value"]["@id"] = "datapoint/1/datum/1/value/1/"
+
+    out_dp1_datum2 = out_dp1["data"][1]
+    out_dp1_datum2["@id"] = "datapoint/1/datum/2/"
+    out_dp1_datum2["value"]["@id"] = "datapoint/1/datum/2/value/1/"
+
+    out_dp1_datum3 = out_dp1["data"][2]
+    out_dp1_datum3["@id"] = "datapoint/1/datum/3/"
+    out_dp1_datum3["value"]["@id"] = "datapoint/1/datum/3/value/1/"
+
+    out_dp2 = copy.deepcopy(dp2)
+
+    out_dp2["@id"] = "datapoint/2/"
+    out_dp2["value"]["@id"] = "datapoint/2/textvalue/1/"
+
+    assert sd.datapoint([dp1, dp2]) == [out_dp1, out_dp2]
 
 
 def test_datagroup_with_datapoints(sd):
