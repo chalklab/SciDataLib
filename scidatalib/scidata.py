@@ -68,7 +68,8 @@ class SciData:
             "qudt": "http://qudt.org/vocab/unit/",
             "obo": "http://purl.obolibrary.org/obo/",
             "dc": "http://purl.org/dc/terms/",
-            "xsd": "http://www.w3.org/2001/XMLSchema#"
+            "xsd": "http://www.w3.org/2001/XMLSchema#",
+            "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"
         }
         self.baseurl = {}
         self.meta['@graph']['uid'] = uid
@@ -356,14 +357,14 @@ class SciData:
                 if ':' in idee:
                     if idee.split(':')[0] not in self.nspaces.keys():
                         print('Namespace ' + idee.split(':')[0] + ' not set')
-                        raise EnvironmentError
+                        # raise EnvironmentError
                     curr_ids.append(idee)
         elif isinstance(ids, str):
             if ':' in ids:
                 if ids.split(':')[0] not in self.nspaces.keys():
                     print('Namespace ' + ids.split(':')[0] +
                           ' not set ' + str(self.nspaces.keys()))
-                    raise EnvironmentError
+                    # raise EnvironmentError
                 curr_ids.append(ids)
         self.meta['@graph']['ids'] = sorted(set(curr_ids))
         return self.meta['@graph']['ids']
@@ -575,7 +576,7 @@ class SciData:
                         cnt = len(dset['datapoint'])
                     else:
                         cnt = 0
-                    pointlist.append('datapoint/' + str(cnt + 1) + '/')
+                    pointlist.append('datapoint/' + str(cnt) + '/')
                     self.datapoint([x])
                 temp['datapoints'] = pointlist
             if 'attribute' in it:
@@ -584,7 +585,7 @@ class SciData:
                         cnt = len(dset['attribute'])
                     else:
                         cnt = 0
-                    pointlist.append('attribute/' + str(cnt + 1) + '/')
+                    pointlist.append('attribute/' + str(cnt) + '/')
                     self.attribute([x])
                 temp['attribute'] = pointlist
 
@@ -599,7 +600,7 @@ class SciData:
 
         for item in groups:
             cat_index = {}
-            item = iteratedatagroup(item, 1)
+            item = iteratedatagroup(item, 0)
             curr_groups.append(item)
 
         dataset['datagroup'] = curr_groups
@@ -654,11 +655,14 @@ class SciData:
     # private class functions
     def __addid(self, text: str) -> bool:
         """ adds entry to ids list if string contains ':' """
-        if isinstance(text, str) and '://' in text:
-            return False
-        elif isinstance(text, str) and ':' in text:
-            self.ids(text)
-            return True
+        if isinstance(text, str):
+            if '://' in text:
+                return False
+            elif len(text.split(':')) > 1:
+                return False
+            elif ':' in text:
+                self.ids(text)
+                return True
         else:
             return False
 
@@ -773,13 +777,16 @@ class SciData:
             if key != '@id':
                 count = cnt_index[category]
 
-                # For list, recusively process elements in sub-list
+                # For list, recursively process elements in sub-list
                 if isinstance(value, list):
                     level += 1
                     for i, y in enumerate(value):
-                        value[i], category, count, new_cat_index = \
-                            self.__iterate_function(
-                                y, level, cnt_index, new_cat_index)
+                        if type(y) is str:
+                            pass
+                        else:
+                            value[i], category, count, new_cat_index = \
+                                self.__iterate_function(
+                                    y, level, cnt_index, new_cat_index)
                     temp[key] = value
                     level -= 1
 
