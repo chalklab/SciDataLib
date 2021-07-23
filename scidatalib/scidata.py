@@ -188,7 +188,6 @@ class SciData:
         Add to or replace the list of authors within the @graph authors section
         :param authors - list of names, or list of dicts with multiple fields
         :param replace - boolean to replace or not the existing data
-
         Add the list of authors of a set of data with the following defined
         fields in the SciData context file: name, address, organization,
         email, orcid. Expects either:
@@ -790,13 +789,14 @@ class SciData:
                     temp[key] = value
                     level -= 1
 
-                # For list, recusively process key-values in sub-dict
+                # For list, recursively process key-values in sub-dict
                 elif isinstance(value, dict):
                     level += 1
                     temp[key], category, count, new_cat_index = \
                         self.__iterate_function(
                             value, level, cnt_index, new_cat_index)
                     level -= 1
+                    cnt_index[category] = 0
 
                 # Simply add the value to list of objects to return
                 else:
@@ -805,7 +805,7 @@ class SciData:
 
         # Remove the last added "leaf" level to trim the @id value correctly
         new_cat_index.pop(level)
-        cnt_index[category] = 0
+        # cnt_index[category] = 0
         return temp, category, count, new_cat_index
 
     @property

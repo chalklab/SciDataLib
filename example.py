@@ -127,11 +127,13 @@ con1 = {
     '@id': 'constituent',
     'source': 'compound/1/',
     'role': 'chm:analyte',
-    'properties': [prp1]}
+    'properties': [prp1,prp2]
+}
 con2 = {
     '@id': 'constituent',
     'source': 'compound/2/',
-    'role': 'chm:reagent'}
+    'role': 'chm:reagent',
+    'properties': [prp1,prp2]}
 con3 = {
     '@id': 'constituent',
     'source': 'compound/3/',
