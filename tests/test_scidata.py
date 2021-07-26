@@ -159,20 +159,170 @@ def test_aspects(sd):
 
 
 def test_facets(sd):
-    sd.namespaces({'obo': 'http://purl.obolibrary.org/obo/'})
+    sd.namespaces({'obo': 'http://purl.obolibrary.org/obo/', "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"})
     compd = {
-        '@id': 'compound',
-        'name': 'cyanide ion',
-        'inchi': 'InChI=1S/CN/c1-2/q-1',
-        'chebi': 'obo:CHEBI_17514'
+        "@id": "substance",
+        "title": "3 ppm cyanide standard solution",
+        "aggregation": "sub:aq",
+        "mixtype": "sub:homogeneousSolution",
+        "phase": "sub:liquid",
+        "constituents": [
+            {
+                "@id": "constituent",
+                "source": "compound/1/",
+                "role": "chm:analyte",
+                "properties": [
+                    {
+                        "@id": "property",
+                        "quantity": "mass of substance per volume",
+                        "property": "Concentration (w/v)",
+                        "value": {
+                            "@id": "value",
+                            "number": 2.99,
+                            "unitref": "qudt:PPM"
+                        }
+                    },
+                    {
+                        "@id": "property",
+                        "quantity": "volume",
+                        "property": "Volume of solution",
+                        "value": {
+                            "@id": "value",
+                            "number": 100.0,
+                            "unitref": "qudt:MilliL"
+                        }
+                    }
+                ]
+            },
+            {
+                "@id": "constituent",
+                "source": "compound/2/",
+                "role": "chm:reagent",
+                "properties": [
+                    {
+                        "@id": "property",
+                        "quantity": "mass of substance per volume",
+                        "property": "Concentration (w/v)",
+                        "value": {
+                            "@id": "value",
+                            "number": 2.99,
+                            "unitref": "qudt:PPM"
+                        }
+                    },
+                    {
+                        "@id": "property",
+                        "quantity": "volume",
+                        "property": "Volume of solution",
+                        "value": {
+                            "@id": "value",
+                            "number": 100.0,
+                            "unitref": "qudt:MilliL"
+                        }
+                    }
+                ]
+            }
+        ],
+        "properties": [
+            {
+                "@id": "property",
+                "quantity": "volume",
+                "property": "Volume of solution",
+                "value": {
+                    "@id": "value",
+                    "number": 100.0,
+                    "unitref": "qudt:MilliL"
+                }
+            }
+        ]
     }
     out = {
-        '@id': 'compound/1/',
-        "@type": 'sdo:compound',
-        'name': 'cyanide ion',
-        'inchi': 'InChI=1S/CN/c1-2/q-1',
-        'chebi': 'obo:CHEBI_17514'
-    }
+    "@id": "substance/1/",
+    "@type": "sdo:substance",
+    "title": "3 ppm cyanide standard solution",
+    "aggregation": "sub:aq",
+    "mixtype": "sub:homogeneousSolution",
+    "phase": "sub:liquid",
+    "constituents": [
+        {
+            "@id": "substance/1/constituent/1/",
+            "@type": "sdo:constituent",
+            "source": "compound/1/",
+            "role": "chm:analyte",
+            "properties": [
+                {
+                    "@id": "substance/1/constituent/1/property/1/",
+                    "@type": "sdo:property",
+                    "quantity": "mass of substance per volume",
+                    "property": "Concentration (w/v)",
+                    "value": {
+                        "@id": "substance/1/constituent/1/property/1/value/1/",
+                        "@type": "sdo:value",
+                        "number": 2.99,
+                        "unitref": "qudt:PPM"
+                    }
+                },
+                {
+                    "@id": "substance/1/constituent/1/property/2/",
+                    "@type": "sdo:property",
+                    "quantity": "volume",
+                    "property": "Volume of solution",
+                    "value": {
+                        "@id": "substance/1/constituent/1/property/2/value/1/",
+                        "@type": "sdo:value",
+                        "number": 100.0,
+                        "unitref": "qudt:MilliL"
+                    }
+                }
+            ]
+        },
+        {
+            "@id": "substance/1/constituent/2/",
+            "@type": "sdo:constituent",
+            "source": "compound/2/",
+            "role": "chm:reagent",
+            "properties": [
+                {
+                    "@id": "substance/1/constituent/2/property/1/",
+                    "@type": "sdo:property",
+                    "quantity": "mass of substance per volume",
+                    "property": "Concentration (w/v)",
+                    "value": {
+                        "@id": "substance/1/constituent/2/property/1/value/1/",
+                        "@type": "sdo:value",
+                        "number": 2.99,
+                        "unitref": "qudt:PPM"
+                    }
+                },
+                {
+                    "@id": "substance/1/constituent/2/property/2/",
+                    "@type": "sdo:property",
+                    "quantity": "volume",
+                    "property": "Volume of solution",
+                    "value": {
+                        "@id": "substance/1/constituent/2/property/2/value/1/",
+                        "@type": "sdo:value",
+                        "number": 100.0,
+                        "unitref": "qudt:MilliL"
+                    }
+                }
+            ]
+        }
+    ],
+    "properties": [
+        {
+            "@id": "substance/1/property/1/",
+            "@type": "sdo:property",
+            "quantity": "volume",
+            "property": "Volume of solution",
+            "value": {
+                "@id": "substance/1/property/1/value/1/",
+                "@type": "sdo:value",
+                "number": 100.0,
+                "unitref": "qudt:MilliL"
+            }
+        }
+    ]
+}
     assert sd.facets([compd]) == [out]
 
 
