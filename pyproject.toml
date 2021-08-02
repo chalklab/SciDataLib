@@ -1,10 +1,21 @@
 [tool.poetry]
 name = "SciDataLib"
-version = "0.0.1"
+version = "0.2.2"
 description = "Python library for development of SciData JSON-LD files"
 authors = [
     "Stuart Chalk <schalk@unf.edu>",
     "Dylan Johnson <n01448636@unf.edu>",
+    "Marshall McDonnell <mcdonnellmt@ornl.gov>,
+]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/ChalkLab/SciDataLib"
+repository = "https://github.com/ChalkLab/SciDataLib"
+keywords = ["scidata", "scidatalib"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
 ]
 
 [tool.poetry.scripts]

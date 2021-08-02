@@ -97,8 +97,7 @@ def test_keywords(sd):
     key3 = 'Bowl of petunias'
     sd.keywords(key1)
     sd.keywords(key2)
-    keys = [key1, key2, key3]
-    keys.sort()
+    keys = sorted([key1, key2, key3])
     assert sd.keywords(key3) == keys
 
 
@@ -159,7 +158,8 @@ def test_aspects(sd):
 
 
 def test_facets(sd):
-    sd.namespaces({'obo': 'http://purl.obolibrary.org/obo/', "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"})
+    sd.namespaces({'obo': 'http://purl.obolibrary.org/obo/',
+        "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"})
     compd = {
         "@id": "substance",
         "title": "3 ppm cyanide standard solution",
@@ -235,94 +235,60 @@ def test_facets(sd):
             }
         ]
     }
-    out = {
-    "@id": "substance/1/",
-    "@type": "sdo:substance",
-    "title": "3 ppm cyanide standard solution",
-    "aggregation": "sub:aq",
-    "mixtype": "sub:homogeneousSolution",
-    "phase": "sub:liquid",
-    "constituents": [
-        {
-            "@id": "substance/1/constituent/1/",
-            "@type": "sdo:constituent",
-            "source": "compound/1/",
-            "role": "chm:analyte",
-            "properties": [
-                {
-                    "@id": "substance/1/constituent/1/property/1/",
-                    "@type": "sdo:property",
-                    "quantity": "mass of substance per volume",
-                    "property": "Concentration (w/v)",
-                    "value": {
-                        "@id": "substance/1/constituent/1/property/1/value/1/",
-                        "@type": "sdo:value",
-                        "number": 2.99,
-                        "unitref": "qudt:PPM"
-                    }
-                },
-                {
-                    "@id": "substance/1/constituent/1/property/2/",
-                    "@type": "sdo:property",
-                    "quantity": "volume",
-                    "property": "Volume of solution",
-                    "value": {
-                        "@id": "substance/1/constituent/1/property/2/value/1/",
-                        "@type": "sdo:value",
-                        "number": 100.0,
-                        "unitref": "qudt:MilliL"
-                    }
-                }
-            ]
-        },
-        {
-            "@id": "substance/1/constituent/2/",
-            "@type": "sdo:constituent",
-            "source": "compound/2/",
-            "role": "chm:reagent",
-            "properties": [
-                {
-                    "@id": "substance/1/constituent/2/property/1/",
-                    "@type": "sdo:property",
-                    "quantity": "mass of substance per volume",
-                    "property": "Concentration (w/v)",
-                    "value": {
-                        "@id": "substance/1/constituent/2/property/1/value/1/",
-                        "@type": "sdo:value",
-                        "number": 2.99,
-                        "unitref": "qudt:PPM"
-                    }
-                },
-                {
-                    "@id": "substance/1/constituent/2/property/2/",
-                    "@type": "sdo:property",
-                    "quantity": "volume",
-                    "property": "Volume of solution",
-                    "value": {
-                        "@id": "substance/1/constituent/2/property/2/value/1/",
-                        "@type": "sdo:value",
-                        "number": 100.0,
-                        "unitref": "qudt:MilliL"
-                    }
-                }
-            ]
-        }
-    ],
-    "properties": [
-        {
-            "@id": "substance/1/property/1/",
-            "@type": "sdo:property",
-            "quantity": "volume",
-            "property": "Volume of solution",
-            "value": {
-                "@id": "substance/1/property/1/value/1/",
-                "@type": "sdo:value",
-                "number": 100.0,
-                "unitref": "qudt:MilliL"
-            }
-        }
-    ]
-}
+    out = {"@id": "substance/1/",
+           "@type": "sdo:substance",
+           "title": "3 ppm cyanide standard solution",
+           "aggregation": "sub:aq",
+           "mixtype": "sub:homogeneousSolution",
+           "phase": "sub:liquid",
+           "constituents": [{"@id": "substance/1/constituent/1/",
+                             "@type": "sdo:constituent",
+                             "source": "compound/1/",
+                             "role": "chm:analyte",
+                             "properties": [{"@id": "substance/1/constituent/1/property/1/",
+                                             "@type": "sdo:property",
+                                             "quantity": "mass of substance per volume",
+                                             "property": "Concentration (w/v)",
+                                             "value": {"@id": "substance/1/constituent/1/property/1/value/1/",
+                                                       "@type": "sdo:value",
+                                                       "number": 2.99,
+                                                       "unitref": "qudt:PPM"}},
+                                            {"@id": "substance/1/constituent/1/property/2/",
+                                             "@type": "sdo:property",
+                                             "quantity": "volume",
+                                             "property": "Volume of solution",
+                                             "value": {"@id": "substance/1/constituent/1/property/2/value/1/",
+                                                       "@type": "sdo:value",
+                                                       "number": 100.0,
+                                                       "unitref": "qudt:MilliL"}}]},
+                            {"@id": "substance/1/constituent/2/",
+                             "@type": "sdo:constituent",
+                             "source": "compound/2/",
+                             "role": "chm:reagent",
+                             "properties": [{"@id": "substance/1/constituent/2/property/1/",
+                                             "@type": "sdo:property",
+                                             "quantity": "mass of substance per volume",
+                                             "property": "Concentration (w/v)",
+                                             "value": {"@id": "substance/1/constituent/2/property/1/value/1/",
+                                                       "@type": "sdo:value",
+                                                       "number": 2.99,
+                                                       "unitref": "qudt:PPM"}},
+                                            {"@id": "substance/1/constituent/2/property/2/",
+                                             "@type": "sdo:property",
+                                             "quantity": "volume",
+                                             "property": "Volume of solution",
+                                             "value": {"@id": "substance/1/constituent/2/property/2/value/1/",
+                                                       "@type": "sdo:value",
+                                                       "number": 100.0,
+                                                       "unitref": "qudt:MilliL"}}]}],
+           "properties": [{"@id": "substance/1/property/1/",
+                           "@type": "sdo:property",
+                           "quantity": "volume",
+                           "property": "Volume of solution",
+                           "value": {"@id": "substance/1/property/1/value/1/",
+                                     "@type": "sdo:value",
+                                     "number": 100.0,
+                                     "unitref": "qudt:MilliL"}}]}
     assert sd.facets([compd]) == [out]
 
 
@@ -417,7 +383,7 @@ def test_datapoint_nested(sd):
             "@id": "textvalue",
             "@type": "sdo:textvalue",
             "text":
-                "The solution was clear, no reagent precipitation was observed.", # noqa
+                "The solution was clear, no reagent precipitation was observed.",  # noqa
             "textype": "plain",
             "language": "en-us"
         }
@@ -490,8 +456,8 @@ def test_datagroup_with_datapoints(sd):
             "datapoint/1/",
             "datapoint/2/",
             "datapoint/3/"
-            ]
-        }
+        ]
+    }
     assert sd.datagroup([grp]) == [out]
 
 
@@ -504,7 +470,7 @@ def test_datagroup_with_attributes(sd):
     )
 
     # Create an X data vector
-    datax = [0.1*i for i in range(10)]
+    datax = [0.1 * i for i in range(10)]
 
     # Setup attributes of the X data
     atid = 'numericvalue'
@@ -537,8 +503,8 @@ def test_datagroup_with_attributes(sd):
             "attribute/1/",
             "attribute/2/",
             "attribute/3/"
-            ]
-        }
+        ]
+    }
     result = sd.datagroup([grp])
     assert result == [out]
 

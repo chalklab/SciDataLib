@@ -8,8 +8,8 @@ example = SciData(uid)
 
 # context parameters
 example.context(
-            ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
-        )
+    ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+)
 example.context(
     'https://stuchalk.github.io/scidata/contexts/scidata2.jsonld', True)
 base = 'https://scidata.unf.edu/' + uid + '/'
@@ -127,13 +127,13 @@ con1 = {
     '@id': 'constituent',
     'source': 'compound/1/',
     'role': 'chm:analyte',
-    'properties': [prp1,prp2]
+    'properties': [prp1, prp2]
 }
 con2 = {
     '@id': 'constituent',
     'source': 'compound/2/',
     'role': 'chm:reagent',
-    'properties': [prp1,prp2]}
+    'properties': [prp1, prp2]}
 con3 = {
     '@id': 'constituent',
     'source': 'compound/3/',
@@ -284,7 +284,7 @@ dataser1 = {
 for k, v in ser1_dict.items():
     dataser1.update({str(k): str(v)})
 for k, v in ser1_dict_str.items():
-    dataser1.update({str('str_'+k): v})
+    dataser1.update({str('str_' + k): v})
 
 ser2_input = {'colA': [10, 20, 30]}
 ser2_dataframe = pd.DataFrame(ser2_input)
@@ -310,7 +310,7 @@ dataser2 = {
 for k, v in ser2_dict.items():
     dataser2.update({str(k): str(v)})
 for k, v in ser2_dict_str.items():
-    dataser2.update({str('str_'+k): v})
+    dataser2.update({str('str_' + k): v})
 
 example.dataseries([dataser1, dataser2])
 

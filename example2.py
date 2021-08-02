@@ -2,18 +2,14 @@
 from scidatalib.scidata import SciData
 import json
 import pandas as pd
-import re
-
-
-p_name = '/Users/n01448636/Documents/GoogleDrive/PycharmProjects/SciDataLib/test.rruff'
 
 uid = 'example'
 example = SciData(uid)
 
 # context parameters
 example.context(
-            ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
-        )
+    ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
+)
 example.context(
     'https://stuchalk.github.io/scidata/contexts/scidata2.jsonld', True)
 base = 'https://scidata.unf.edu/' + uid + '/'
@@ -261,17 +257,27 @@ dp2 = {
 dps = [dp1, dp2]
 example.datapoint(dps)
 
-# with open(p_name) as openfile:
-#     openfileread = openfile.readlines()
-#     spectrax = []
-#     spectray = []
-#     for x in openfileread:
-#         if re.search('(\d{1,}\.\d{1,}), (\d{1,}\.\d{1,})',x):
-#             spectrax.append(re.match('(\d{1,}\.\d{1,}), (\d{1,}\.\d{1,})',x).group(1))
-#             spectray.append(re.match('(\d{1,}\.\d{1,}), (\d{1,}\.\d{1,})',x).group(2))
 
-spectrax = ['107.9252', '108.4073', '108.8894', '109.3715', '109.8536', '110.3358', '110.8179', '111.3000', '111.7821']
-spectray = ['831.4121', '833.1594', '839.9602', '848.9200', '855.5815', '860.6728', '862.4740', '859.3690', '851.6688']
+spectrax = [
+    '107.9252',
+    '108.4073',
+    '108.8894',
+    '109.3715',
+    '109.8536',
+    '110.3358',
+    '110.8179',
+    '111.3000',
+    '111.7821']
+spectray = [
+    '831.4121',
+    '833.1594',
+    '839.9602',
+    '848.9200',
+    '855.5815',
+    '860.6728',
+    '862.4740',
+    '859.3690',
+    '851.6688']
 ser1_input = {'spectra_x': spectrax, 'spectra_y': spectray}
 ser1_dataframe = pd.DataFrame(ser1_input)
 ser1_dataframe_str = pd.DataFrame(ser1_input).applymap(str)
@@ -288,7 +294,9 @@ for k, v in ser1_dict_str.items():
 
 example.dataseries([dataser1])
 
-example.datagroup([{"@id": "datagroup", "@type": "sdo:datagroup", "datapoints": ["datapoint"]}])
+example.datagroup(
+    [{"@id": "datagroup", "@type": "sdo:datagroup",
+      "datapoints": ["datapoint"]}])
 
 # add source
 src = {'citation': 'Chalk Research Group',

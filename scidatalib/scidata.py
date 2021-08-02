@@ -206,10 +206,10 @@ class SciData:
             for au in authors:
                 auth = {'@id': ('author/' + str(len(a) + 1) + '/')}
                 auth.update({'@type': 'dc:creator'})
-                if type(au) is dict:
+                if isinstance(au, dict):
                     if 'name' in au:
                         auth.update(au)
-                elif type(au) is str:
+                elif isinstance(au, str):
                     auth.update({'name': au})
                 a.append(auth)
             self.meta['@graph']['authors'] = a
@@ -780,7 +780,7 @@ class SciData:
                 if isinstance(value, list):
                     level += 1
                     for i, y in enumerate(value):
-                        if type(y) is str:
+                        if isinstance(y, str):
                             pass
                         else:
                             value[i], category, count, new_cat_index = \
