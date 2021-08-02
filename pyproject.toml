@@ -5,7 +5,7 @@ description = "Python library for development of SciData JSON-LD files"
 authors = [
     "Stuart Chalk <schalk@unf.edu>",
     "Dylan Johnson <n01448636@unf.edu>",
-    "Marshall McDonnell <mcdonnellmt@ornl.gov>,
+    "Marshall McDonnell <mcdonnellmt@ornl.gov>"
 ]
 license = "MIT"
 readme = "README.md"
