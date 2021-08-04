@@ -311,4 +311,4 @@ holder = ', '.join([
 lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
 example.rights(holder, lic)
 
-print(json.dumps(example.output, ensure_ascii=False))
+print(json.dumps(example.output, indent=4, ensure_ascii=False))

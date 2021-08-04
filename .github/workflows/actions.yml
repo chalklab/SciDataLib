@@ -37,6 +37,7 @@ jobs:
         env:
           TEST_PYPI_TOKEN_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
         run: |
+          poetry update
           poetry build
           poetry config repositories.testpypi https://test.pypi.org/legacy/
           poetry publish -r testpypi --username "__token__" --password $TEST_PYPI_TOKEN_PASSWORD

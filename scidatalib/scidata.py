@@ -813,14 +813,15 @@ class SciData:
         """
         Generates Scidata JSON-LD File
         """
-        self.__addtoc()
+        # self.__addtoc()
         today = datetime.today()
         self.meta['generatedAt'] = today.strftime("%m-%d-%y %H:%M:%S")
 
         # clean top level
         for key in list(self.meta['@graph']):
             if not self.meta['@graph'][key]:
-                del self.meta['@graph'][key]
+                if key != 'toc':
+                    del self.meta['@graph'][key]
         for key in list(self.meta['@graph']['scidata']):
             if not self.meta['@graph']['scidata'][key]:
                 del self.meta['@graph']['scidata'][key]
@@ -829,5 +830,13 @@ class SciData:
             for key in list(self.meta['@graph']['scidata'][sect]):
                 if not self.meta['@graph']['scidata'][sect][key]:
                     del self.meta['@graph']['scidata'][sect][key]
+        if not self.meta['@graph']['scidata'].get('methodology', {}).get('aspects', False):
+            del self.meta['@graph']['scidata']['methodology']
+        if not self.meta['@graph']['scidata'].get('system', {}).get('facets', False):
+            del self.meta['@graph']['scidata']['system']
+        if not self.meta['@graph']['scidata'].get('dataset', {}).get('datapoint', False):
+            if not self.meta['@graph']['scidata'].get('dataset', {}).get('dataseries', False):
+                del self.meta['@graph']['scidata']['dataset']
+        self.__addtoc()
 
         return self.meta
