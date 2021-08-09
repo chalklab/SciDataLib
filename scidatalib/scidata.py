@@ -421,7 +421,7 @@ class SciData:
         curr_aspects: list = meth['aspects']
         uidindex = []
         for listentry in aspects:
-            item, uidindex = self.__iterate_function2(listentry, uidindex)
+            item, uidindex = self.__iterate_function(listentry, uidindex)
             curr_aspects.append(item)
 
         meth['aspects'] = curr_aspects
@@ -437,7 +437,7 @@ class SciData:
         curr_facets: list = system['facets']
         uidindex = []
         for listentry in facets:
-            item, uidindex = self.__iterate_function2(listentry, uidindex)
+            item, uidindex = self.__iterate_function(listentry, uidindex)
             curr_facets.append(item)
 
         system['facets'] = curr_facets
@@ -473,7 +473,7 @@ class SciData:
         uidindex = []
 
         for listentry in attributes:
-            item, uidindex = self.__iterate_function2(listentry, uidindex)
+            item, uidindex = self.__iterate_function(listentry, uidindex)
             curr_attributes.append(item)
 
         dataset['attribute'] = curr_attributes
@@ -493,7 +493,7 @@ class SciData:
         uidindex = []
 
         for listentry in points:
-            item, uidindex = self.__iterate_function2(listentry, uidindex)
+            item, uidindex = self.__iterate_function(listentry, uidindex)
             curr_points.append(item)
 
         dataset['datapoint'] = curr_points
@@ -513,7 +513,7 @@ class SciData:
         uidindex = []
 
         for listentry in series:
-            item, uidindex = self.__iterate_function2(listentry, uidindex)
+            item, uidindex = self.__iterate_function(listentry, uidindex)
             curr_series.append(item)
 
         dataset['dataseries'] = curr_series
@@ -701,7 +701,7 @@ class SciData:
         self.meta["@context"] = c + [n, b]
         return self.meta["@context"]
 
-    def __iterate_function2(self, it, uidindex, uid=False):
+    def __iterate_function(self, it, uidindex, uid=False):
 
         if isinstance(it, str):
             self.__addid(it)
@@ -739,12 +739,12 @@ class SciData:
                 if isinstance(value, list):
                     listuid = uid
                     for i, listentry in enumerate(value):
-                        value[i], uidindex = self.__iterate_function2(
+                        value[i], uidindex = self.__iterate_function(
                             listentry, uidindex, listuid)
                     temp[key] = value
 
                 elif isinstance(value, dict):
-                    temp[key], uidindex = self.__iterate_function2(
+                    temp[key], uidindex = self.__iterate_function(
                         value, uidindex, uid)
 
                 else:
@@ -753,91 +753,6 @@ class SciData:
 
         return temp, uidindex
 
-    def __iterate_function(self, it, level, cnt_index, cat_index):
-        """
-        Recursive function to iteratively update @id, @type, and categories
-        for a sub-section
-
-        :param it: string or list of objects to iterate over
-        :param level: current level of sub-section
-        :param cnt_index: dict to keep the count of a repeated category
-        :param cat_index: dict to keep the category level
-        :return: Tuple of [
-                updated object in the iterated listcategory,
-                category of object,
-                count of the given repeated category,
-                update cat_index
-            ]
-        """
-        new_cat_index = cat_index.copy()
-
-        # If we simply have string, return, end recursion
-        if isinstance(it, str):
-            self.__addid(it)
-            return it, 1, cnt_index, cat_index
-
-        # Set the category
-        if '@id' in it:
-            category = it['@id']
-        elif 'descriptors' in it or 'identifiers' in it:
-            category = 'compound'
-        else:
-            category = 'undefined'
-
-        # Increase count if already encountered category; initialize otherwise
-        if category in cnt_index:
-            cnt_index[category] += 1
-        else:
-            cnt_index[category] = 1
-
-        # Update state holding level of nesting and associated category
-        new_cat_index.update({level: category})
-
-        # Set the @id and @type based on the category and count
-        uid = ''
-        for cat in list(new_cat_index.values()):
-            uid += cat + '/' + str(cnt_index[cat]) + '/'
-
-        # Loop over non-id or non-type entries to recursively process
-        # sub-elements of the list of objects
-        temp: dict = {'@id': uid, '@type': 'sdo:' + category}
-        for key, value in it.items():
-
-            # Already constructed the @id, so iterate only on non-@id entries
-            if key != '@id':
-                count = cnt_index[category]
-
-                # For list, recursively process elements in sub-list
-                if isinstance(value, list):
-                    level += 1
-                    for i, y in enumerate(value):
-                        if isinstance(y, str):
-                            pass
-                        else:
-                            value[i], category, count, new_cat_index = \
-                                self.__iterate_function(
-                                    y, level, cnt_index, new_cat_index)
-                    temp[key] = value
-                    level -= 1
-
-                # For list, recursively process key-values in sub-dict
-                elif isinstance(value, dict):
-                    level += 1
-                    temp[key], category, count, new_cat_index = \
-                        self.__iterate_function(
-                            value, level, cnt_index, new_cat_index)
-                    level -= 1
-                    cnt_index[category] = 0
-
-                # Simply add the value to list of objects to return
-                else:
-                    temp[key] = value
-                    self.__addid(value)
-
-        # Remove the last added "leaf" level to trim the @id value correctly
-        new_cat_index.pop(level)
-        # cnt_index[category] = 0
-        return temp, category, count, new_cat_index
 
     @property
     def output(self) -> dict:
