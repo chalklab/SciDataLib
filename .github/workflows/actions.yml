@@ -34,6 +34,7 @@ jobs:
 
       - name: Build Python package and Upload to TestPyPi
         shell: bash -l {0}
+        if: ${{ matrix.python-version == env.PYTHON_MAIN_VERSION }}
         env:
           TEST_PYPI_TOKEN_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
         run: |
@@ -64,6 +65,6 @@ jobs:
         env:
           PYPI_TOKEN_PASSWORD: ${{ secrets.PYPI_TOKEN }}
         run: |
-          pip install wheel twine
-          python setup.py sdist bdist_wheel
-          twine upload --username "__token__" --password $PYPI_TOKEN_PASSWORD dist/*
+          poetry update
+          poetry build
+          poetry publish --username "__token__" --password $TEST_PYPI_TOKEN_PASSWORD

@@ -294,9 +294,9 @@ for k, v in ser1_dict_str.items():
 
 example.dataseries([dataser1])
 
-example.datagroup(
-    [{"@id": "datagroup", "@type": "sdo:datagroup",
-      "datapoints": ["datapoint"]}])
+# example.datagroup(
+#     [{"@id": "datagroup", "@type": "sdo:datagroup",
+#       "datapoints": ["datapoint"]}])
 
 # add source
 src = {'citation': 'Chalk Research Group',
