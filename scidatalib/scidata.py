@@ -717,14 +717,13 @@ class SciData:
             category = 'undefined'
 
         if prev_uid:
-            uid = prev_uid + category + '/' + str(1) + '/'
+            uid = prev_uid + category + '/1/'
         else:
-            uid = category + '/' + str(1) + '/'
+            uid = category + '/1/'
 
         def enumuid(uid):
-            if uid in uidindex:
-                uidsplit = uid.rsplit('/', 2)
-                uid = uidsplit[0] + '/' + str(int(uidsplit[1]) + 1) + '/'
+            uidsplit = uid.rsplit('/', 2)
+            uid = uidsplit[0] + '/' + str(int(uidsplit[1]) + 1) + '/'
             return uid
 
         while uid in uidindex:
