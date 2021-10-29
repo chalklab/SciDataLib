@@ -577,6 +577,39 @@ class SciData:
         self.meta['@graph']['scidata'] = scidata
         return new_series
 
+    def datagroup(self, group: list) -> list:
+        """Add one or more datapoints"""
+        new_group = []
+        scidata: dict = self.meta['@graph']['scidata']
+        dataset: dict = scidata['dataset']
+        if 'datagroup' in dataset.keys():
+            curr_group: list = dataset['datagroup']
+        else:
+            curr_group = []
+        for listentry in group:
+            item = self.__iterate_function(listentry)
+            item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'}}
+            matched_group = 0
+            for groupitem in curr_group:
+                group_item_noid = {
+                    k: groupitem[k] for k in set(
+                        list(
+                            groupitem.keys())) -
+                    {'@id'}}
+                if group_item_noid == item_noid:
+                    matched_group = groupitem
+            if matched_group:
+                new_group.append(matched_group)
+                self.uidindex.remove(item['@id'])
+            else:
+                new_group.append(item)
+                curr_group.append(item)
+
+        dataset['datagroup'] = curr_group
+        scidata['dataset'] = dataset
+        self.meta['@graph']['scidata'] = scidata
+        return new_group
+
     def sources(self, sources: list, replace=False) -> dict:
         """
         Add to or replace the source reference list
@@ -758,28 +791,26 @@ class SciData:
         for key in list(self.meta['@graph']['scidata']):
             if not self.meta['@graph']['scidata'][key]:
                 del self.meta['@graph']['scidata'][key]
-        sects = ['methodology', 'system', 'dataset']
-        for sect in sects:
-            for key in list(self.meta['@graph']['scidata'][sect]):
-                if not self.meta['@graph']['scidata'][sect][key]:
-                    del self.meta['@graph']['scidata'][sect][key]
-        if not self.meta['@graph']['scidata'].get(
-                'methodology',
-                {}).get(
-                'aspects',
-                False):
-            del self.meta['@graph']['scidata']['methodology']
-        if not self.meta['@graph']['scidata'].get(
-                'system',
-                {}).get(
-                'facets',
-                False):
-            del self.meta['@graph']['scidata']['system']
-        if not self.meta['@graph']['scidata'].get(
-                'dataset', {}).get('datapoint', False):
+        if self.meta['@graph']['scidata'].get('methodology'):
             if not self.meta['@graph']['scidata'].get(
-                    'dataset', {}).get('dataseries', False):
-                del self.meta['@graph']['scidata']['dataset']
+                    'methodology',
+                    {}).get(
+                    'aspects',
+                    False):
+                del self.meta['@graph']['scidata']['methodology']
+        if self.meta['@graph']['scidata'].get('system'):
+            if not self.meta['@graph']['scidata'].get(
+                    'system',
+                    {}).get(
+                    'facets',
+                    False):
+                del self.meta['@graph']['scidata']['system']
+        if self.meta['@graph']['scidata'].get('dataset'):
+            if not self.meta['@graph']['scidata'].get(
+                    'dataset', {}).get('datapoint', False):
+                if not self.meta['@graph']['scidata'].get(
+                        'dataset', {}).get('dataseries', False):
+                    del self.meta['@graph']['scidata']['dataset']
         self.__addtoc()
 
         return self.meta

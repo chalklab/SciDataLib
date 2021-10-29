@@ -279,6 +279,10 @@ dataser1 = {"@id": "dataseries",
                  "dataarray": seriesy}]}
 example.dataseries([dataser1])
 
+datagrp1 = {"@id": "datagroup",
+            "label": "datagroup 1",
+            "ids": ["datapoint/1/", "datapoint/2/"]}
+example.datagroup([datagrp1])
 
 # add source
 src = {'citation': 'Chalk Research Group',
