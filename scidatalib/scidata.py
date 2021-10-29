@@ -73,6 +73,7 @@ class SciData:
         }
         self.baseurl = {}
         self.meta['@graph']['uid'] = uid
+        self.uidindex = []
 
     # public class methods
     def context(self, context: [str, list], replace=False) -> list:
@@ -415,35 +416,63 @@ class SciData:
 
     def aspects(self, aspects: list) -> list:
         """Add to or replace the aspects of the file"""
-
+        new_aspects = []
         scidata: dict = self.meta['@graph']['scidata']
         meth: dict = scidata['methodology']
         curr_aspects: list = meth['aspects']
-        uidindex = []
         for listentry in aspects:
-            item, uidindex = self.__iterate_function(listentry, uidindex)
-            curr_aspects.append(item)
+            item = self.__iterate_function(listentry)
+            item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'}}
+            matched_aspect = 0
+            for aspectitem in curr_aspects:
+                aspect_item_noid = {
+                    k: aspectitem[k] for k in set(
+                        list(
+                            aspectitem.keys())) -
+                    {'@id'}}
+                if aspect_item_noid == item_noid:
+                    matched_aspect = aspectitem
+                    matched_aspect_id = aspectitem['@id']
+            if matched_aspect:
+                new_aspects.append(matched_aspect)
+                self.uidindex.remove(item['@id'])
+            else:
+                new_aspects.append(item)
+                curr_aspects.append(item)
 
         meth['aspects'] = curr_aspects
         scidata['methodology'] = meth
         self.meta['@graph']['scidata'] = scidata
-        return curr_aspects
+        return new_aspects
 
     def facets(self, facets: list) -> list:
         """Add to or replace the facets of the file"""
-
+        new_facets = []
         scidata: dict = self.meta['@graph']['scidata']
         system: dict = scidata['system']
         curr_facets: list = system['facets']
-        uidindex = []
         for listentry in facets:
-            item, uidindex = self.__iterate_function(listentry, uidindex)
-            curr_facets.append(item)
-
+            item = self.__iterate_function(listentry)
+            item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'}}
+            matched_facet = 0
+            for facetitem in curr_facets:
+                facet_item_noid = {
+                    k: facetitem[k] for k in set(
+                        list(
+                            facetitem.keys())) -
+                    {'@id'}}
+                if facet_item_noid == item_noid:
+                    matched_facet = facetitem
+            if matched_facet:
+                new_facets.append(matched_facet)
+                self.uidindex.remove(item['@id'])
+            else:
+                new_facets.append(item)
+                curr_facets.append(item)
         system['facets'] = curr_facets
         scidata['system'] = system
         self.meta['@graph']['scidata'] = scidata
-        return curr_facets
+        return new_facets
 
     def scope(self, scope: [str, list]) -> str:
         """
@@ -463,128 +492,90 @@ class SciData:
 
     def attribute(self, attributes: list) -> list:
         """Add one or more attributes"""
-
+        new_attributes = []
         scidata: dict = self.meta['@graph']['scidata']
         dataset: dict = scidata['dataset']
         if 'attribute' in dataset.keys():
             curr_attributes: list = dataset['attribute']
         else:
             curr_attributes = []
-        uidindex = []
-
         for listentry in attributes:
-            item, uidindex = self.__iterate_function(listentry, uidindex)
-            curr_attributes.append(item)
+            item = self.__iterate_function(listentry)
+            item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'}}
+            matched_attribute = 0
+            for attributeitem in curr_attributes:
+                attribute_item_noid = {
+                    k: attributeitem[k] for k in set(
+                        list(
+                            attributeitem.keys())) -
+                    {'@id'}}
+                if attribute_item_noid == item_noid:
+                    matched_attribute = attributeitem
+            if matched_attribute:
+                new_attributes.append(matched_attribute)
+                self.uidindex.remove(item['@id'])
+            else:
+                new_attributes.append(item)
+                curr_attributes.append(item)
 
         dataset['attribute'] = curr_attributes
         scidata['dataset'] = dataset
         self.meta['@graph']['scidata'] = scidata
-        return curr_attributes
+        return new_attributes
 
     def datapoint(self, points: list) -> list:
         """Add one or more datapoints"""
-
+        new_points = []
         scidata: dict = self.meta['@graph']['scidata']
         dataset: dict = scidata['dataset']
+
         if 'datapoint' in dataset.keys():
             curr_points: list = dataset['datapoint']
         else:
             curr_points = []
-        uidindex = []
 
         for listentry in points:
-            item, uidindex = self.__iterate_function(listentry, uidindex)
+            item = self.__iterate_function(listentry)
+            new_points.append(item)
             curr_points.append(item)
 
         dataset['datapoint'] = curr_points
         scidata['dataset'] = dataset
         self.meta['@graph']['scidata'] = scidata
-        return curr_points
+        return new_points
 
     def dataseries(self, series: list) -> list:
         """Add one or more datapoints"""
-
+        new_series = []
         scidata: dict = self.meta['@graph']['scidata']
         dataset: dict = scidata['dataset']
         if 'dataseries' in dataset.keys():
             curr_series: list = dataset['dataseries']
         else:
             curr_series = []
-        uidindex = []
-
         for listentry in series:
-            item, uidindex = self.__iterate_function(listentry, uidindex)
-            curr_series.append(item)
+            item = self.__iterate_function(listentry)
+            item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'}}
+            matched_serie = 0
+            for serieitem in curr_series:
+                serie_item_noid = {
+                    k: serieitem[k] for k in set(
+                        list(
+                            serieitem.keys())) -
+                    {'@id'}}
+                if serie_item_noid == item_noid:
+                    matched_serie = serieitem
+            if matched_serie:
+                new_series.append(matched_serie)
+                self.uidindex.remove(item['@id'])
+            else:
+                new_series.append(item)
+                curr_series.append(item)
 
         dataset['dataseries'] = curr_series
         scidata['dataset'] = dataset
         self.meta['@graph']['scidata'] = scidata
-        return curr_series
-
-    def datagroup(self, groups: list) -> list:
-        """Add one or more datagroups"""
-        cnt_index = {}
-
-        def iteratedatagroup(it, level):
-            """ iteratedatagroup function """
-            if isinstance(it, str):
-                self.__addid(it)
-                return it
-            elif '@id' in it:
-                category = it['@id']
-            else:
-                category = 'undefined'
-            if category in cnt_index:
-                cnt_index[category] += 1
-            else:
-                cnt_index[category] = 1
-            cat_index.update({level: category})
-            uid = ''
-            for cat in cat_index.values():
-                uid += cat + '/' + str(cnt_index[cat]) + '/'
-            temp: dict = {'@id': uid, '@type': 'sdo:' + category}
-            if 'source' in it:
-                temp.update({'source': it['source']})
-
-            dset = self.meta['@graph']['scidata']['dataset']
-            pointlist = []
-            if 'datapoints' in it:
-                for x in it['datapoints']:
-                    if 'datapoint' in dset:
-                        cnt = len(dset['datapoint'])
-                    else:
-                        cnt = 0
-                    pointlist.append('datapoint/' + str(cnt) + '/')
-                    self.datapoint([x])
-                temp['datapoints'] = pointlist
-            if 'attribute' in it:
-                for x in it['attribute']:
-                    if 'attribute' in dset:
-                        cnt = len(dset['attribute'])
-                    else:
-                        cnt = 0
-                    pointlist.append('attribute/' + str(cnt) + '/')
-                    self.attribute([x])
-                temp['attribute'] = pointlist
-
-            return temp
-
-        scidata: dict = self.meta['@graph']['scidata']
-        dataset: dict = scidata['dataset']
-        if 'datagroup' in dataset.keys():
-            curr_groups: list = dataset['datagroup']
-        else:
-            curr_groups = []
-
-        for item in groups:
-            cat_index = {}
-            item = iteratedatagroup(item, 0)
-            curr_groups.append(item)
-
-        dataset['datagroup'] = curr_groups
-        scidata['dataset'] = dataset
-        self.meta['@graph']['scidata'] = scidata
-        return curr_groups
+        return new_series
 
     def sources(self, sources: list, replace=False) -> dict:
         """
@@ -697,15 +688,14 @@ class SciData:
         c = self.contexts
         n = self.nspaces
         b = self.baseurl
-        # con = c + [n, b]
         self.meta["@context"] = c + [n, b]
         return self.meta["@context"]
 
-    def __iterate_function(self, it, uidindex, uid=False):
+    def __iterate_function(self, it, uid=False):
 
         if isinstance(it, str):
             self.__addid(it)
-            return it, uidindex
+            return it
         prev_uid = uid
 
         # Set the category
@@ -726,9 +716,9 @@ class SciData:
             uid = uidsplit[0] + '/' + str(int(uidsplit[1]) + 1) + '/'
             return uid
 
-        while uid in uidindex:
+        while uid in self.uidindex:
             uid = enumuid(uid)
-        uidindex.append(uid)
+        self.uidindex.append(uid)
 
         temp: dict = {'@id': uid, '@type': 'sdo:' + category}
 
@@ -738,27 +728,25 @@ class SciData:
                 if isinstance(value, list):
                     listuid = uid
                     for i, listentry in enumerate(value):
-                        value[i], uidindex = self.__iterate_function(
-                            listentry, uidindex, listuid)
+                        value[i] = self.__iterate_function(
+                            listentry, listuid)
                     temp[key] = value
 
                 elif isinstance(value, dict):
-                    temp[key], uidindex = self.__iterate_function(
-                        value, uidindex, uid)
+                    temp[key] = self.__iterate_function(
+                        value, uid)
 
                 else:
                     temp[key] = value
                     self.__addid(value)
 
-        return temp, uidindex
-
+        return temp
 
     @property
     def output(self) -> dict:
         """
         Generates Scidata JSON-LD File
         """
-        # self.__addtoc()
         today = datetime.today()
         self.meta['generatedAt'] = today.strftime("%m-%d-%y %H:%M:%S")
 

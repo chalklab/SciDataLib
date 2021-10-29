@@ -423,99 +423,99 @@ def test_datapoint_nested(sd):
     assert sd.datapoint([dp1, dp2]) == [out_dp1, out_dp2]
 
 
-def test_datagroup_with_datapoints(sd):
-    sd.namespaces(
-        {
-            'gb': 'https://goldbook.iupac.org/terms/view/',
-            'qudt': 'http://qudt.org/vocab/unit/'
-        }
-    )
-    atid = 'numericvalue'
-    val1 = {'@id': atid, 'number': 0.99913, 'unitref': 'qudt:GM-PER-MilliL'}
-    val2 = {'@id': atid, 'number': 0.99823, 'unitref': 'qudt:GM-PER-MilliL'}
-    val3 = {'@id': atid, 'number': 0.99707, 'unitref': 'qudt:GM-PER-MilliL'}
-    pnt1 = {
-        '@id': 'datapoint',
-        'quantity': 'gb:D01590',
-        'conditions': 'condition/1/',
-        'value': val1
-    }
-    pnt2 = {
-        '@id': 'datapoint',
-        'quantity': 'gb:D01590',
-        'conditions': 'condition/2/',
-        'value': val2
-    }
-    pnt3 = {
-        '@id': 'datapoint',
-        'quantity': 'gb:D01590',
-        'conditions': 'condition/3/',
-        'value': val3
-    }
-    grp = {
-        '@id': 'datagroup',
-        'source': 'chemicalsystem/1/',
-        'datapoints': [pnt1, pnt2, pnt3]
-    }
-    out = {
-        "@id": "datagroup/1/",
-        "@type": "sdo:datagroup",
-        "source": "chemicalsystem/1/",
-        "datapoints": [
-            "datapoint/1/",
-            "datapoint/2/",
-            "datapoint/3/"
-        ]
-    }
-    assert sd.datagroup([grp]) == [out]
-
-
-def test_datagroup_with_attributes(sd):
-    sd.namespaces(
-        {
-            'gb': 'https://goldbook.iupac.org/terms/view/',
-            'qudt': 'http://qudt.org/vocab/unit/'
-        }
-    )
-
-    # Create an X data vector
-    datax = [0.1 * i for i in range(10)]
-
-    # Setup attributes of the X data
-    atid = 'numericvalue'
-    val1 = {'@id': atid, 'number': min(datax), 'unitref': 'qudt:PER-CentiM'}
-    val2 = {'@id': atid, 'number': max(datax), 'unitref': 'qudt:PER-CentiM'}
-    val3 = {'@id': atid, 'number': len(datax), 'unitref': 'qudt:PER-CentiM'}
-    pnt1 = {
-        '@id': 'attribute',
-        'quantity': 'gb:W06659',
-        'value': val1
-    }
-    pnt2 = {
-        '@id': 'attribute',
-        'quantity': 'gb:W06659',
-        'value': val2
-    }
-    pnt3 = {
-        '@id': 'attribute',
-        'quantity': 'gb:W06659',
-        'value': val3
-    }
-    grp = {
-        '@id': 'datagroup',
-        'attribute': [pnt1, pnt2, pnt3]
-    }
-    out = {
-        "@id": "datagroup/1/",
-        "@type": "sdo:datagroup",
-        "attribute": [
-            "attribute/1/",
-            "attribute/2/",
-            "attribute/3/"
-        ]
-    }
-    result = sd.datagroup([grp])
-    assert result == [out]
+# def test_datagroup_with_datapoints(sd):
+#     sd.namespaces(
+#         {
+#             'gb': 'https://goldbook.iupac.org/terms/view/',
+#             'qudt': 'http://qudt.org/vocab/unit/'
+#         }
+#     )
+#     atid = 'numericvalue'
+#     val1 = {'@id': atid, 'number': 0.99913, 'unitref': 'qudt:GM-PER-MilliL'}
+#     val2 = {'@id': atid, 'number': 0.99823, 'unitref': 'qudt:GM-PER-MilliL'}
+#     val3 = {'@id': atid, 'number': 0.99707, 'unitref': 'qudt:GM-PER-MilliL'}
+#     pnt1 = {
+#         '@id': 'datapoint',
+#         'quantity': 'gb:D01590',
+#         'conditions': 'condition/1/',
+#         'value': val1
+#     }
+#     pnt2 = {
+#         '@id': 'datapoint',
+#         'quantity': 'gb:D01590',
+#         'conditions': 'condition/2/',
+#         'value': val2
+#     }
+#     pnt3 = {
+#         '@id': 'datapoint',
+#         'quantity': 'gb:D01590',
+#         'conditions': 'condition/3/',
+#         'value': val3
+#     }
+#     grp = {
+#         '@id': 'datagroup',
+#         'source': 'chemicalsystem/1/',
+#         'datapoints': [pnt1, pnt2, pnt3]
+#     }
+#     out = {
+#         "@id": "datagroup/1/",
+#         "@type": "sdo:datagroup",
+#         "source": "chemicalsystem/1/",
+#         "datapoints": [
+#             "datapoint/1/",
+#             "datapoint/2/",
+#             "datapoint/3/"
+#         ]
+#     }
+#     assert sd.datagroup([grp]) == [out]
+#
+#
+# def test_datagroup_with_attributes(sd):
+#     sd.namespaces(
+#         {
+#             'gb': 'https://goldbook.iupac.org/terms/view/',
+#             'qudt': 'http://qudt.org/vocab/unit/'
+#         }
+#     )
+#
+#     # Create an X data vector
+#     datax = [0.1 * i for i in range(10)]
+#
+#     # Setup attributes of the X data
+#     atid = 'numericvalue'
+#     val1 = {'@id': atid, 'number': min(datax), 'unitref': 'qudt:PER-CentiM'}
+#     val2 = {'@id': atid, 'number': max(datax), 'unitref': 'qudt:PER-CentiM'}
+#     val3 = {'@id': atid, 'number': len(datax), 'unitref': 'qudt:PER-CentiM'}
+#     pnt1 = {
+#         '@id': 'attribute',
+#         'quantity': 'gb:W06659',
+#         'value': val1
+#     }
+#     pnt2 = {
+#         '@id': 'attribute',
+#         'quantity': 'gb:W06659',
+#         'value': val2
+#     }
+#     pnt3 = {
+#         '@id': 'attribute',
+#         'quantity': 'gb:W06659',
+#         'value': val3
+#     }
+#     grp = {
+#         '@id': 'datagroup',
+#         'attribute': [pnt1, pnt2, pnt3]
+#     }
+#     out = {
+#         "@id": "datagroup/1/",
+#         "@type": "sdo:datagroup",
+#         "attribute": [
+#             "attribute/1/",
+#             "attribute/2/",
+#             "attribute/3/"
+#         ]
+#     }
+#     result = sd.datagroup([grp])
+#     assert result == [out]
 
 
 def test_source(sd):

@@ -10,8 +10,8 @@ example = SciData(uid)
 example.context(
     ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
 )
-example.context(
-    'https://stuchalk.github.io/scidata/contexts/scidata2.jsonld', True)
+# example.context(
+#     'https://stuchalk.github.io/scidata/contexts/scidata2.jsonld', True)
 base = 'https://scidata.unf.edu/' + uid + '/'
 example.base(base)
 
@@ -176,24 +176,6 @@ facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
 example.facets(facets)
 
 # add to dataset (goes into dataseries, datagroup, and/or datapoint
-val4 = {'@id': 'value', 'number': 10.03}
-val5 = {
-    '@id': 'textvalue',
-    'text': 'The solution was clear, no reagent precipitation was observed.',
-    'textype': 'plain', 'language': 'en-us'}
-pnt1 = {
-    '@id': 'datapoint',
-    'quantity': 'gb:P04524',
-    'conditions': 'condition/1/',
-    'value': val4}
-pnt2 = {
-    '@id': 'datapoint',
-    'annotation': 'gb:P04524',
-    'conditions': 'Observation',
-    'value': val5}
-
-dps = [pnt1, pnt2]
-
 dp1_datum1 = {
     "@id": "datum",
     "@type": "sdo:exptdata",
@@ -260,59 +242,42 @@ dps = [dp1, dp2]
 
 example.datapoint(dps)
 
-ser1_input = {'colA': [1, 2, 3], 'colB': [1, 2, 3]}
-ser1_dataframe = pd.DataFrame(ser1_input)
-ser1_dataframe_str = pd.DataFrame(ser1_input).applymap(str)
-ser1_dict = ser1_dataframe.reset_index().to_dict(orient='list')
-del ser1_dict['index']
-ser1_dict_str = ser1_dataframe_str.reset_index().to_dict(orient='list')
-del ser1_dict_str['index']
-ser1_json = json.loads(ser1_dataframe.to_json(orient="split"))
-ser1_numpy_array = ser1_dataframe.to_numpy()
-ser1_numpy_list = ser1_numpy_array.tolist()
-ser1_numpy_json = json.dumps(ser1_numpy_list)
+seriesx = [
+    '107.9252',
+    '108.4073',
+    '108.8894',
+    '109.3715',
+    '109.8536',
+    '110.3358',
+    '110.8179',
+    '111.3000',
+    '111.7821']
+seriesy = [
+    '831.4121',
+    '833.1594',
+    '839.9602',
+    '848.9200',
+    '855.5815',
+    '860.6728',
+    '862.4740',
+    '859.3690',
+    '851.6688']
 
-dataser1 = {
-    '@id': 'dataseries',
-    'annotation': 'gb:P04524',
-    'conditions': 'Spectra',
-    # 'values_pandas_json': str(ser1_json)
-    # 'values_pandas_dict': str(ser1_dict)}
-    'values_numpy_array': str(ser1_numpy_array),
-    'values_numpy_list': str(ser1_numpy_list),
-    'values_numpy_json': str(ser1_numpy_json)}
-for k, v in ser1_dict.items():
-    dataser1.update({str(k): str(v)})
-for k, v in ser1_dict_str.items():
-    dataser1.update({str('str_' + k): v})
-
-ser2_input = {'colA': [10, 20, 30]}
-ser2_dataframe = pd.DataFrame(ser2_input)
-ser2_dataframe_str = pd.DataFrame(ser2_input).applymap(str)
-ser2_dict = ser2_dataframe.reset_index().to_dict(orient='list')
-del ser2_dict['index']
-ser2_dict_str = ser2_dataframe_str.reset_index().to_dict(orient='list')
-del ser2_dict_str['index']
-ser2_json = json.loads(ser2_dataframe.to_json(orient="split"))
-ser2_numpy_array = ser2_dataframe.to_numpy()
-ser2_numpy_list = ser2_numpy_array.tolist()
-ser2_numpy_json = json.dumps(ser2_numpy_list)
-
-dataser2 = {
-    '@id': 'dataseries',
-    'annotation': 'gb:P04524',
-    'conditions': 'Spectra',
-    # 'values_pandas_json': str(ser2_json),
-    # 'values_pandas_dict': str(ser2_dict),
-    'values_numpy_array': str(ser2_numpy_array),
-    'values_numpy_list': str(ser2_numpy_list),
-    'values_numpy_json': str(ser2_numpy_json)}
-for k, v in ser2_dict.items():
-    dataser2.update({str(k): str(v)})
-for k, v in ser2_dict_str.items():
-    dataser2.update({str('str_' + k): v})
-
-example.dataseries([dataser1, dataser2])
+dataser1 = {"@id": "dataseries",
+            "label": "Raman Spectroscopy",
+            "parameter": [{
+                "@id": "parameter",
+                "quantity": "Raman Shift",
+                "property": "Raman Shift",
+                "units": "1/cm",
+                "datatype": "decimal",
+                "dataarray": seriesx},
+                {"@id": "parameter",
+                 "quantity": "intensity",
+                 "property": "intensity",
+                 "datatype": "decimal",
+                 "dataarray": seriesy}]}
+example.dataseries([dataser1])
 
 
 # add source
@@ -328,4 +293,5 @@ holder = ', '.join([
 lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
 example.rights(holder, lic)
 
+# print(json.dumps(example.output, ensure_ascii=False))
 print(json.dumps(example.output, indent=4, ensure_ascii=False))
