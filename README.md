@@ -244,7 +244,7 @@ poetry run scidatalib --help
 #### Flake8 linting
 Run linting over the package with [flake8](https://flake8.pycqa.org/en/latest/) via:
 ```
-poetry run flake8 scidatalib/ tests/
+poetry run flake8 --count
 ```
 
 #### Pytest testing
