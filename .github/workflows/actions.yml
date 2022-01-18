@@ -56,7 +56,7 @@ jobs:
         run: |
           poetry update
           poetry build
-          poetry publish --username "__token__" --password $TEST_PYPI_TOKEN_PASSWORD
+          poetry publish --username "__token__" --password $PYPI_TOKEN_PASSWORD
 
       - name: Build Python package and Upload to TestPyPi
         shell: bash -l {0}
