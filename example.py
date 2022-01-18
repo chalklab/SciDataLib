@@ -71,7 +71,7 @@ procedure = {
         'allowed to equilibrate before the measurement was taken'
     )}
 aspects = [measurement, resource, procedure]
-example.aspects(aspects)
+# example.aspects(aspects)
 
 # add to system (data goes into the facets array)
 # for any field values using namespaces
@@ -173,7 +173,7 @@ con1 = {
     'value': val3}
 facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
 
-example.facets(facets)
+# example.facets(facets)
 
 # add to dataset (goes into dataseries, datagroup, and/or datapoint
 dp1_datum1 = {
@@ -240,7 +240,7 @@ dp2 = {
 
 dps = [dp1, dp2]
 
-example.datapoint(dps)
+# example.datapoint(dps)
 
 seriesx = [
     '107.9252',
@@ -296,7 +296,6 @@ holder = ', '.join([
     'University of North Florida'])
 lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
 example.rights(holder, lic)
-
 
 package = [{
         "aspects": [{

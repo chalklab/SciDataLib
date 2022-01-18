@@ -432,7 +432,7 @@ class SciData:
                     {'@id'}}
                 if aspect_item_noid == item_noid:
                     matched_aspect = aspectitem
-                    matched_aspect_id = aspectitem['@id']
+                    # matched_aspect_id = aspectitem['@id']
             if matched_aspect:
                 new_aspects.append(matched_aspect)
                 self.uidindex.remove(item['@id'])
@@ -611,16 +611,20 @@ class SciData:
         return new_group
 
     def scidatapackage(self, package):
-        """Add a package of data where the datapoints are linked with the associated aspects and facets
-        package = [{'aspects':{},'facets':{},'datapoint':{}},{'aspects':{},'facets':{},'datapoint':{}}]"""
+        """Add a package of data where the datapoints are linked
+            with the associated aspects and facets
+        package = [{'aspects':{},'facets':{},'datapoint':{}},
+            {'aspects':{},'facets':{},'datapoint':{}}]"""
         for packet in package:
             packet['facets'] = self.facets(packet['facets'])
             packet['aspects'] = self.aspects(packet['aspects'])
             atfacet = [a_dict["@id"] for a_dict in packet['facets']]
             ataspect = [a_dict["@id"] for a_dict in packet['aspects']]
             for dp in packet['dataset']:
-                dp.update({'facets#': atfacet})
-                dp.update({'aspects#': ataspect})
+                if atfacet:
+                    dp.update({'facets#': atfacet})
+                if ataspect:
+                    dp.update({'aspects#': ataspect})
             self.datapoint(packet['dataset'])
 
     def sources(self, sources: list, replace=False) -> dict:

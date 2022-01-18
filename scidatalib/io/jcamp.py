@@ -1169,31 +1169,32 @@ def _write_add_header_lines_system(scidata: SciData) -> List[str]:
     """
     lines = []
     graph = scidata.output.get("@graph")
-    system = graph.get("scidata").get("system")
+    system = graph.get("scidata").get("system", False)
 
     # Facets
-    facets = system.get("facets")
-    if facets:
-        for facet in facets:
-            if facet.get("@id").startswith("compound"):
-                if "casrn" in facet:
-                    lines.append(f'##CAS REGISTRY NO={facet["casrn"]}')
+    if system:
+        facets = system.get("facets", False)
+        if facets:
+            for facet in facets:
+                if facet.get("@id").startswith("compound"):
+                    if "casrn" in facet:
+                        lines.append(f'##CAS REGISTRY NO={facet["casrn"]}')
 
-                if "formula" in facet:
-                    lines.append(f'##MOLFORM={facet["formula"]}')
+                    if "formula" in facet:
+                        lines.append(f'##MOLFORM={facet["formula"]}')
 
-            if facet.get("@id").startswith("substance"):
-                if "phase" in facet:
-                    lines.append(f'##STATE={facet["phase"]}')
+                if facet.get("@id").startswith("substance"):
+                    if "phase" in facet:
+                        lines.append(f'##STATE={facet["phase"]}')
 
-            if facet.get("@id").startswith("condition"):
-                items = _PRESSURE_UNIT_MAP.items()
-                reverse_pressure_map = {v: k for k, v in items}
-                scidata_punit = facet["value"]["unitref"]
-                jcamp_punit = reverse_pressure_map[scidata_punit]
-                partial_pressure = f'{facet["value"]["number"]} '
-                partial_pressure += f'{jcamp_punit}'
-                lines.append(f'##PARTIAL_PRESSURE={partial_pressure}')
+                if facet.get("@id").startswith("condition"):
+                    items = _PRESSURE_UNIT_MAP.items()
+                    reverse_pressure_map = {v: k for k, v in items}
+                    scidata_punit = facet["value"]["unitref"]
+                    jcamp_punit = reverse_pressure_map[scidata_punit]
+                    partial_pressure = f'{facet["value"]["number"]} '
+                    partial_pressure += f'{jcamp_punit}'
+                    lines.append(f'##PARTIAL_PRESSURE={partial_pressure}')
 
     return '\n'.join(lines)
 
@@ -1210,50 +1211,51 @@ def _write_add_header_lines_dataset(scidata: SciData) -> List[str]:
     lines = []
 
     graph = scidata.output.get("@graph")
-    dataset = graph.get("scidata").get("dataset")
+    dataset = graph.get("scidata").get("dataset", False)
 
-    attributes = dataset["attribute"]
+    if dataset:
+        attributes = dataset.get("attribute", False)
 
-    reverse_xunit_map = {v: k for k, v in _XUNIT_MAP.items()}
-    scidata_xunits = attributes[0]["value"]["unitref"]
-    xunits = reverse_xunit_map[scidata_xunits]
+        reverse_xunit_map = {v: k for k, v in _XUNIT_MAP.items()}
+        scidata_xunits = attributes[0]["value"]["unitref"]
+        xunits = reverse_xunit_map[scidata_xunits]
 
-    scidata_yunits = attributes[0]["value"]["unitref"]
-    yunits = scidata_yunits
+        scidata_yunits = attributes[0]["value"]["unitref"]
+        yunits = scidata_yunits
 
-    npoints = attributes[0]["value"]["number"]
+        npoints = attributes[0]["value"]["number"]
 
-    first_x = attributes[1]["value"]["number"]
-    last_x = attributes[2]["value"]["number"]
-    min_x = attributes[3]["value"]["number"]
-    max_x = attributes[4]["value"]["number"]
-    xfactor = attributes[5]["value"]["number"]
+        first_x = attributes[1]["value"]["number"]
+        last_x = attributes[2]["value"]["number"]
+        min_x = attributes[3]["value"]["number"]
+        max_x = attributes[4]["value"]["number"]
+        xfactor = attributes[5]["value"]["number"]
 
-    first_y = attributes[6]["value"]["number"]
-    # last_y = attributes[7]["value"]["number"]
-    min_y = attributes[8]["value"]["number"]
-    max_y = attributes[9]["value"]["number"]
-    yfactor = attributes[10]["value"]["number"]
-    yunits = attributes[5]["value"]["unitref"]
-    delta_x = (float(last_x) - float(first_x)) / (float(npoints) - 1)
+        first_y = attributes[6]["value"]["number"]
+        # last_y = attributes[7]["value"]["number"]
+        min_y = attributes[8]["value"]["number"]
+        max_y = attributes[9]["value"]["number"]
+        yfactor = attributes[10]["value"]["number"]
+        yunits = attributes[5]["value"]["unitref"]
+        delta_x = (float(last_x) - float(first_x)) / (float(npoints) - 1)
 
-    lines.append(f'##XUNITS={xunits}')
-    lines.append(f'##YUNITS={yunits}')
-    lines.append(f'##XFACTOR={xfactor}')
-    lines.append(f'##YFACTOR={yfactor}')
-    lines.append(f'##DELTAX={delta_x:.6f}')
-    lines.append(f'##FIRSTX={first_x}')
-    lines.append(f'##LASTX={last_x}')
-    lines.append(f'##FIRSTY={first_y}')
-    lines.append(f'##MAXX={max_x}')
-    lines.append(f'##MINX={min_x}')
-    lines.append(f'##MAXY={max_y}')
-    lines.append(f'##MINY={min_y}')
-    lines.append(f'##NPOINTS={npoints}')
+        lines.append(f'##XUNITS={xunits}')
+        lines.append(f'##YUNITS={yunits}')
+        lines.append(f'##XFACTOR={xfactor}')
+        lines.append(f'##YFACTOR={yfactor}')
+        lines.append(f'##DELTAX={delta_x:.6f}')
+        lines.append(f'##FIRSTX={first_x}')
+        lines.append(f'##LASTX={last_x}')
+        lines.append(f'##FIRSTY={first_y}')
+        lines.append(f'##MAXX={max_x}')
+        lines.append(f'##MINX={min_x}')
+        lines.append(f'##MAXY={max_y}')
+        lines.append(f'##MINY={min_y}')
+        lines.append(f'##NPOINTS={npoints}')
 
-    description = graph.get("description")
-    xydata = _write_extract_description_section(description, "XYDATA")
-    lines.append(f'##XYDATA={xydata}')
+        description = graph.get("description")
+        xydata = _write_extract_description_section(description, "XYDATA")
+        lines.append(f'##XYDATA={xydata}')
 
     return '\n'.join(lines)
 
