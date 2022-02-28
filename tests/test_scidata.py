@@ -423,6 +423,103 @@ def test_datapoint_nested(sd):
     assert sd.datapoint([dp1, dp2]) == [out_dp1, out_dp2]
 
 
+def test_dataseries(sd):
+    series_x = [
+        '107.9252',
+        '108.4073',
+        '108.8894',
+        '109.3715',
+        '109.8536',
+        '110.3358',
+        '110.8179',
+        '111.3000',
+        '111.7821'
+    ]
+
+    series_y = [
+        '831.4121',
+        '833.1594',
+        '839.9602',
+        '848.9200',
+        '855.5815',
+        '860.6728',
+        '862.4740',
+        '859.3690',
+        '851.6688'
+    ]
+
+    dataseries_1 = {
+        "@id": "dataseries",
+        "label": "Raman Spectroscopy",
+        "parameter": [
+            {
+                "@id": "parameter",
+                "quantity": "Raman Shift",
+                "property": "Raman Shift",
+                "units": "1/cm",
+                "datatype": "decimal",
+                "dataarray": series_x
+            }, {
+                "@id": "parameter",
+                "quantity": "intensity",
+                "property": "intensity",
+                "datatype": "decimal",
+                "dataarray": series_y
+            }
+        ]
+    }
+
+    out = [
+      {
+        "@id": "dataseries/1/",
+        "@type": "sdo:dataseries",
+        "label": "Raman Spectroscopy",
+        "parameter": [
+          {
+            "@id": "dataseries/1/parameter/1/",
+            "@type": "sdo:parameter",
+            "quantity": "Raman Shift",
+            "property": "Raman Shift",
+            "units": "1/cm",
+            "datatype": "decimal",
+            "dataarray": [
+              "107.9252",
+              "108.4073",
+              "108.8894",
+              "109.3715",
+              "109.8536",
+              "110.3358",
+              "110.8179",
+              "111.3000",
+              "111.7821"
+            ]
+          },
+          {
+            "@id": "dataseries/1/parameter/2/",
+            "@type": "sdo:parameter",
+            "quantity": "intensity",
+            "property": "intensity",
+            "datatype": "decimal",
+            "dataarray": [
+              "831.4121",
+              "833.1594",
+              "839.9602",
+              "848.9200",
+              "855.5815",
+              "860.6728",
+              "862.4740",
+              "859.3690",
+              "851.6688"
+            ]
+          }
+        ]
+      }
+    ]
+
+    result = sd.dataseries([dataseries_1])
+    assert out == result
+
+
 @pytest.mark.skip(reason="Need to figure out the output format")
 def test_datagroup_with_datapoints(sd):
     sd.namespaces(
