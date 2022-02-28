@@ -456,13 +456,15 @@ def test_dataseries(sd):
                 "@id": "parameter",
                 "quantity": "Raman Shift",
                 "property": "Raman Shift",
-                "units": "1/cm",
+                "units":    "1/cm",
+                "axis":     "x-axis",
                 "datatype": "decimal",
                 "dataarray": series_x
             }, {
                 "@id": "parameter",
                 "quantity": "intensity",
                 "property": "intensity",
+                "axis":     "y-axis",
                 "datatype": "decimal",
                 "dataarray": series_y
             }
@@ -481,6 +483,7 @@ def test_dataseries(sd):
             "quantity": "Raman Shift",
             "property": "Raman Shift",
             "units": "1/cm",
+            "axis":     "x-axis",
             "datatype": "decimal",
             "dataarray": [
               "107.9252",
@@ -499,6 +502,7 @@ def test_dataseries(sd):
             "@type": "sdo:parameter",
             "quantity": "intensity",
             "property": "intensity",
+            "axis":     "y-axis",
             "datatype": "decimal",
             "dataarray": [
               "831.4121",
@@ -518,6 +522,9 @@ def test_dataseries(sd):
 
     result = sd.dataseries([dataseries_1])
     assert out == result
+
+    output_result = sd.output.get("@graph").get("scidata").get("dataset").get("dataseries")
+    assert out == output_result
 
 
 @pytest.mark.skip(reason="Need to figure out the output format")
