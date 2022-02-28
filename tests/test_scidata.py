@@ -523,7 +523,8 @@ def test_dataseries(sd):
     result = sd.dataseries([dataseries_1])
     assert out == result
 
-    output_result = sd.output.get("@graph").get("scidata").get("dataset").get("dataseries")
+    graph = sd.output.get("@graph")
+    output_result = graph.get("scidata").get("dataset").get("dataseries")
     assert out == output_result
 
 

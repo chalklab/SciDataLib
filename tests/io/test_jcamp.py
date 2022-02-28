@@ -597,21 +597,21 @@ def test_read_get_facets_section():
 
 
 def test_read_get_dataseries_subsection():
-    x = np.arange(0., 10., 0.1)
-    y = np.random.random(len(x))
+    xset = [str(x) for x in np.arange(0., 10., 0.1)]
+    yset = [str(y) for y in np.random.random(len(xset))]
     jcamp_dict = {
-        "x": x,
-        "y": y,
+        "x": xset,
+        "y": yset,
         "xunits": "1/CM",
     }
     result = jcamp._read_get_dataseries_subsection(jcamp_dict)
 
-    result_x = result[0]["parameter"]["valuearray"]["numberarray"]
-    result_y = result[1]["parameter"]["valuearray"]["numberarray"]
-    result_xunit = result[0]["parameter"]["valuearray"]["unitref"]
+    result_x = result[0]["parameter"][0]["dataarray"]
+    result_y = result[0]["parameter"][1]["dataarray"]
+    result_xunit = result[0]["parameter"][0]["unitref"]
 
-    assert list(x) == list(result_x)
-    assert list(y) == list(result_y)
+    assert list(xset) == list(result_x)
+    assert list(yset) == list(result_y)
     assert "qudt:PER-CentiM" == result_xunit
 
 
@@ -697,6 +697,10 @@ def test_read_jcamp_function(raman_tannic_acid_file):
     scidata_obj = jcamp.read_jcamp(raman_tannic_acid_file)
     assert type(scidata_obj) == SciData
 
+    dataset = scidata_obj.output.get("@graph").get("scidata").get("dataset")
+    dataseries = dataset.get("dataseries")[0]
+    assert dataseries.get("@id") == "dataseries/1/"
+
 
 def test_read_jcamp(raman_tannic_acid_file):
     scidata_obj = read(raman_tannic_acid_file, ioformat="jcamp")
@@ -729,7 +733,6 @@ def test_write_jcamp_function(tmp_path, raman_tannic_acid_file):
         assert result_list == target_list
 
 
-@pytest.mark.skip(reason="Missing dataseries for comparison")
 def test_write_jcamp(tmp_path, raman_tannic_acid_file):
     scidata = jcamp.read_jcamp(raman_tannic_acid_file.resolve())
     jcamp_dir = tmp_path / "jcamp"
