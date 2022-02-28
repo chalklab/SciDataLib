@@ -78,7 +78,6 @@ def test_read_rruff(raman_soddyite_file):
     assert facet["name"] == "Soddyite"
 
 
-@pytest.mark.skip(reason="Missing dataseries for comparison")
 def test_write_rruff(tmp_path, raman_soddyite_file):
     scidata = rruff.read_rruff(raman_soddyite_file.absolute())
     rruff_dir = tmp_path / "rruff"
