@@ -8,8 +8,6 @@ on:
   push:
     branches:
       - '*'
-    tags:
-      - 'v*'
 
 jobs:
   build:
@@ -47,24 +45,3 @@ jobs:
             poetry run pytest --cov=scidatalib --cov-report=term-missing tests/
             pip install coverage
             bash <(curl -s https://codecov.io/bash)
-
-      - name: Build Python package and Upload to TestPyPi
-        shell: bash -l {0}
-        if: startsWith( github.ref, 'refs/tags/v') && matrix.python-version == env.PYTHON_MAIN_VERSION
-        env:
-          TEST_PYPI_TOKEN_PASSWORD: ${{ secrets.TEST_PYPI_TOKEN }}
-        run: |
-          poetry update
-          poetry build
-          poetry config repositories.testpypi https://test.pypi.org/legacy/
-          poetry publish -r testpypi --username "__token__" --password $TEST_PYPI_TOKEN_PASSWORD
-
-      - name: Build Python package and Upload to PyPi
-        shell: bash -l {0}
-        if: startsWith( github.ref, 'refs/tags/v') && matrix.python-version == env.PYTHON_MAIN_VERSION
-        env:
-          PYPI_TOKEN_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-        run: |
-          poetry update
-          poetry build
-          poetry publish --username "__token__" --password $PYPI_TOKEN_PASSWORD
