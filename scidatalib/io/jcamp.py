@@ -885,7 +885,7 @@ def _read_get_datagroup_subsection(jcamp_dict: dict) -> List[dict]:
 
     # Create data group
     datagroup = {
-        "@id": "datagroup/1",
+        "@id": "datagroup",
         "type": "sdo:datagroup",
         "attribute": [
             attr_count,
@@ -904,8 +904,6 @@ def _read_get_datagroup_subsection(jcamp_dict: dict) -> List[dict]:
     return datagroup
 
 
-# TODO: add the dataseries
-#   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
 def _read_get_dataseries_subsection(jcamp_dict: dict) -> List[dict]:
     """
     Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
@@ -920,41 +918,27 @@ def _read_get_dataseries_subsection(jcamp_dict: dict) -> List[dict]:
 
     dataseries = [
         {
-            "@id": "dataseries/1/",
-            "@type": "sdo:independent",
-            "label": "Wave Numbers (cm^-1)",
-            "axis": "x-axis",
-            "parameter": {
-                "@id": "dataseries/1/parameter/",
-                "@type": "sdo:parameter",
-                "quantity": "wavenumbers",
-                "property": "Wave Numbers",
-                "valuearray": {
-                    "@id": "dataseries/1/parameter/valuearray/",
-                    "@type": "sdo:valuearray",
+            "@id": "dataseries",
+            "label": "Spectroscopy",
+            "parameter": [
+                {
+                    "@id": "parameter",
+                    "quantity": "Wave Numbers",
+                    "property": "Wave Numbers",
+                    "units": "1/cm",
+                    "axis": "x-axis",
                     "datatype": "decimal",
-                    "numberarray": jcamp_dict['x'],
+                    "dataarray": [str(x) for x in jcamp_dict['x']],
                     "unitref": xunitref,
-                }
-            }
-        },
-        {
-            "@id": "dataseries/2/",
-            "@type": "sdo:dependent",
-            "label": "Intensity (Arbitrary Units)",
-            "axis": "y-axis",
-            "parameter": {
-                "@id": "dataseries/2/parameter/",
-                "@type": "sdo:parameter",
-                "quantity": "intensity",
-                "property": "Intensity",
-                "valuearray": {
-                    "@id": "dataseries/2/parameter/valuearray/",
-                    "@type": "sdo:valuearray",
+                }, {
+                    "@id": "parameter",
+                    "quantity": "Intensity (Arbitrary Units)",
+                    "property": "Intensity (Arbitrary Units)",
+                    "axis": "y-axis",
                     "datatype": "decimal",
-                    "numberarray": jcamp_dict['y']
+                    "dataarray": [str(y) for y in jcamp_dict['y']],
                 }
-            }
+            ]
         }
     ]
 
@@ -1028,8 +1012,8 @@ def _read_translate_jcamp_to_scidata(jcamp_dict: dict) -> SciData:
     datagroup = _read_get_datagroup_subsection(jcamp_dict)
     scidata.datagroup([datagroup])
 
-    # TODO: add the dataseries
-    #   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
+    dataseries = _read_get_dataseries_subsection(jcamp_dict)
+    scidata.dataseries(dataseries)
 
     return scidata
 
@@ -1214,7 +1198,8 @@ def _write_add_header_lines_dataset(scidata: SciData) -> List[str]:
     dataset = graph.get("scidata").get("dataset", False)
 
     if dataset:
-        attributes = dataset.get("attribute", False)
+        datagroup = dataset.get("datagroup")[0]
+        attributes = datagroup.get("attribute", False)
 
         reverse_xunit_map = {v: k for k, v in _XUNIT_MAP.items()}
         scidata_xunits = attributes[0]["value"]["unitref"]
@@ -1308,21 +1293,18 @@ def _write_jcamp_data_section(
     :param mode: File mode to use (i.e. 'w' for overwrite, 'a' for append, ...)
     :param precision: Floating point number for formatting the output data
     """
-    pass
-    # TODO: add the dataseries
-    #   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
-    '''
-    graph = scidata.output.get("@graph")
-    dataset = graph.get("scidata").get("dataset")
-    dataseries = dataset.get("dataseries")
+
+    dataset = scidata.output.get("@graph").get("scidata").get("dataset")
+    dataseries = dataset.get("dataseries")[0]
+    parameters = dataseries.get("parameter")
     with open(filename, mode) as fileobj:
         xdata = []
         ydata = []
-        for data in dataseries:
+        for data in parameters:
             if data.get("axis") == "x-axis":
-                xdata = data["parameter"]["valuearray"]["numberarray"]
+                xdata = [float(x) for x in data["dataarray"]]
             if data.get("axis") == "y-axis":
-                ydata = data["parameter"]["valuearray"]["numberarray"]
+                ydata = [float(y) for y in data["dataarray"]]
 
         for x, y in zip(xdata, ydata):
             line = f' {x:.{precision}f},   {y:.{precision}f}'
@@ -1331,4 +1313,3 @@ def _write_jcamp_data_section(
                 yline = f'{y:.{precision}f}'[0:trim]
                 line = f' {xline},   {yline}'
             fileobj.write(f'{line}\n')
-    '''

@@ -220,8 +220,8 @@ def _read_translate_rruff_to_scidata(rruff_dict: dict) -> dict:
     datagroup = jcamp._read_get_datagroup_subsection(rruff_dict)
     scidata.datagroup([datagroup])
 
-    # TODO: add the dataseries
-    #   Issue: https://github.com/ChalkLab/SciDataLib/issues/43
+    dataseries = jcamp._read_get_dataseries_subsection(rruff_dict)
+    scidata.dataseries(dataseries)
 
     return scidata
 
