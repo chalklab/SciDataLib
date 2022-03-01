@@ -260,6 +260,10 @@ Get code coverage reporting using the [pytest-cov](https://pytest-cov.readthedoc
 poetry run pytest --cov=scidatalib --cov-report=term-missing tests/
 ```
 
+# Release
+
+For developers, please see [Release Workflow](https://github.com/ChalkLab/SciDataLib/wiki/Release-Workflow).
+
 # Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
