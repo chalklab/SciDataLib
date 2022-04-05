@@ -172,7 +172,7 @@ con1 = {
     'value': val3}
 facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
 
-# example.facets(facets)
+example.facets(facets)
 
 # add to dataset (goes into dataseries, datagroup, and/or datapoint
 dp1_datum1 = {
@@ -239,7 +239,7 @@ dp2 = {
 
 dps = [dp1, dp2]
 
-# example.datapoint(dps)
+example.datapoint(dps)
 
 seriesx = [
     '107.9252',
@@ -281,7 +281,10 @@ example.dataseries([dataser1])
 datagrp1 = {"@id": "datagroup",
             "label": "datagroup 1",
             "ids": ["datapoint/1/", "datapoint/2/"]}
-example.datagroup([datagrp1])
+datagrp2 = {"@id": "datagroup",
+            "label": "datagroup 2",
+            "ids": ["datapoint/3/", "datapoint/4/"]}
+example.datagroup([datagrp1, datagrp2])
 
 # add source
 src = {'citation': 'Chalk Research Group',
@@ -305,7 +308,10 @@ package = [{"aspects": [{"@id": "assay",
                         "@type": "sdo:compound",
                         "mw_freebase": "491.52",
                         "full_molformula": "C26H26FN5O4",
-                        "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"},
+                        "#intlinks": [{"@id": "identifier",
+                                       "@type": "sdo:identifier",
+                                       "standard_inchi_key":
+                                           "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
                        {"@id": "target",
                         "@type": "sdo:target",
                         "pref_name": "HERG",
@@ -328,7 +334,10 @@ package = [{"aspects": [{"@id": "assay",
                         "@type": "sdo:compound",
                         "mw_freebase": "491.52",
                         "full_molformula": "C26H26FN5O4",
-                        "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"},
+                        "#intlinks": [{"@id": "identifier",
+                                       "@type": "sdo:identifier",
+                                       "standard_inchi_key":
+                                           "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
                        {"@id": "target",
                         "@type": "sdo:target",
                         "pref_name": "HERG",
@@ -342,6 +351,7 @@ package = [{"aspects": [{"@id": "assay",
                                    "value":
                                        "12.300000000000000000000000000000",
                                    "units": "uM"}]}]}]
+
 
 example.scidatapackage(package)
 

@@ -244,52 +244,56 @@ def test_facets(sd):
            "mixtype": "sub:homogeneousSolution",
            "phase": "sub:liquid",
            "constituents":
-           [{"@id": "substance/1/constituent/1/",
-             "@type": "sdo:constituent",
-             "source": "compound/1/",
-             "role": "chm:analyte",
-             "properties": [
-                 {"@id": "substance/1/constituent/1/property/1/",
-                  "@type": "sdo:property",
-                  "quantity": "mass of substance per volume",
-                  "property": "Concentration (w/v)",
-                  "value": {
-                      "@id": "substance/1/constituent/1/property/1/value/1/",
-                      "@type": "sdo:value",
-                      "number": 2.99,
-                      "unitref": "qudt:PPM"}},
-                 {"@id": "substance/1/constituent/1/property/2/",
-                  "@type": "sdo:property",
-                  "quantity": "volume",
-                  "property": "Volume of solution",
-                  "value": {
-                      "@id": "substance/1/constituent/1/property/2/value/1/",
-                      "@type": "sdo:value",
-                      "number": 100.0,
-                      "unitref": "qudt:MilliL"}}]},
-            {"@id": "substance/1/constituent/2/",
-             "@type": "sdo:constituent",
-             "source": "compound/2/",
-             "role": "chm:reagent",
-             "properties": [
-                 {"@id": "substance/1/constituent/2/property/1/",
-                  "@type": "sdo:property",
-                  "quantity": "mass of substance per volume",
-                  "property": "Concentration (w/v)",
-                  "value": {
-                      "@id": "substance/1/constituent/2/property/1/value/1/",
-                      "@type": "sdo:value",
-                      "number": 2.99,
-                      "unitref": "qudt:PPM"}},
-                 {"@id": "substance/1/constituent/2/property/2/",
-                  "@type": "sdo:property",
-                  "quantity": "volume",
-                  "property": "Volume of solution",
-                  "value": {
-                      "@id": "substance/1/constituent/2/property/2/value/1/",
-                      "@type": "sdo:value",
-                      "number": 100.0,
-                      "unitref": "qudt:MilliL"}}]}],
+               [{"@id": "substance/1/constituent/1/",
+                 "@type": "sdo:constituent",
+                 "source": "compound/1/",
+                 "role": "chm:analyte",
+                 "properties": [
+                     {"@id": "substance/1/constituent/1/property/1/",
+                      "@type": "sdo:property",
+                      "quantity": "mass of substance per volume",
+                      "property": "Concentration (w/v)",
+                      "value": {
+                          "@id": "substance/1/constituent/1/"
+                                 "property/1/value/1/",
+                          "@type": "sdo:value",
+                          "number": 2.99,
+                          "unitref": "qudt:PPM"}},
+                     {"@id": "substance/1/constituent/1/property/2/",
+                      "@type": "sdo:property",
+                      "quantity": "volume",
+                      "property": "Volume of solution",
+                      "value": {
+                          "@id": "substance/1/constituent/1/"
+                                 "property/2/value/1/",
+                          "@type": "sdo:value",
+                          "number": 100.0,
+                          "unitref": "qudt:MilliL"}}]},
+                {"@id": "substance/1/constituent/2/",
+                 "@type": "sdo:constituent",
+                 "source": "compound/2/",
+                 "role": "chm:reagent",
+                 "properties": [
+                     {"@id": "substance/1/constituent/2/property/1/",
+                      "@type": "sdo:property",
+                      "quantity": "mass of substance per volume",
+                      "property": "Concentration (w/v)",
+                      "value": {
+                          "@id": "substance/1/constituent/2/"
+                                 "property/1/value/1/",
+                          "@type": "sdo:value",
+                          "number": 2.99,
+                          "unitref": "qudt:PPM"}},
+                     {"@id": "substance/1/constituent/2/property/2/",
+                      "@type": "sdo:property",
+                      "quantity": "volume",
+                      "property": "Volume of solution",
+                      "value": {
+                          "@id": "substance/1/constituent/2/"
+                                 "property/2/value/1/",
+                          "@type": "sdo:value",
+                          "number": 100.0,
+                          "unitref": "qudt:MilliL"}}]}],
            "properties": [{"@id": "substance/1/property/1/",
                            "@type": "sdo:property",
                            "quantity": "volume",
@@ -423,6 +427,35 @@ def test_datapoint_nested(sd):
     assert sd.datapoint([dp1, dp2]) == [out_dp1, out_dp2]
 
 
+def test_datagroup_with_datapoints(sd):
+    datagrp1 = {"@id": "datagroup",
+                "label": "datagroup 1",
+                "ids": ["datapoint/1/", "datapoint/2/"]}
+    datagrp2 = {"@id": "datagroup",
+                "label": "datagroup 2",
+                "ids": ["datapoint/3/", "datapoint/4/"]}
+
+    out = [{
+        "@id": "datagroup/1/",
+        "@type": "sdo:datagroup",
+        "label": "datagroup 1",
+        "ids": [
+            "datapoint/1/",
+            "datapoint/2/"
+        ]
+    },
+        {
+            "@id": "datagroup/2/",
+            "@type": "sdo:datagroup",
+            "label": "datagroup 2",
+            "ids": [
+                "datapoint/3/",
+                "datapoint/4/"
+            ]
+        }]
+    assert sd.datagroup([datagrp1, datagrp2]) == out
+
+
 def test_dataseries(sd):
     series_x = [
         '107.9252',
@@ -456,15 +489,15 @@ def test_dataseries(sd):
                 "@id": "parameter",
                 "quantity": "Raman Shift",
                 "property": "Raman Shift",
-                "units":    "1/cm",
-                "axis":     "x-axis",
+                "units": "1/cm",
+                "axis": "x-axis",
                 "datatype": "decimal",
                 "dataarray": series_x
             }, {
                 "@id": "parameter",
                 "quantity": "intensity",
                 "property": "intensity",
-                "axis":     "y-axis",
+                "axis": "y-axis",
                 "datatype": "decimal",
                 "dataarray": series_y
             }
@@ -472,52 +505,52 @@ def test_dataseries(sd):
     }
 
     out = [
-      {
-        "@id": "dataseries/1/",
-        "@type": "sdo:dataseries",
-        "label": "Raman Spectroscopy",
-        "parameter": [
-          {
-            "@id": "dataseries/1/parameter/1/",
-            "@type": "sdo:parameter",
-            "quantity": "Raman Shift",
-            "property": "Raman Shift",
-            "units": "1/cm",
-            "axis":     "x-axis",
-            "datatype": "decimal",
-            "dataarray": [
-              "107.9252",
-              "108.4073",
-              "108.8894",
-              "109.3715",
-              "109.8536",
-              "110.3358",
-              "110.8179",
-              "111.3000",
-              "111.7821"
+        {
+            "@id": "dataseries/1/",
+            "@type": "sdo:dataseries",
+            "label": "Raman Spectroscopy",
+            "parameter": [
+                {
+                    "@id": "dataseries/1/parameter/1/",
+                    "@type": "sdo:parameter",
+                    "quantity": "Raman Shift",
+                    "property": "Raman Shift",
+                    "units": "1/cm",
+                    "axis": "x-axis",
+                    "datatype": "decimal",
+                    "dataarray": [
+                        "107.9252",
+                        "108.4073",
+                        "108.8894",
+                        "109.3715",
+                        "109.8536",
+                        "110.3358",
+                        "110.8179",
+                        "111.3000",
+                        "111.7821"
+                    ]
+                },
+                {
+                    "@id": "dataseries/1/parameter/2/",
+                    "@type": "sdo:parameter",
+                    "quantity": "intensity",
+                    "property": "intensity",
+                    "axis": "y-axis",
+                    "datatype": "decimal",
+                    "dataarray": [
+                        "831.4121",
+                        "833.1594",
+                        "839.9602",
+                        "848.9200",
+                        "855.5815",
+                        "860.6728",
+                        "862.4740",
+                        "859.3690",
+                        "851.6688"
+                    ]
+                }
             ]
-          },
-          {
-            "@id": "dataseries/1/parameter/2/",
-            "@type": "sdo:parameter",
-            "quantity": "intensity",
-            "property": "intensity",
-            "axis":     "y-axis",
-            "datatype": "decimal",
-            "dataarray": [
-              "831.4121",
-              "833.1594",
-              "839.9602",
-              "848.9200",
-              "855.5815",
-              "860.6728",
-              "862.4740",
-              "859.3690",
-              "851.6688"
-            ]
-          }
-        ]
-      }
+        }
     ]
 
     result = sd.dataseries([dataseries_1])
@@ -528,55 +561,55 @@ def test_dataseries(sd):
     assert out == output_result
 
 
-@pytest.mark.skip(reason="Need to figure out the output format")
-def test_datagroup_with_datapoints(sd):
-    sd.namespaces(
-        {
-            'gb': 'https://goldbook.iupac.org/terms/view/',
-            'qudt': 'http://qudt.org/vocab/unit/'
-        }
-    )
-    atid = 'numericvalue'
-    val1 = {'@id': atid, 'number': 0.99913, 'unitref': 'qudt:GM-PER-MilliL'}
-    val2 = {'@id': atid, 'number': 0.99823, 'unitref': 'qudt:GM-PER-MilliL'}
-    val3 = {'@id': atid, 'number': 0.99707, 'unitref': 'qudt:GM-PER-MilliL'}
-    pnt1 = {
-        '@id': 'datapoint',
-        'quantity': 'gb:D01590',
-        'conditions': 'condition/1/',
-        'value': val1
-    }
-    pnt2 = {
-        '@id': 'datapoint',
-        'quantity': 'gb:D01590',
-        'conditions': 'condition/2/',
-        'value': val2
-    }
-    pnt3 = {
-        '@id': 'datapoint',
-        'quantity': 'gb:D01590',
-        'conditions': 'condition/3/',
-        'value': val3
-    }
-    grp = {
-        '@id': 'datagroup',
-        'source': 'chemicalsystem/1/',
-        'datapoints': [pnt1, pnt2, pnt3]
-    }
-    out = {
-        "@id": "datagroup/1/",
-        "@type": "sdo:datagroup",
-        "source": "chemicalsystem/1/",
-        "datapoints": [
-            "datapoint/1/",
-            "datapoint/2/",
-            "datapoint/3/"
-        ]
-    }
-
-    result = sd.datagroup([grp])
-
-    assert result == [out]
+# @pytest.mark.skip(reason="Need to figure out the output format")
+# def test_datagroup_with_datapoints(sd):
+#     sd.namespaces(
+#         {
+#             'gb': 'https://goldbook.iupac.org/terms/view/',
+#             'qudt': 'http://qudt.org/vocab/unit/'
+#         }
+#     )
+#     atid = 'numericvalue'
+#     val1 = {'@id': atid, 'number': 0.99913, 'unitref': 'qudt:GM-PER-MilliL'}
+#     val2 = {'@id': atid, 'number': 0.99823, 'unitref': 'qudt:GM-PER-MilliL'}
+#     val3 = {'@id': atid, 'number': 0.99707, 'unitref': 'qudt:GM-PER-MilliL'}
+#     pnt1 = {
+#         '@id': 'datapoint',
+#         'quantity': 'gb:D01590',
+#         'conditions': 'condition/1/',
+#         'value': val1
+#     }
+#     pnt2 = {
+#         '@id': 'datapoint',
+#         'quantity': 'gb:D01590',
+#         'conditions': 'condition/2/',
+#         'value': val2
+#     }
+#     pnt3 = {
+#         '@id': 'datapoint',
+#         'quantity': 'gb:D01590',
+#         'conditions': 'condition/3/',
+#         'value': val3
+#     }
+#     grp = {
+#         '@id': 'datagroup',
+#         'source': 'chemicalsystem/1/',
+#         'datapoints': [pnt1, pnt2, pnt3]
+#     }
+#     out = {
+#         "@id": "datagroup/1/",
+#         "@type": "sdo:datagroup",
+#         "source": "chemicalsystem/1/",
+#         "datapoints": [
+#             "datapoint/1/",
+#             "datapoint/2/",
+#             "datapoint/3/"
+#         ]
+#     }
+#
+#     result = sd.datagroup([grp])
+#
+#     assert result == [out]
 
 
 @pytest.mark.skip(reason="Need to figure out the output format")
