@@ -839,9 +839,16 @@ class SciData:
             if not self.meta['@graph']['scidata'][key]:
                 del self.meta['@graph']['scidata'][key]
         if self.meta['@graph']['scidata'].get('methodology'):
-            if not self.meta['@graph']['scidata'].get(
-                    'methodology', {}).get('aspects', False):
+            if not self.meta['@graph']['scidata']\
+                    .get('methodology', {}).get('aspects', False):
                 del self.meta['@graph']['scidata']['methodology']
+            else:
+                for x in self.meta['@graph']['scidata']['methodology']['aspects']:
+                    if x.get('#intlinks'):
+                        for y in x['#intlinks']:
+                            (self.meta['@graph']['scidata']
+                                ['methodology']['aspects'].append(y))
+                        x.pop('#intlinks', None)
         if self.meta['@graph']['scidata'].get('system'):
             if not self.meta['@graph']['scidata']\
                     .get('system', {}).get('facets', False):
