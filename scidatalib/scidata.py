@@ -843,7 +843,8 @@ class SciData:
                     .get('methodology', {}).get('aspects', False):
                 del self.meta['@graph']['scidata']['methodology']
             else:
-                for x in self.meta['@graph']['scidata']['methodology']['aspects']:
+                for x in (self.meta['@graph']['scidata']
+                          ['methodology']['aspects']):
                     if x.get('#intlinks'):
                         for y in x['#intlinks']:
                             (self.meta['@graph']['scidata']
