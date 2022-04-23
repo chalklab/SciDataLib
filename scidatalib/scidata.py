@@ -356,14 +356,19 @@ class SciData:
             for idee in ids:
                 if ':' in idee:
                     if idee.split(':')[0] not in self.nspaces.keys():
-                        print('Namespace ' + idee.split(':')[0] + ' not set')
+                        print('Note: Namespace <'
+                              + idee.split(':')[0]
+                              + "> not set. A crosswalk "
+                                "url prefix is likely not "
+                                "matched with it's linked namespace")
                         # raise EnvironmentError
                     curr_ids.append(idee)
         elif isinstance(ids, str):
             if ':' in ids:
                 if ids.split(':')[0] not in self.nspaces.keys():
-                    print('Namespace ' + ids.split(':')[0] +
-                          ' not set ' + str(self.nspaces.keys()))
+                    print('Note: Namespace <' + ids.split(':')[0]
+                          + "> not set. A crosswalk url prefix is "
+                            "likely not matched with it's linked namespace")
                     # raise EnvironmentError
                 curr_ids.append(ids)
         self.meta['@graph']['ids'] = sorted(set(curr_ids))
@@ -421,38 +426,42 @@ class SciData:
         methodology: dict = scidata['methodology']
         curr_aspects: list = methodology['aspects']
         for listentry in aspects:
-            item = self.__iterate_function(listentry, False, 'aspects')
-            item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'}}
-            if item_noid.get('#intlinks'):
-                item_noid_int = [{k: v for k, v in d.items() if k not in [
-                    '@id', '#aspects', '@type']} for
-                                 d in item_noid['#intlinks']]
-                item_noid['#intlinks'] = item_noid_int
-
-            matched_aspect = 0
-            for aspectitem in curr_aspects:
-                aspect_item_noid = {
-                    k: aspectitem[k] for k in set(
-                        list(
-                            aspectitem.keys())) - {'@id'}}
-                if aspect_item_noid.get('#intlinks'):
-                    aspect_item_noid_int = \
-                        [{k: v for k, v in d.items() if
-                          k not in ['@id', '#aspects', '@type']} for d in
-                         aspect_item_noid['#intlinks']]
-                    aspect_item_noid['#intlinks'] = aspect_item_noid_int
-                if aspect_item_noid == item_noid:
-                    matched_aspect = aspectitem
-
-            if matched_aspect:
-                self.uidindex.remove(item['@id'])
-                if item.get('#intlinks', None):
-                    for itemn in item['#intlinks']:
-                        self.uidindex.remove(itemn['@id'])
-                new_aspects.append(matched_aspect)
-            else:
-                new_aspects.append(item)
-                curr_aspects.append(item)
+            intlinklist = None
+            if '#intlinks' in listentry.keys():
+                intlinklist = listentry.pop('#intlinks')
+            rootitem = self.__iterate_function(listentry, False)
+            rootitemid = rootitem['@id']
+            itemlist = [rootitem]
+            if intlinklist:
+                for intlinkentry in intlinklist:
+                    intitem = (self.__iterate_function
+                               (intlinkentry, False))
+                    intitem.update({'aspects#': [rootitemid]})
+                    itemlist.append(intitem)
+            for n, item in enumerate(itemlist):
+                item_noid = {k: item[k] for k in
+                             set(list(item.keys())) - {'@id'} - {'aspects#'}}
+                matched_aspect = 0
+                for aspectitem in curr_aspects:
+                    aspect_item_noid = {
+                        k: aspectitem[k] for k in
+                        set(list(aspectitem.keys())) - {'@id'} - {'aspects#'}}
+                    if aspect_item_noid == item_noid:
+                        if n == 0:
+                            rootitemid = aspectitem['@id']
+                        if aspectitem.get('aspects#', None):
+                            item['aspects#'] = [rootitemid]
+                            if item['aspects#'][0] not in \
+                                    aspectitem['aspects#']:
+                                aspectitem['aspects#']\
+                                    .append(item['aspects#'][0])
+                        matched_aspect = aspectitem
+                if matched_aspect:
+                    self.uidindex.remove(item['@id'])
+                    new_aspects.append(matched_aspect)
+                else:
+                    new_aspects.append(item)
+                    curr_aspects.append(item)
         methodology['aspects'] = curr_aspects
         scidata['methodology'] = methodology
         self.meta['@graph']['scidata'] = scidata
@@ -465,38 +474,40 @@ class SciData:
         system: dict = scidata['system']
         curr_facets: list = system['facets']
         for listentry in facets:
-            item = self.__iterate_function(listentry, False, 'facets')
-            item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'}}
-            if item_noid.get('#intlinks'):
-                item_noid_int = [{k: v for k, v in d.items() if k not in [
-                    '@id', '#facets', '@type']} for
-                                 d in item_noid['#intlinks']]
-                item_noid['#intlinks'] = item_noid_int
-
-            matched_facet = 0
-            for facetitem in curr_facets:
-                facet_item_noid = {
-                    k: facetitem[k] for k in set(
-                        list(
-                            facetitem.keys())) - {'@id'}}
-                if facet_item_noid.get('#intlinks'):
-                    facet_item_noid_int = \
-                        [{k: v for k, v in d.items() if
-                          k not in ['@id', '#facets', '@type']} for
-                         d in facet_item_noid['#intlinks']]
-                    facet_item_noid['#intlinks'] = facet_item_noid_int
-                if facet_item_noid == item_noid:
-                    matched_facet = facetitem
-
-            if matched_facet:
-                self.uidindex.remove(item['@id'])
-                if item.get('#intlinks', None):
-                    for itemn in item['#intlinks']:
-                        self.uidindex.remove(itemn['@id'])
-                new_facets.append(matched_facet)
-            else:
-                new_facets.append(item)
-                curr_facets.append(item)
+            intlinklist = None
+            if '#intlinks' in listentry.keys():
+                intlinklist = listentry.pop('#intlinks')
+            rootitem = self.__iterate_function(listentry, False)
+            rootitemid = rootitem['@id']
+            itemlist = [rootitem]
+            if intlinklist:
+                for intlinkentry in intlinklist:
+                    intitem = self.__iterate_function(intlinkentry, False)
+                    intitem.update({'facets#': [rootitemid]})
+                    itemlist.append(intitem)
+            for n, item in enumerate(itemlist):
+                item_noid = {k: item[k] for k in
+                             set(list(item.keys())) - {'@id'} - {'facets#'}}
+                matched_facet = 0
+                for facetitem in curr_facets:
+                    facet_item_noid = {
+                        k: facetitem[k] for k in
+                        set(list(facetitem.keys())) - {'@id'} - {'facets#'}}
+                    if facet_item_noid == item_noid:
+                        if n == 0:
+                            rootitemid = facetitem['@id']
+                        if facetitem.get('facets#', None):
+                            item['facets#'] = [rootitemid]
+                            facetitem['facets#'].append(item['facets#'][0])
+                            facetitem['facets#'] = \
+                                list(set(facetitem['facets#']))
+                        matched_facet = facetitem
+                if matched_facet:
+                    self.uidindex.remove(item['@id'])
+                    new_facets.append(matched_facet)
+                else:
+                    new_facets.append(item)
+                    curr_facets.append(item)
         system['facets'] = curr_facets
         scidata['system'] = system
         self.meta['@graph']['scidata'] = scidata
@@ -766,7 +777,7 @@ class SciData:
         self.meta["@context"] = c + [n, b]
         return self.meta["@context"]
 
-    def __iterate_function(self, it, uid=False, sd=None):
+    def __iterate_function(self, it, uid=False):
         if isinstance(it, str):
             self.__addid(it)
             return it
@@ -775,8 +786,6 @@ class SciData:
         # Set the category
         if '@id' in it:
             category = it['@id']
-        # elif 'descriptors' in it or 'identifiers' in it:
-        #     category = 'compound'
         else:
             category = 'undefined'
 
@@ -795,27 +804,18 @@ class SciData:
         self.uidindex.append(uid)
 
         temp: dict = {'@id': uid, '@type': 'sdo:' + category}
-
         for key, value in it.items():
             if key != '@id':
-                if key == '#intlinks':
-                    for i, int_dict in enumerate(value):
-                        int_dict.update({'#' + sd: uid})
-                        temp.setdefault(
-                            key, []).append(
-                            self.__iterate_function(
-                                int_dict, False, None))
-
-                elif isinstance(value, list):
+                if isinstance(value, list):
                     listuid = uid
                     for i, listentry in enumerate(value):
                         value[i] = self.__iterate_function(
-                            listentry, listuid, None)
+                            listentry, listuid)
                     temp[key] = value
 
                 elif isinstance(value, dict):
                     temp[key] = self.__iterate_function(
-                        value, uid, None)
+                        value, uid)
 
                 else:
                     temp[key] = value
@@ -842,26 +842,10 @@ class SciData:
             if not self.meta['@graph']['scidata']\
                     .get('methodology', {}).get('aspects', False):
                 del self.meta['@graph']['scidata']['methodology']
-            else:
-                for x in (self.meta['@graph']['scidata']
-                          ['methodology']['aspects']):
-                    if x.get('#intlinks'):
-                        for y in x['#intlinks']:
-                            (self.meta['@graph']['scidata']
-                                ['methodology']['aspects'].append(y))
-                        x.pop('#intlinks', None)
         if self.meta['@graph']['scidata'].get('system'):
             if not self.meta['@graph']['scidata']\
                     .get('system', {}).get('facets', False):
                 del self.meta['@graph']['scidata']['system']
-            else:
-                for x in self.meta['@graph']['scidata']['system']['facets']:
-                    if x.get('#intlinks'):
-                        for y in x['#intlinks']:
-                            (self.meta['@graph']['scidata']
-                                ['system']['facets'].append(y))
-                        x.pop('#intlinks', None)
-
         if self.meta['@graph']['scidata'].get('dataset'):
             if not self.meta['@graph']['scidata'].get(
                     'dataset', {}).get('datapoint', False):
