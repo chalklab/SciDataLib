@@ -989,6 +989,9 @@ class SciData:
         if isinstance(it, str):
             self.__addid(it)
             return it
+        if isinstance(it, list):
+            if not all(isinstance(item, dict) for item in it):
+                return it
         prev_uid = uid
 
         # Set the category
@@ -1015,11 +1018,14 @@ class SciData:
         for key, value in it.items():
             if key != '@id':
                 if isinstance(value, list):
-                    listuid = uid
-                    for i, listentry in enumerate(value):
-                        value[i] = self.__iterate_function(
-                            listentry, listuid)
-                    temp[key] = value
+                    if not all(isinstance(item, dict) for item in value):
+                        temp[key] = value
+                    else:
+                        listuid = uid
+                        for i, listentry in enumerate(value):
+                            value[i] = self.__iterate_function(
+                                listentry, listuid)
+                        temp[key] = value
 
                 elif isinstance(value, dict):
                     temp[key] = self.__iterate_function(
