@@ -44,7 +44,7 @@ measurement = {
     '@id': 'measurement',
     'scope': 'resource/1/',
     'technique': 'Potentiometry',
-    'techniqueref': 'obo:OMIT_0005812'}
+    'technique#': 'obo:OMIT_0005812'}
 value = {
     '@id': 'textvalue',
     'text': 'true'}
@@ -168,7 +168,7 @@ con1 = {
     'scope': 'substance/1/',
     'quantity': 'temperature',
     'property': 'Ambient temperature',
-    'propertyref': 'gb:T06321',
+    'property#': 'gb:T06321',
     'value': val3}
 facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
 
