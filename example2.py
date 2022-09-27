@@ -23,28 +23,46 @@ def convert_rruff():
             seriesy.append(xy[1])
     rruff.update({'series': {'x': seriesx, 'y': seriesy}})
 
-    # create SciData
+    # initialize SciData object
     uid = 'ornl_rruff_' + rruff['rruffid']
     example2 = SciData(uid)
+
+    """ METADATA "FINDING AID" SECTION """
+
+    # add document base URL
     base = 'https://scidata.unf.edu/' + uid + '/'
+    context = 'https://stuchalk.github.io/scidata/contexts/crg_substance.jsonld'
+    example2.context(context)
     example2.base(base)
+
     # named graph parameters
-    example2.docid('rruff_' + rruff['rruffid'])
+    example2.docid('rruff_' + rruff['rruffid'])  # Graph name
     example2.version('1')
+
     # inside @graph
     example2.title(rruff['names'] + ' rruff file')
     mm = {'name': rruff['source']}
     example2.author([mm])
-    # description
+
+    # add description
     example2.description(rruff['description'])
-    # publisher
+
+    # add publisher
     example2.publisher(rruff['locality'])
+
+    # add permalink
     example2.permalink('https://' + rruff['url'])
-    # add scidata discipline and subdiscipline
+
+    # add discipline and subdiscipline (plus namespace)
     example2.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
     example2.discipline('w3i:Chemistry')
     example2.subdiscipline('w3i:MaterialsScience')
-    # add methodology
+
+    """ METHODOLOGY SECTION """
+    # methodology data goes into the aspects array in the JSON-LD file
+    # for any field values that use namespaces add the namespaces separately using .namespaces
+
+    # add measurement
     aspects = []
     example2.namespaces({'obo': 'http://purl.obolibrary.org/obo/', 'qudt': 'https://qudt.org/vocab/unit/'})
     measurement = {
@@ -62,7 +80,10 @@ def convert_rruff():
         ]}
     aspects.append(measurement)
     example2.aspects(aspects)
-    # add system
+
+    """ SYSTEM SECTION """
+
+    # add chemical substance
     facets = []
     name = 'uranyl silicate dihydrate'
     formula = rruff['ideal chemistry'].replace("_", "").replace("&#183;", ".")
@@ -72,13 +93,14 @@ def convert_rruff():
         'name': name,
         'formula': formula
     }
-    meta = requests.get('https://opsin.ch.cam.ac.uk/opsin/' + name).json()
+    meta = requests.get('https://opsin.ch.cam.ac.uk/opsin/' + name).json()  # get metadata from OPSIN
     ignore = ['status', 'message', 'cml', 'inchi']
     for key, value in meta.items():
         if key not in ignore:
             substance.update({key: value})
     facets.append(substance)
-    # mineral
+
+    # add minerals (named in title)
     mineral1 = {
         '@id': 'mineral',
         'name': 'malachite',
@@ -94,6 +116,9 @@ def convert_rruff():
     }
     facets.append(mineral2)
     example2.facets(facets)
+
+    """ DATASET SECTION """
+
     # dataset
     example2.namespaces({'all': 'http://purl.allotrope.org/ontologies/result#'})
     seriesx = rruff['series']['x']
@@ -109,17 +134,18 @@ def convert_rruff():
                 "units": "1/cm",
                 "units#": "qudt:PER-CentiM",
                 "datatype": "decimal",
-                "dataarray": seriesx
+                "data": seriesx
             },
             {
                 "@id": "parameter",
                 "quantity": "intensity",
                 "datatype": "decimal",
-                "dataarray": seriesy
+                "data": seriesy
             }
         ]
     }
     example2.dataseries([series])
+
     # add source
     src = {'citation': 'RRUFF Project', 'url': 'https://rruff.info/R060361'}
     example2.sources([src])

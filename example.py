@@ -2,368 +2,373 @@
 from scidatalib.scidata import SciData
 import json
 
-uid = 'example'
-example = SciData(uid)
 
-# context parameters
-example.context(
-    ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld']
-)
-# example.context(
-#     'https://stuchalk.github.io/scidata/contexts/scidata2.jsonld', True)
-base = 'https://scidata.unf.edu/' + uid + '/'
-example.base(base)
+def create_scidata():
+    # initialize SciData object
+    uid = 'example'
+    example = SciData(uid)
 
-# named graph parameters
-example.docid('pH')
-example.version('1')
+    """ METADATA "FINDING AID" SECTION """
 
-# inside @graph
-example.title('pH of cyanide standard')
-sjc = {'name': 'Stuart Chalk',
-       'organization': 'University of North Florida',
-       'orcid': 'https://orcid.org/0000-0002-0703-7776'}
-example.author([sjc])
-example.description(
-    ('Determination of the pH of a 3 ppm cyanide solution '
-     'after complete reaction'))
-example.publisher(
-    'Chalk Group, Department of Chemistry, University of North Florida')
-example.permalink('https://stuchalk.github.io/scidata/examples/ph_min.jsonld')
+    # context parameters
+    base = 'https://scidata.unf.edu/' + uid + '/'
+    context = 'https://stuchalk.github.io/scidata/contexts/scidata.jsonld'
+    example.context(context)
+    example.base(base)
 
-# add to scidata discipline and subdiscipline
-example.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
-example.discipline('w3i:Chemistry')
-example.subdiscipline('w3i:ChemicalInformatics')
+    # named graph parameters
+    example.docid('pH')
+    example.version('1')
 
-# add to methodology (data goes into the aspects array)
-# for any field values using namespaces
-# makes sure to add them using .add_namespace
-example.evaluation('experimental')
-measurement = {
-    '@id': 'measurement',
-    'scope': 'resource/1/',
-    'technique': 'Potentiometry',
-    'technique#': 'obo:OMIT_0005812'}
-value = {
-    '@id': 'textvalue',
-    'text': 'true'}
-settings = {
-    '@id': 'setting',
-    'category': 'instrument feature',
-    'type': 'temperature compensation',
-    'value': value}
-resource = {
-    '@id': 'resource',
-    'instrument': 'obo:CHMO_0002344',
-    'instrumentType': 'Temperature compensated pH electrode',
-    'name': 'Accumet Liquid-Filled pH/ATC Epoxy Body Combination Electrode',
-    'vendor': 'Fisher Scientific',
-    'catalognumber': '13-620-530A',
-    'settings': settings}
-procedure = {
-    '@id': 'procedure',
-    'description': (
-        'The pH electrode was calibrated at pH 7, pH 4, and pH 10 prior to '
-        'measurement. A portion of the solution was transferred to a beaker '
-        'and the DI water washed electrode wash placed in the solution and '
-        'allowed to equilibrate before the measurement was taken'
-    )}
-aspects = [measurement, resource, procedure]
-# example.aspects(aspects)
+    # inside @graph
+    example.title('pH of cyanide standard')
+    sjc = {'name': 'Stuart Chalk',
+           'organization': 'University of North Florida',
+           'orcid': 'https://orcid.org/0000-0002-0703-7776'}
+    example.author([sjc])
 
-# add to system (data goes into the facets array)
-# for any field values using namespaces
-# makes sure to add them using .add_namespace
-comp1 = {
-    '@id': 'compound',
-    'name': 'cyanide ion',
-    'inchi': 'InChI=1S/CN/c1-2/q-1',
-    'chebi': 'obo:CHEBI_17514'}
-comp2 = {
-    '@id': 'compound',
-    'name': 'phenolphthlin',
-    'inchi': 'InChI=1S/C6H6O/c7-6-4-2-1-3-5-6/h1-5,7H',
-    'chebi': 'obo:CHEBI_34915'}
-comp3 = {
-    '@id': 'compound',
-    'name': 'copper(II) ion',
-    'inchi': 'InChI=1S/Cu/q+2',
-    'chebi': 'obo:CHEBI_29036'}
-comp4 = {
-    '@id': 'compound',
-    'name': 'tetraborate ion',
-    'inchi': 'InChI=1S/B4H4O9/c5-1-9-3(7)11-2(6)12-4(8,10-1)13-3/h5-8H/q-2',
-    'chebi': 'obo:CHEBI_38889'}
-comp5 = {
-    '@id': 'compound',
-    'name': 'ethanol',
-    'inchi': 'InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3',
-    'chebi': 'obo:CHEBI_16236'}
-comp6 = {
-    '@id': 'compound',
-    'name': 'water',
-    'inchi': 'InChI=1S/H2O/h1H2',
-    'chebi': 'obo:CHEBI_15377'}
+    # add description
+    example.description('Determination of the pH of a 3 ppm cyanide solution after complete reaction')
 
-val1 = {'@id': 'value', 'number': 2.99, 'unitref': 'qudt:PPM'}
-val2 = {'@id': 'value', 'number': 100.0, 'unitref': 'qudt:MilliL'}
-val3 = {'@id': 'value', 'number': 22.8, 'unitref': 'qudt:DEG_C'}
+    # add publisher
+    example.publisher('Chalk Group, Department of Chemistry, University of North Florida')
 
-prp1 = {
-    '@id': 'property',
-    'quantity': 'mass of substance per volume',
-    'property': 'Concentration (w/v)',
-    'value': val1}
-prp2 = {
-    '@id': 'property',
-    'quantity': 'volume',
-    'property': 'Volume of solution',
-    'value': val2}
-example.namespaces(
-    {"chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
-con1 = {
-    '@id': 'constituent',
-    'source': 'compound/1/',
-    'role': 'chm:analyte',
-    'properties': [prp1, prp2]
-}
-con2 = {
-    '@id': 'constituent',
-    'source': 'compound/2/',
-    'role': 'chm:reagent',
-    'properties': [prp1, prp2]}
-con3 = {
-    '@id': 'constituent',
-    'source': 'compound/3/',
-    'role': 'chm:reagent'}
-con4 = {
-    '@id': 'constituent',
-    'source': 'compound/4/',
-    'role': 'chm:buffer'}
-con5 = {
-    '@id': 'constituent',
-    'source': 'compound/5/',
-    'role': 'chm:solvent'}
-con6 = {
-    '@id': 'constituent',
-    'source': 'compound/6/',
-    'role': 'chm:solvent'}
-cons = [con1, con2, con3, con4, con5, con6]
+    # add permalink
+    example.permalink('https://stuchalk.github.io/scidata/examples/ph_min.jsonld')
 
-example.namespaces(
-    {'sub': 'https://stuchalk.github.io/scidata/ontology/substance.owl#',
-     'gb': 'https://goldbook.iupac.org/'})
-sub1 = {
-    '@id': 'substance',
-    'title': '3 ppm cyanide standard solution',
-    'aggregation': 'sub:aq',
-    'mixtype': 'sub:homogeneousSolution',
-    'phase': 'sub:liquid',
-    'constituents': cons,
-    'properties': [prp2]}
-con1 = {
-    '@id': 'condition',
-    'source': 'measurement/1/',
-    'scope': 'substance/1/',
-    'quantity': 'temperature',
-    'property': 'Ambient temperature',
-    'property#': 'gb:T06321',
-    'value': val3}
-facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
+    # add discipline and subdiscipline (plus namespace)
+    example.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
+    example.discipline('w3i:Chemistry')
+    example.subdiscipline('w3i:ChemicalInformatics')
 
-example.facets(facets)
+    """ METHODOLOGY SECTION """
+    # methodology data goes into the aspects array in the JSON-LD file
+    # for any field values that use namespaces add the namespaces separately using .namespaces
 
-# add to dataset (goes into dataseries, datagroup, and/or datapoint
-dp1_datum1 = {
-    "@id": "datum",
-    "@type": "sdo:exptdata",
-    "type": "IC50",
-    "value": {
-        "@id": "value",
-        "@type": "sdo:value",
-        "relation": "=",
-        "units": "uM",
-        "value": "19.000000000000000000000000000000"
+    # add the type of methodology - experimental, computational, etc.
+    example.evaluation('experimental')
+
+    # add measurement
+    measurement = {
+        '@id': 'measurement',
+        'scope': 'resource/1/',
+        'technique': 'Potentiometry',
+        'technique#': 'obo:OMIT_0005812'}
+    value = {
+        '@id': 'textvalue',
+        'text': 'true'}
+    settings = {
+        '@id': 'setting',
+        'category': 'instrument feature',
+        'type': 'temperature compensation',
+        'value': value}
+    resource = {
+        '@id': 'resource',
+        'instrument': 'obo:CHMO_0002344',
+        'instrumentType': 'Temperature compensated pH electrode',
+        'name': 'Accumet Liquid-Filled pH/ATC Epoxy Body Combination Electrode',
+        'vendor': 'Fisher Scientific',
+        'catalognumber': '13-620-530A',
+        'settings': settings}
+    procedure = {
+        '@id': 'procedure',
+        'description': (
+            'The pH electrode was calibrated at pH 7, pH 4, and pH 10 prior to '
+            'measurement. A portion of the solution was transferred to a beaker '
+            'and the DI water washed electrode wash placed in the solution and '
+            'allowed to equilibrate before the measurement was taken'
+        )}
+    aspects = [measurement, resource, procedure]
+    # example.aspects(aspects)
+
+    # add to system (data goes into the facets array)
+    # for any field values using namespaces
+    # makes sure to add them using .add_namespace
+    comp1 = {
+        '@id': 'substance',
+        'name': 'cyanide ion',
+        'inchi': 'InChI=1S/CN/c1-2/q-1',
+        'chebi': 'obo:CHEBI_17514'}
+    comp2 = {
+        '@id': 'substance',
+        'name': 'phenolphthlin',
+        'inchi': 'InChI=1S/C6H6O/c7-6-4-2-1-3-5-6/h1-5,7H',
+        'chebi': 'obo:CHEBI_34915'}
+    comp3 = {
+        '@id': 'substance',
+        'name': 'copper(II) ion',
+        'inchi': 'InChI=1S/Cu/q+2',
+        'chebi': 'obo:CHEBI_29036'}
+    comp4 = {
+        '@id': 'substance',
+        'name': 'tetraborate ion',
+        'inchi': 'InChI=1S/B4H4O9/c5-1-9-3(7)11-2(6)12-4(8,10-1)13-3/h5-8H/q-2',
+        'chebi': 'obo:CHEBI_38889'}
+    comp5 = {
+        '@id': 'substance',
+        'name': 'ethanol',
+        'inchi': 'InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3',
+        'chebi': 'obo:CHEBI_16236'}
+    comp6 = {
+        '@id': 'substance',
+        'name': 'water',
+        'inchi': 'InChI=1S/H2O/h1H2',
+        'chebi': 'obo:CHEBI_15377'}
+
+    val1 = {'@id': 'value', 'number': 2.99, 'unitref': 'qudt:PPM'}
+    val2 = {'@id': 'value', 'number': 100.0, 'unitref': 'qudt:MilliL'}
+    val3 = {'@id': 'value', 'number': 22.8, 'unitref': 'qudt:DEG_C'}
+
+    prp1 = {
+        '@id': 'property',
+        'quantity': 'mass of substance per volume',
+        'property': 'Concentration (w/v)',
+        'value': val1}
+    prp2 = {
+        '@id': 'property',
+        'quantity': 'volume',
+        'property': 'Volume of solution',
+        'value': val2}
+    example.namespaces(
+        {"chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
+    con1 = {
+        '@id': 'constituent',
+        'source': 'substance/1/',
+        'role': 'chm:analyte',
+        'properties': [prp1, prp2]
     }
-}
+    con2 = {
+        '@id': 'constituent',
+        'source': 'substance/2/',
+        'role': 'chm:reagent',
+        'properties': [prp1, prp2]}
+    con3 = {
+        '@id': 'constituent',
+        'source': 'substance/3/',
+        'role': 'chm:reagent'}
+    con4 = {
+        '@id': 'constituent',
+        'source': 'substance/4/',
+        'role': 'chm:buffer'}
+    con5 = {
+        '@id': 'constituent',
+        'source': 'substance/5/',
+        'role': 'chm:solvent'}
+    con6 = {
+        '@id': 'constituent',
+        'source': 'substance/6/',
+        'role': 'chm:solvent'}
+    cons = [con1, con2, con3, con4, con5, con6]
 
-dp1_datum2 = {
-    "@id": "datum",
-    "@type": "sdo:deriveddata",
-    "value": {
-        "standard_relation": "=",
-        "@id": "value",
-        "@type": "sdo:value",
-        "standard_value": "19000.000000000000000000000000000000",
-        "standard_units": "nM",
-        "standard_type": "IC50",
-        "pchembl_value": "4.72",
-        "uo_units": "obo:UO_0000065",
-        "qudt_units": "qudt:NanoMOL-PER-L"
+    example.namespaces(
+        {'sub': 'https://stuchalk.github.io/scidata/ontology/substance.owl#',
+         'gb': 'https://goldbook.iupac.org/'})
+    sub1 = {
+        '@id': 'substance',
+        'title': '3 ppm cyanide standard solution',
+        'aggregation': 'sub:aq',
+        'mixtype': 'sub:homogeneousSolution',
+        'phase': 'sub:liquid',
+        'constituents': cons,
+        'properties': [prp2]}
+    con1 = {
+        '@id': 'condition',
+        'source': 'measurement/1/',
+        'scope': 'substance/1/',
+        'quantity': 'temperature',
+        'property': 'Ambient temperature',
+        'property#': 'gb:T06321',
+        'value': val3}
+    facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
+
+    example.facets(facets)
+
+    # add to dataset (goes into dataseries, datagroup, and/or datapoint
+    dp1_datum1 = {
+        "@id": "datum",
+        "@type": "sdo:exptdata",
+        "type": "IC50",
+        "value": {
+            "@id": "value",
+            "@type": "sdo:value",
+            "relation": "=",
+            "units": "uM",
+            "value": "19.000000000000000000000000000000"
+        }
     }
-}
 
-dp1_datum3 = {
-    "@id": "datum",
-    "@type": "sdo:None",
-    "value": {
-        "standard_flag": "1",
-        "@id": "value",
-        "@type": "sdo:value",
-        "activity_id": "16464576"
+    dp1_datum2 = {
+        "@id": "datum",
+        "@type": "sdo:deriveddata",
+        "value": {
+            "standard_relation": "=",
+            "@id": "value",
+            "@type": "sdo:value",
+            "standard_value": "19000.000000000000000000000000000000",
+            "standard_units": "nM",
+            "standard_type": "IC50",
+            "pchembl_value": "4.72",
+            "uo_units": "obo:UO_0000065",
+            "qudt_units": "qudt:NanoMOL-PER-L"
+        }
     }
-}
 
-dp1 = {
-    "@id": "datapoint",
-    "@type": "sdo:datapoint",
-    "activity_id": 16464576,
-    "assay": "CHEMBL3767769",
-    "data": [dp1_datum1, dp1_datum2, dp1_datum3]
-}
-
-# Input datapoint 2
-dp2 = {
-    "@id": "datapoint",
-    "annotation": "gb:P04524",
-    "conditions": "Observation",
-    "value": {
-        "@id": "textvalue",
-        "text":
-            "The solution was clear, no reagent precipitation was observed.",
-        "textype": "plain",
-        "language": "en-us"
+    dp1_datum3 = {
+        "@id": "datum",
+        "@type": "sdo:None",
+        "value": {
+            "standard_flag": "1",
+            "@id": "value",
+            "@type": "sdo:value",
+            "activity_id": "16464576"
+        }
     }
-}
 
-dps = [dp1, dp2]
+    dp1 = {
+        "@id": "datapoint",
+        "@type": "sdo:datapoint",
+        "activity_id": 16464576,
+        "assay": "CHEMBL3767769",
+        "data": [dp1_datum1, dp1_datum2, dp1_datum3]
+    }
 
-example.datapoint(dps)
+    # Input datapoint 2
+    dp2 = {
+        "@id": "datapoint",
+        "annotation": "gb:P04524",
+        "conditions": "Observation",
+        "value": {
+            "@id": "textvalue",
+            "text":
+                "The solution was clear, no reagent precipitation was observed.",
+            "textype": "plain",
+            "language": "en-us"
+        }
+    }
 
-seriesx = [
-    '107.9252',
-    '108.4073',
-    '108.8894',
-    '109.3715',
-    '109.8536',
-    '110.3358',
-    '110.8179',
-    '111.3000',
-    '111.7821']
-seriesy = [
-    '831.4121',
-    '833.1594',
-    '839.9602',
-    '848.9200',
-    '855.5815',
-    '860.6728',
-    '862.4740',
-    '859.3690',
-    '851.6688']
+    dps = [dp1, dp2]
 
-dataser1 = {"@id": "dataseries",
-            "label": "Raman Spectroscopy",
-            "parameter": [{
-                "@id": "parameter",
-                "quantity": "Raman Shift",
-                "property": "Raman Shift",
-                "units": "1/cm",
-                "datatype": "decimal",
-                "dataarray": seriesx},
-                {"@id": "parameter",
-                 "quantity": "intensity",
-                 "property": "intensity",
-                 "datatype": "decimal",
-                 "dataarray": seriesy}]}
-example.dataseries([dataser1])
+    example.datapoint(dps)
 
-datagrp1 = {"@id": "datagroup",
-            "label": "datagroup 1",
-            "ids": ["datapoint/1/", "datapoint/2/"]}
-datagrp2 = {"@id": "datagroup",
-            "label": "datagroup 2",
-            "ids": ["datapoint/3/", "datapoint/4/"]}
-example.datagroup([datagrp1, datagrp2])
+    seriesx = [
+        '107.9252',
+        '108.4073',
+        '108.8894',
+        '109.3715',
+        '109.8536',
+        '110.3358',
+        '110.8179',
+        '111.3000',
+        '111.7821']
+    seriesy = [
+        '831.4121',
+        '833.1594',
+        '839.9602',
+        '848.9200',
+        '855.5815',
+        '860.6728',
+        '862.4740',
+        '859.3690',
+        '851.6688']
 
-# add source
-src = {'citation': 'Chalk Research Group',
-       'url': 'https://stuchalk.github.io/scidata/examples/ph_min.jsonld'}
-example.sources([src])
+    dataser1 = {"@id": "dataseries",
+                "label": "Raman Spectroscopy",
+                "parameter": [{
+                    "@id": "parameter",
+                    "quantity": "Raman Shift",
+                    "property": "Raman Shift",
+                    "units": "1/cm",
+                    "datatype": "decimal",
+                    "dataarray": seriesx},
+                    {"@id": "parameter",
+                     "quantity": "intensity",
+                     "property": "intensity",
+                     "datatype": "decimal",
+                     "dataarray": seriesy}]}
+    example.dataseries([dataser1])
 
-# add rights
-holder = ', '.join([
-    'Chalk Research Group',
-    'Department of Chemistry',
-    'University of North Florida'])
-lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
-example.rights(holder, lic)
+    datagrp1 = {"@id": "datagroup",
+                "label": "datagroup 1",
+                "ids": ["datapoint/1/", "datapoint/2/"]}
+    datagrp2 = {"@id": "datagroup",
+                "label": "datagroup 2",
+                "ids": ["datapoint/3/", "datapoint/4/"]}
+    example.datagroup([datagrp1, datagrp2])
 
-packet = [{
-    "aspects":
-        [{"@id": "assay",
-          "@type": "sdo:assay",
-          "description": "Inhibition of human "
-                         "ERG by MK499 binding assay",
-          "assay_organism": "Homo sapiens"}],
-    "facets": [
-        {"@id": "compound",
-         "@type": "sdo:compound",
-         "mw_freebase": "491.52",
-         "full_molformula": "C26H26FN5O4",
-         "#intlinks": [
-             {"@id": "identifier",
-              "@type": "sdo:identifier",
-              "standard_inchi_key":
-                  "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
-        {"@id": "target",
-         "@type": "sdo:target",
-         "pref_name": "HERG",
-         "tax_id": 9606,
-         "organism": "Homo sapiens"}],
-    "dataset": [
-        {"@id": "datapoint",
-         "@type": "sdo:datapoint",
-         "data": [
-             {"@id": "datum",
-              "@type": "sdo:exptdata",
-              "type": "IC50",
-              "value":
-                  "15.200000000000000000000000000000",
-              "units": "uM"}]}]}, {
-    "aspects": [
-        {"@id": "assay",
-         "@type": "sdo:assay",
-         "description": "Inhibition of human ERG "
-                        "by MK499 binding assay",
-         "assay_organism": "Homo sapiens"}],
-    "facets": [
-        {"@id": "compound",
-         "@type": "sdo:compound",
-         "mw_freebase": "491.52",
-         "full_molformula": "C26H26FN5O4",
-         "#intlinks": [
-             {"@id": "identifier",
-              "@type": "sdo:identifier",
-              "standard_inchi_key":
-                  "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
-        {"@id": "target",
-         "@type": "sdo:target",
-         "pref_name": "HERG",
-         "tax_id": 9606,
-         "organism": "Homo sapiens"}],
-    "dataset": [
-        {"@id": "datapoint",
-         "@type": "sdo:datapoint",
-         "data": [
-             {"@id": "datum",
-              "@type": "sdo:exptdata",
-              "type": "IC50",
-              "value":
-                  "12.300000000000000000000000000000",
-              "units": "uM"}]}]}]
+    # add source
+    src = {'citation': 'Chalk Research Group',
+           'url': 'https://stuchalk.github.io/scidata/examples/ph_min.jsonld'}
+    example.sources([src])
 
-example.scidatapacket(packet)
+    # add rights
+    holder = ', '.join([
+        'Chalk Research Group',
+        'Department of Chemistry',
+        'University of North Florida'])
+    lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
+    example.rights(holder, lic)
 
-# print(json.dumps(example.output, ensure_ascii=False))
-print(json.dumps(example.output, indent=4, ensure_ascii=False))
+    packet = [{
+        "aspects":
+            [{"@id": "assay",
+              "@type": "sdo:assay",
+              "description": "Inhibition of human hERG by MK499 binding assay",
+              "assay_organism": "Homo sapiens"}],
+        "facets": [
+            {"@id": "substance",
+             "mw_freebase": "491.52",
+             "full_molformula": "C26H26FN5O4",
+             "#intlinks": [
+                 {"@id": "identifier",
+                  "standard_inchi_key":
+                      "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
+            {"@id": "target",
+             "@type": "sdo:target",
+             "pref_name": "HERG",
+             "tax_id": 9606,
+             "organism": "Homo sapiens"}],
+        "dataset": [
+            {"@id": "datapoint",
+             "@type": "sdo:datapoint",
+             "data": [
+                 {"@id": "datum",
+                  "@type": "sdo:exptdata",
+                  "type": "IC50",
+                  "value":
+                      "15.200000000000000000000000000000",
+                  "units": "uM"}]}]}, {
+        "aspects": [
+            {"@id": "assay",
+             "@type": "sdo:assay",
+             "description": "Inhibition of human ERG "
+                            "by MK499 binding assay",
+             "assay_organism": "Homo sapiens"}],
+        "facets": [
+            {"@id": "substance",
+             "mw_freebase": "491.52",
+             "full_molformula": "C26H26FN5O4",
+             "#intlinks": [
+                 {"@id": "identifier",
+                  "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
+            {"@id": "target",
+             "@type": "sdo:target",
+             "pref_name": "HERG",
+             "tax_id": 9606,
+             "organism": "Homo sapiens"}],
+        "dataset": [
+            {"@id": "datapoint",
+             "@type": "sdo:datapoint",
+             "data": [
+                 {"@id": "datum",
+                  "@type": "sdo:exptdata",
+                  "type": "IC50",
+                  "value":
+                      "12.300000000000000000000000000000",
+                  "units": "uM"}]}]}]
+
+    example.scidatapacket(packet)
+
+    # print(json.dumps(example.output, ensure_ascii=False))
+    print(json.dumps(example.output, indent=4, ensure_ascii=False))
+
+create_scidata()
