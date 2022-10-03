@@ -60,11 +60,13 @@ def convert_rruff():
 
     """ METHODOLOGY SECTION """
     # methodology data goes into the aspects array in the JSON-LD file
-    # for any field values that use namespaces add the namespaces separately using .namespaces
+    # for any field values that use namespaces add the namespaces separately
+    # using .namespaces
 
     # add measurement
     aspects = []
-    example2.namespaces({'obo': 'http://purl.obolibrary.org/obo/', 'qudt': 'https://qudt.org/vocab/unit/'})
+    example2.namespaces({'obo': 'http://purl.obolibrary.org/obo/',
+                        'qudt': 'https://qudt.org/vocab/unit/'})
     measurement = {
         '@id': 'measurement',
         'technique': 'Raman',
@@ -93,7 +95,9 @@ def convert_rruff():
         'name': name,
         'formula': formula
     }
-    meta = requests.get('https://opsin.ch.cam.ac.uk/opsin/' + name).json()  # get metadata from OPSIN
+    meta = requests.get(
+        'https://opsin.ch.cam.ac.uk/opsin/' +
+        name).json()  # get metadata from OPSIN
     ignore = ['status', 'message', 'cml', 'inchi']
     for key, value in meta.items():
         if key not in ignore:
@@ -120,7 +124,8 @@ def convert_rruff():
     """ DATASET SECTION """
 
     # dataset
-    example2.namespaces({'all': 'http://purl.allotrope.org/ontologies/result#'})
+    example2.namespaces(
+        {'all': 'http://purl.allotrope.org/ontologies/result#'})
     seriesx = rruff['series']['x']
     seriesy = rruff['series']['y']
     series = {
