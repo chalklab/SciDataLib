@@ -28,13 +28,16 @@ def create_scidata():
     example.author([sjc])
 
     # add description
-    example.description('Determination of the pH of a 3 ppm cyanide solution after complete reaction')
+    example.description(
+        'Determination of the pH of a 3 ppm cyanide solution after complete reaction')
 
     # add publisher
-    example.publisher('Chalk Group, Department of Chemistry, University of North Florida')
+    example.publisher(
+        'Chalk Group, Department of Chemistry, University of North Florida')
 
     # add permalink
-    example.permalink('https://stuchalk.github.io/scidata/examples/ph_min.jsonld')
+    example.permalink(
+        'https://stuchalk.github.io/scidata/examples/ph_min.jsonld')
 
     # add discipline and subdiscipline (plus namespace)
     example.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
@@ -43,7 +46,8 @@ def create_scidata():
 
     """ METHODOLOGY SECTION """
     # methodology data goes into the aspects array in the JSON-LD file
-    # for any field values that use namespaces add the namespaces separately using .namespaces
+    # for any field values that use namespaces add the namespaces separately
+    # using .namespaces
 
     # add the type of methodology - experimental, computational, etc.
     example.evaluation('experimental')
@@ -76,8 +80,7 @@ def create_scidata():
             'The pH electrode was calibrated at pH 7, pH 4, and pH 10 prior to '
             'measurement. A portion of the solution was transferred to a beaker '
             'and the DI water washed electrode wash placed in the solution and '
-            'allowed to equilibrate before the measurement was taken'
-        )}
+            'allowed to equilibrate before the measurement was taken')}
     aspects = [measurement, resource, procedure]
     example.aspects(aspects)
 
@@ -129,7 +132,8 @@ def create_scidata():
         'quantitykind': 'volume',
         'quantity': 'Volume of solution',
         'value': val2}
-    example.namespaces({"chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
+    example.namespaces(
+        {"chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
     con1 = {
         '@id': 'constituent',
         'source': 'substance/1/',
@@ -224,9 +228,7 @@ def create_scidata():
             "@id": "textvalue",
             "text": "The solution was clear, no reagent precipitation was observed.",
             "textype": "plain",
-            "language": "en-us"
-        }
-    }
+            "language": "en-us"}}
 
     dps = [dp1, dp2]
 
@@ -283,7 +285,8 @@ def create_scidata():
     example.datagroup([datagrp1, datagrp2])
 
     # add source
-    src = {'citation': 'Chalk Research Group', 'url': 'https://stuchalk.github.io/scidata/examples/ph_min.jsonld'}
+    src = {'citation': 'Chalk Research Group',
+           'url': 'https://stuchalk.github.io/scidata/examples/ph_min.jsonld'}
     example.sources([src])
 
     # add rights
