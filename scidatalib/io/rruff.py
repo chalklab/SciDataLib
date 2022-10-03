@@ -13,8 +13,8 @@ def read_rruff(filename: str) -> dict:
     Reader for RRUFF database files to SciData object
     RRUFF file format is a modified version of JCAMP, so re-use jcamp module
 
-    :param filename: Filename to read from for RRUFF files
-    :return: SciData object read in from RRUFF file
+    param filename: Filename to read from for RRUFF files
+    return: SciData object read in from RRUFF file
     """
     with open(filename, "r") as fileobj:
         rruff_dict = _reader(fileobj)
@@ -46,8 +46,8 @@ def _reader(filehandle: TextIO) -> dict:
     """
     File reader for  RRUFF file format
 
-    :param filehandle: RRUFF file to read from
-    :return: Dictionary parsed from RRUFF file
+    param filehandle: RRUFF file to read from
+    return: Dictionary parsed from RRUFF file
     """
     rruff_dict = {}
     y = []
@@ -71,9 +71,9 @@ def _reader(filehandle: TextIO) -> dict:
     x = np.array([float(xval) for xval in x])
     y = np.array([float(yval) for yval in y])
 
-    if ("xfactor" in rruff_dict):
+    if "xfactor" in rruff_dict:
         x = x * rruff_dict["xfactor"]
-    if ("yfactor" in rruff_dict):
+    if "yfactor" in rruff_dict:
         y = y * rruff_dict["yfactor"]
 
     rruff_dict['x'] = x
@@ -81,13 +81,13 @@ def _reader(filehandle: TextIO) -> dict:
     return rruff_dict
 
 
-def _read_get_aspects_section(rruff_dict: dict) -> dict:
+def _read_get_aspects_section(rruff_dict: dict) -> list:
     """
     Extract and translate from the RRUFF dictionary the SciData JSON-LD
-    'aspects' sub-ection of the 'methodology' section
+    'aspects' subsection of the 'methodology' section
 
-    :param rruff_dict: RRUFF dictionary to extract aspects section from
-    :return: The 'aspects' section of SciData JSON-LD methodology
+    param rruff_dict: RRUFF dictionary to extract aspects section from
+    return: The 'aspects' section of SciData JSON-LD methodology
     """
     aspects = []
 
@@ -123,16 +123,16 @@ def _read_get_aspects_section(rruff_dict: dict) -> dict:
     return aspects
 
 
-def _read_get_facets_section(rruff_dict: dict) -> dict:
+def _read_get_facets_section(rruff_dict: dict) -> list:
     """
     Extract and translate from the RRUFF dictionary the SciData JSON-LD
-    'facets' sub-section of the 'system' section
+    'facets' subsection of the 'system' section
 
-    :param rruff_dict: RRUFF dictionary to extract facets section from
-    :return: The 'facets' section of SciData JSON-LD from translation
+    param rruff_dict: RRUFF dictionary to extract facets section from
+    return: The 'facets' section of SciData JSON-LD from translation
     """
-
     facets = []
+
     material = {
         "@id": "material",
         "@type": "sdo:material",
@@ -147,13 +147,13 @@ def _read_translate_rruff_to_scidata(rruff_dict: dict) -> dict:
     """
     Main translation of RRUFF to SciData object
 
-    :param rruff_dict: RRUFF dictionary extracted from read
-    :return: SciData object from translation
+    param rruff_dict: RRUFF dictionary extracted from read
+    return: SciData object from translation
     """
     scidata = SciData(_SCIDATA_UID)
 
     # Add champ namespace for aspect techniqueType
-    cao = {"cao": "http://champ-project.org/images/ontology/cao.owl#"}
+    cao = {"cao": "https://champ-project.org/images/ontology/cao.owl#"}
     scidata.namespaces(cao)
 
     # Title
@@ -186,15 +186,14 @@ def _read_translate_rruff_to_scidata(rruff_dict: dict) -> dict:
     scidata.author(authors)
 
     # Sources / references
-    sources = []
-    sources.append({
+    sources = [{
         "@id": "source/1/",
         "@type": "dc:source",
         "citation": "Highlights in Mineralogical Crystallography 2015 1-30",
         "reftype": "journal article",
         "doi": "10.1515/9783110417104-003",
         "url": "https://doi.org/10.1515/9783110417104-003"
-    })
+    }]
 
     if "url" in rruff_dict:
         sources.append({
@@ -230,8 +229,8 @@ def _write_get_ideal_chemistry(scidata: SciData) -> str:
     """
     Extract ideal chemistry from SciData object
 
-    :param scidata: SciData object
-    :return: The ideal chemistry if exists in SciData object, None otherwise
+    param scidata: SciData object
+    return: The ideal chemistry if exists in SciData object, None otherwise
     """
     chemistry = None
     graph = scidata.output.get("@graph")
@@ -246,8 +245,8 @@ def _write_get_laser_wavelength(scidata: SciData) -> str:
     """
     Extract laser wavelength from SciData object
 
-    :param scidata: SciData object
-    :return: The laser wavelength if exists in SciData object, None otherwise
+    param scidata: SciData object
+    return: The laser wavelength if exists in SciData object, None otherwise
     """
     laser_wavelength = None
     graph = scidata.output.get("@graph")
@@ -266,8 +265,8 @@ def _write_get_rruff_url(scidata: SciData) -> str:
     """
     Extract RRUFF URL from SciData object
 
-    :param scidata: SciData object
-    :return: The RRUFF URL if exists in SciData object, None otherwise
+    param scidata: SciData object
+    return: The RRUFF URL if exists in SciData object, None otherwise
     """
     url = None
     graph = scidata.output.get("@graph")
@@ -282,8 +281,8 @@ def _write_get_header_section(scidata: SciData) -> str:
     """
     Get the header lines section for RRUFF file from SciData object
 
-    :param scidata: SciData object
-    :return: List of lines to write for the RRUFF header section
+    param scidata: SciData object
+    return: List of lines to write for the RRUFF header section
     """
     lines = []
 
@@ -339,9 +338,9 @@ def _write_rruff_header_section(
     Writes RRUFF file header to filename using the SciData object.
     Can optionally change the mode of how to open the file.
 
-    :param filename: Name of the RRUFF file to write
-    :param scidata: SciData object to write as RRUFF file
-    :param mode: File mode. Default is 'w'.
+    param filename: Name of the RRUFF file to write
+    param scidata: SciData object to write as RRUFF file
+    param mode: File mode. Default is 'w'.
     """
     lines = _write_get_header_section(scidata)
     with open(filename, mode) as fileobj:

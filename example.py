@@ -64,9 +64,9 @@ def create_scidata():
         'value': value}
     resource = {
         '@id': 'resource',
-        'instrument': 'obo:CHMO_0002344',
-        'instrumentType': 'Temperature compensated pH electrode',
         'name': 'Accumet Liquid-Filled pH/ATC Epoxy Body Combination Electrode',
+        'instrumentType': 'Temperature compensated pH electrode',
+        'instrument#': 'obo:CHMO_0002344',
         'vendor': 'Fisher Scientific',
         'catalognumber': '13-620-530A',
         'settings': settings}
@@ -79,7 +79,7 @@ def create_scidata():
             'allowed to equilibrate before the measurement was taken'
         )}
     aspects = [measurement, resource, procedure]
-    # example.aspects(aspects)
+    example.aspects(aspects)
 
     # add to system (data goes into the facets array)
     # for any field values using namespaces
@@ -115,49 +115,48 @@ def create_scidata():
         'inchi': 'InChI=1S/H2O/h1H2',
         'chebi': 'obo:CHEBI_15377'}
 
-    val1 = {'@id': 'value', 'number': 2.99, 'unitref': 'qudt:PPM'}
-    val2 = {'@id': 'value', 'number': 100.0, 'unitref': 'qudt:MilliL'}
-    val3 = {'@id': 'value', 'number': 22.8, 'unitref': 'qudt:DEG_C'}
+    val1 = {'@id': 'value', 'number': 2.99, 'unit#': 'qudt:PPM'}
+    val2 = {'@id': 'value', 'number': 100.0, 'unit#': 'qudt:MilliL'}
+    val3 = {'@id': 'value', 'number': 22.8, 'unit#': 'qudt:DEG_C'}
 
     prp1 = {
         '@id': 'property',
-        'quantity': 'mass of substance per volume',
-        'property': 'Concentration (w/v)',
+        'quantitykind': 'mass of substance per volume',
+        'quantity': 'Concentration (w/v)',
         'value': val1}
     prp2 = {
         '@id': 'property',
-        'quantity': 'volume',
-        'property': 'Volume of solution',
+        'quantitykind': 'volume',
+        'quantity': 'Volume of solution',
         'value': val2}
-    example.namespaces(
-        {"chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
+    example.namespaces({"chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#"})
     con1 = {
         '@id': 'constituent',
         'source': 'substance/1/',
-        'role': 'chm:analyte',
+        'role#': 'chm:analyte',
         'properties': [prp1, prp2]
     }
     con2 = {
         '@id': 'constituent',
         'source': 'substance/2/',
-        'role': 'chm:reagent',
+        'role#': 'chm:reagent',
         'properties': [prp1, prp2]}
     con3 = {
         '@id': 'constituent',
         'source': 'substance/3/',
-        'role': 'chm:reagent'}
+        'role#': 'chm:reagent'}
     con4 = {
         '@id': 'constituent',
         'source': 'substance/4/',
-        'role': 'chm:buffer'}
+        'role#': 'chm:buffer'}
     con5 = {
         '@id': 'constituent',
         'source': 'substance/5/',
-        'role': 'chm:solvent'}
+        'role#': 'chm:solvent'}
     con6 = {
         '@id': 'constituent',
         'source': 'substance/6/',
-        'role': 'chm:solvent'}
+        'role#': 'chm:solvent'}
     cons = [con1, con2, con3, con4, con5, con6]
 
     example.namespaces(
@@ -166,18 +165,18 @@ def create_scidata():
     sub1 = {
         '@id': 'substance',
         'title': '3 ppm cyanide standard solution',
-        'aggregation': 'sub:aq',
-        'mixtype': 'sub:homogeneousSolution',
-        'phase': 'sub:liquid',
+        'aggregation#': 'sub:aq',
+        'mixtype#': 'sub:homogeneousSolution',
+        'phase#': 'sub:liquid',
         'constituents': cons,
         'properties': [prp2]}
     con1 = {
         '@id': 'condition',
-        'source': 'measurement/1/',
-        'scope': 'substance/1/',
-        'quantity': 'temperature',
-        'property': 'Ambient temperature',
-        'property#': 'gb:T06321',
+        'source#': 'measurement/1/',
+        'scope#': 'substance/1/',
+        'quantitykind': 'temperature',
+        'quantity': 'Ambient temperature',
+        'quantity#': 'gb:T06321',
         'value': val3}
     facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
 
@@ -190,7 +189,6 @@ def create_scidata():
         "type": "IC50",
         "value": {
             "@id": "value",
-            "@type": "sdo:value",
             "relation": "=",
             "units": "uM",
             "value": "19.000000000000000000000000000000"
@@ -201,46 +199,30 @@ def create_scidata():
         "@id": "datum",
         "@type": "sdo:deriveddata",
         "value": {
-            "standard_relation": "=",
             "@id": "value",
-            "@type": "sdo:value",
+            "standard_relation": "=",
             "standard_value": "19000.000000000000000000000000000000",
             "standard_units": "nM",
             "standard_type": "IC50",
             "pchembl_value": "4.72",
-            "uo_units": "obo:UO_0000065",
-            "qudt_units": "qudt:NanoMOL-PER-L"
-        }
-    }
-
-    dp1_datum3 = {
-        "@id": "datum",
-        "@type": "sdo:None",
-        "value": {
-            "standard_flag": "1",
-            "@id": "value",
-            "@type": "sdo:value",
-            "activity_id": "16464576"
+            "unit#": ["obo:UO_0000065", "qudt:NanoMOL-PER-L"]
         }
     }
 
     dp1 = {
         "@id": "datapoint",
-        "@type": "sdo:datapoint",
         "activity_id": 16464576,
         "assay": "CHEMBL3767769",
-        "data": [dp1_datum1, dp1_datum2, dp1_datum3]
+        "data": [dp1_datum1, dp1_datum2]
     }
 
     # Input datapoint 2
     dp2 = {
         "@id": "datapoint",
-        "annotation": "gb:P04524",
         "conditions": "Observation",
         "value": {
             "@id": "textvalue",
-            "text":
-                "The solution was clear, no reagent precipitation was observed.",
+            "text": "The solution was clear, no reagent precipitation was observed.",
             "textype": "plain",
             "language": "en-us"
         }
@@ -272,19 +254,24 @@ def create_scidata():
         '851.6688']
 
     dataser1 = {"@id": "dataseries",
-                "label": "Raman Spectroscopy",
-                "parameter": [{
-                    "@id": "parameter",
-                    "quantity": "Raman Shift",
-                    "property": "Raman Shift",
-                    "units": "1/cm",
-                    "datatype": "decimal",
-                    "dataarray": seriesx},
-                    {"@id": "parameter",
-                     "quantity": "intensity",
-                     "property": "intensity",
-                     "datatype": "decimal",
-                     "dataarray": seriesy}]}
+                "label": "Raman Spectrum",
+                "parameter": [
+                    {
+                        "@id": "parameter",
+                        "quantitykind": "Reciprocal length",
+                        "quantity": "Wavenumber",
+                        "units": "1/cm",
+                        "datatype": "decimal",
+                        "dataarray": seriesx
+                    }, {
+                        "@id": "parameter",
+                        "quantitykind": "intensity",
+                        "quantity": "intensity",
+                        "datatype": "decimal",
+                        "dataarray": seriesy
+                    }
+                ]
+                }
     example.dataseries([dataser1])
 
     datagrp1 = {"@id": "datagroup",
@@ -296,15 +283,11 @@ def create_scidata():
     example.datagroup([datagrp1, datagrp2])
 
     # add source
-    src = {'citation': 'Chalk Research Group',
-           'url': 'https://stuchalk.github.io/scidata/examples/ph_min.jsonld'}
+    src = {'citation': 'Chalk Research Group', 'url': 'https://stuchalk.github.io/scidata/examples/ph_min.jsonld'}
     example.sources([src])
 
     # add rights
-    holder = ', '.join([
-        'Chalk Research Group',
-        'Department of Chemistry',
-        'University of North Florida'])
+    holder = 'Chalk Research Group, Department of Chemistry, University of North Florida'
     lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
     example.rights(holder, lic)
 
@@ -370,5 +353,6 @@ def create_scidata():
 
     # print(json.dumps(example.output, ensure_ascii=False))
     print(json.dumps(example.output, indent=4, ensure_ascii=False))
+
 
 create_scidata()
