@@ -171,8 +171,10 @@ def _reader_is_float(strings: List[str]) -> bool:
     Test if a string, or list of strings, contains a numeric value(s).
 
     param strings: The string or list of strings to test.
-    return: Single boolean or list of boolean values indicating whether each input can be converted into float.
-    raises TypeError: If passing a list and elements are not strings or single element is not a string
+    return: Single boolean or list of boolean values indicating
+        whether each input can be converted into float.
+    raises TypeError: If passing a list and elements are not
+        strings or single element is not a string
     raises ValueError: If passing empty list
     """
     if isinstance(strings, tuple) or isinstance(strings, list):
@@ -237,8 +239,10 @@ def _read_num_dif_factory(char: str, line: str) -> Tuple[str, bool]:
 
     param char: Character we are currently processing.
     param line: Line we are processing, used for raising exception.
-    return: Tuple of updated values for numeric character (char) and DIF flag (bool). Example: ('+1', False)
-    raises UnkownCharacterException: If we find a character that is neither a valid compression character nor number.
+    return: Tuple of updated values for numeric character (char)
+        and DIF flag (bool). Example: ('+1', False)
+    raises UnkownCharacterException: If we find a character that is
+        neither a valid compression character nor number.
     """
     if char == ' ':
         num = ''
@@ -393,7 +397,8 @@ def _read_parse_header_line(
 
     param line: Header line to parse
     param jcamp_dict: Dictionary currently holding the JCAMP-DX file info
-    param datastart: Boolean that is True if we are inside a data section, False if not
+    param datastart: Boolean that is True if we are inside a data section,
+        False if not
     param last_key: String to store the last key we parsed from the header
 
     return: Tuple of the modified JCAMP dictionary, the updated flag for if
@@ -777,10 +782,13 @@ def _read_get_facets_section(jcamp_dict: dict) -> dict:
 
 def _read_get_datagroup_subsection(jcamp_dict: dict) -> List[dict]:
     """
-    Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD 'dataset' section's datagroup
+    Extract and translate from the JCAMP-DX dictionary
+    the SciData JSON-LD 'dataset' section's datagroup
 
-    param jcamp_dict: JCAMP-DX dictionary to extract dataset section's datagroup from
-    return: The 'dataset' section's datagroup of SciData JSON-LD from translation
+    param jcamp_dict: JCAMP-DX dictionary to extract
+        dataset section's datagroup from
+    return: The 'dataset' section's datagroup of
+        SciData JSON-LD from translation
     """
     # Convert from JCAMP units -> SciData JSON-LD unitref
     xunits = jcamp_dict.get("xunits", "")
@@ -899,7 +907,8 @@ def _read_get_dataseries_subsection(jcamp_dict: dict) -> List[dict]:
     Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
     'dataset' section's dataseries
 
-    param jcamp_dict: JCAMP-DX dictionary to extract dataset section's dataseries from
+    param jcamp_dict: JCAMP-DX dictionary to extract
+        dataset section's dataseries from
     return: The 'dataset' section's dataseries of SciData
     """
     xunits = jcamp_dict.get("xunits", "")
