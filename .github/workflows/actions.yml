@@ -2,7 +2,7 @@ name: GitHub Actions
 
 env:
   PYTHON_MAIN_VERSION: 3.7
-  POETRY_VERSION: 1.2.0
+  POETRY_VERSION: 1.1.15
 
 on:
   push:
