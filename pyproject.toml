@@ -22,7 +22,7 @@ classifiers = [
 scidatalib = "scidatalib.cli:cli"
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 numpy = "^1.22.0"
 
 [tool.poetry.dev-dependencies]
