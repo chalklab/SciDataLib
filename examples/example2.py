@@ -31,7 +31,12 @@ def convert_rruff():
 
     # add document base URL
     base = 'https://scidata.unf.edu/' + uid + '/'
-    context = 'https://stuchalk.github.io/scidata/contexts/crg_substance.jsonld'
+    context = (
+        'https://stuchalk.github.io',
+        '/scidata',
+        '/contexts',
+        '/crg_substance.jsonld'
+    )
     example2.context(context)
     example2.base(base)
 
@@ -156,8 +161,26 @@ def convert_rruff():
     example2.sources([src])
 
     # add rights
-    holder = 'Developed by The University of Arizona and is the property of The Arizona Board of Regents, on behalf of The University of Arizona, Copyright (C) 2005'
-    lic = 'By accessing this database, users consent to use this database and software solely for informational purposes. Selling, distributing, publishing, circulating, or commercially exploiting the data in this database without the express written permission of the owners of the data is expressly prohibited. Use of this database and software shall not convey any ownership right, title or interest, nor any security or other interest in any intellectual property rights relating to the database and software, nor in any copy of any part of the database and software.'
+    holder = (
+        'Developed by The University of Arizona ',
+        'and is the property of The Arizona Board of Regents ',
+        'on behalf of The University of Arizona, Copyright (C) 2005'
+    )
+    lic = (
+        'By accessing this database, ',
+        'users consent to use this database and ',
+        'software solely for informational purposes. ',
+        'Selling, distributing, publishing, circulating, ',
+        'or commercially exploiting the data in this database ',
+        'without the express written permission of the owners ',
+        'of the data is expressly prohibited. ',
+        'Use of this database and software shall not convey any ',
+        'ownership right, title or interest, '
+        'nor any security or other interest in any '
+        'intellectual property rights ',
+        'relating to the database and software, ',
+        'nor in any copy of any part of the database and software.'
+    )
     example2.rights(holder, lic)
 
     print(json.dumps(example2.output, indent=4))

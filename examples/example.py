@@ -28,16 +28,21 @@ def create_scidata():
     example.author([sjc])
 
     # add description
-    example.description(
-        'Determination of the pH of a 3 ppm cyanide solution after complete reaction')
+    description = (
+        'Determination of the pH of a 3 ppm cyanide solution ',
+        'after complete reaction'
+    )
+    example.description(description)
 
     # add publisher
-    example.publisher(
-        'Chalk Group, Department of Chemistry, University of North Florida')
+    publisher = (
+        'Chalk Group, Department of Chemistry, University of North Florida'
+    )
+    example.publisher(publisher)
 
     # add permalink
-    example.permalink(
-        'https://stuchalk.github.io/scidata/examples/ph_min.jsonld')
+    link = 'https://stuchalk.github.io/scidata/examples/ph_min.jsonld'
+    example.permalink(link)
 
     # add discipline and subdiscipline (plus namespace)
     example.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
@@ -68,7 +73,9 @@ def create_scidata():
         'value': value}
     resource = {
         '@id': 'resource',
-        'name': 'Accumet Liquid-Filled pH/ATC Epoxy Body Combination Electrode',
+        'name': (
+            'Accumet Liquid-Filled pH/ATC Epoxy Body Combination Electrode',
+        ),
         'instrumentType': 'Temperature compensated pH electrode',
         'instrument#': 'obo:CHMO_0002344',
         'vendor': 'Fisher Scientific',
@@ -77,16 +84,20 @@ def create_scidata():
     procedure = {
         '@id': 'procedure',
         'description': (
-            'The pH electrode was calibrated at pH 7, pH 4, and pH 10 prior to '
-            'measurement. A portion of the solution was transferred to a beaker '
-            'and the DI water washed electrode wash placed in the solution and '
-            'allowed to equilibrate before the measurement was taken')}
+            'The pH electrode was calibrated at ',
+            'pH 7, pH 4, and pH 10 prior to measurement. ',
+            'A portion of the solution was transferred to a beaker '
+            'and the DI water washed electrode wash placed ',
+            'in the solution and allowed to equilibrate ',
+            'before the measurement was taken')
+    }
     aspects = [measurement, resource, procedure]
     example.aspects(aspects)
 
     # add to system (data goes into the facets array)
     # for any field values using namespaces
     # makes sure to add them using .add_namespace
+    inchi = 'InChI=1S/B4H4O9/c5-1-9-3(7)11-2(6)12-4(8,10-1)13-3/h5-8H/q-2',
     comp1 = {
         '@id': 'substance',
         'name': 'cyanide ion',
@@ -105,7 +116,7 @@ def create_scidata():
     comp4 = {
         '@id': 'substance',
         'name': 'tetraborate ion',
-        'inchi': 'InChI=1S/B4H4O9/c5-1-9-3(7)11-2(6)12-4(8,10-1)13-3/h5-8H/q-2',
+        'inchi': inchi,
         'chebi': 'obo:CHEBI_38889'}
     comp5 = {
         '@id': 'substance',
@@ -221,12 +232,13 @@ def create_scidata():
     }
 
     # Input datapoint 2
+    text = "The solution was clear, no reagent precipitation was observed."
     dp2 = {
         "@id": "datapoint",
         "conditions": "Observation",
         "value": {
             "@id": "textvalue",
-            "text": "The solution was clear, no reagent precipitation was observed.",
+            "text": text,
             "textype": "plain",
             "language": "en-us"}}
 
@@ -290,7 +302,11 @@ def create_scidata():
     example.sources([src])
 
     # add rights
-    holder = 'Chalk Research Group, Department of Chemistry, University of North Florida'
+    holder = (
+        'Chalk Research Group, ',
+        'Department of Chemistry, ',
+        'University of North Florida'
+    )
     lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
     example.rights(holder, lic)
 
