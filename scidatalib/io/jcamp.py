@@ -69,7 +69,7 @@ class MultiHeaderKeyException(Exception):
 
 
 # Compression encoding dictionaries for JCAMP
-# Reference found on following site under "Compression Table"
+# Reference: found on following site under "Compression Table"
 #   - http://wwwchem.uwimona.edu.jm/software/jcampdx.html
 
 # Represents the value with a preceding space (compresses whitespace)
@@ -157,8 +157,8 @@ def write_jcamp(filename: str, scidata: SciData):
     JCAMP-DX is Joint Committee on Atomic and Molecular Physical Data eXchange
     JCAMP-DX URL:  http://jcamp-dx.org/
 
-    :param filename: Filename for JCAMP-DX file
-    :param scidata: SciData object to write out
+    param filename: Filename for JCAMP-DX file
+    param scidata: SciData object to write out
     """
     _write_jcamp_header_section(filename, scidata, mode='w')
     _write_jcamp_data_section(filename, scidata, mode='a')
@@ -167,16 +167,14 @@ def write_jcamp(filename: str, scidata: SciData):
 
 
 def _reader_is_float(strings: List[str]) -> bool:
-    '''
+    """
     Test if a string, or list of strings, contains a numeric value(s).
 
-    :param strings: The string or list of strings to test.
-    :return: Single boolean or list of boolean values indicating whether
-        each input can be converted into float.
-    :raises TypeError: If passing a list and elements are not strings or
-        single element is not a string
-    :raises ValueError: If passing empty list
-    '''
+    param strings: The string or list of strings to test.
+    return: Single boolean or list of boolean values indicating whether each input can be converted into float.
+    raises TypeError: If passing a list and elements are not strings or single element is not a string
+    raises ValueError: If passing empty list
+    """
     if isinstance(strings, tuple) or isinstance(strings, list):
         if not all(isinstance(i, str) for i in strings):
             raise TypeError("Input {} not a list of strings".format(strings))
@@ -194,7 +192,7 @@ def _reader_is_float(strings: List[str]) -> bool:
 
     else:
         if not isinstance(strings, str):
-            raise TypeError("Input '%s' is not a string" % (strings))
+            raise TypeError("Input '%s' is not a string" % strings)
 
         try:
             float(strings)
@@ -211,7 +209,7 @@ def _read_parse_dataset_duplicate_characters(line: str) -> str:
     Example: Repeat 9 character 3 times with 'U'
         "9U" == "999"
 
-    Reference found on following site under "Compression Table"
+    Reference: found on following site under "Compression Table"
         - http://wwwchem.uwimona.edu.jm/software/jcampdx.html
 
     :param line: Line in JCAMP-DX file with duplicate characters (DUP)
@@ -219,7 +217,7 @@ def _read_parse_dataset_duplicate_characters(line: str) -> str:
     """
     new_line = ""
     for i, char in enumerate(line):
-        if (char in DUP_digits):
+        if char in DUP_digits:
             # Get number of duplicates to multiply by
             # NOTE: subtract one since we will already have one character from
             #       the original one we are duplicating from.
@@ -237,30 +235,28 @@ def _read_num_dif_factory(char: str, line: str) -> Tuple[str, bool]:
     character to give the next numeric value  and flag if we are processing
     using DIF compression.
 
-    :param char: Character we are currently processing.
-    :param line: Line we are processing, used for raising exception.
-    :return: Tuple of updated values for numeric character (char)
-        and DIF flag (bool). Example: ('+1', False)
-    :raises UnkownCharacterException: If we find a character that is neither
-            a valid compression character or number.
+    param char: Character we are currently processing.
+    param line: Line we are processing, used for raising exception.
+    return: Tuple of updated values for numeric character (char) and DIF flag (bool). Example: ('+1', False)
+    raises UnkownCharacterException: If we find a character that is neither a valid compression character nor number.
     """
     if char == ' ':
         num = ''
-        DIF = False
+        dif = False
 
     elif char in SQZ_digits:
         num = SQZ_digits[char]
-        DIF = False
+        dif = False
 
     elif char in DIF_digits:
         num = str(DIF_digits[char])
-        DIF = True
+        dif = True
 
     else:
         msg = f"Unknown character {char} encountered in line {line}"
         raise UnknownCharacterException(msg)
 
-    return (num, DIF)
+    return num, dif
 
 
 def _read_parse_dataset_line_single_x_multi_y(line: str) -> List[float]:
@@ -269,20 +265,20 @@ def _read_parse_dataset_line_single_x_multi_y(line: str) -> List[float]:
     where we have one X column and multiple Y columns on one line.
     Handles decoding JCAMP compression encoding.
 
-    Reference found on following site under "Compression Table"
+    Reference: found on following site under "Compression Table"
         - http://wwwchem.uwimona.edu.jm/software/jcampdx.html
 
     :param line: Line from JCAMP for data of '(X++(Y..Y))' format
     :return: List of float values for the line
     :raises UnkownCharacterException: If we find a character that is neither
-        a valid compression character or number.
+        a valid compression character nor number.
     """
     # process the duplicate characters (DUP_digits)
-    DUP_set = set(DUP_digits)
-    if any(char in DUP_set for char in line):
+    dup_set = set(DUP_digits)
+    if any(char in dup_set for char in line):
         line = _read_parse_dataset_duplicate_characters(line)
 
-    DIF = False
+    dif = False
     num = ''
     values = []
     for char in line:
@@ -292,15 +288,15 @@ def _read_parse_dataset_line_single_x_multi_y(line: str) -> List[float]:
 
         if num:
             value = float(num)
-            if DIF:
+            if dif:
                 value = float(num) + values[-1]
             values.append(value)
 
-        num, DIF = _read_num_dif_factory(char, line)
+        num, dif = _read_num_dif_factory(char, line)
 
     if num:
         value = float(num)
-        if DIF:
+        if dif:
             value = float(num) + values[-1]
         values.append(value)
     return values
@@ -311,13 +307,13 @@ def _read_parse_dataset_line(line: str, data_format: str) -> List[float]:
     Parse a data line of the JCAMP-DX file format for the given data format.
     Handles decoding JCAMP compression encoding.
 
-    Reference found on following site under "Compression Table"
+    Reference: found on following site under "Compression Table"
         - http://wwwchem.uwimona.edu.jm/software/jcampdx.html
 
-    :param line: Line in JCAMP-DX file to parse
-    :param data_format: Format of data. Choices: ['(XY..XY)', '(X++(Y..Y))']
+    param line: Line in JCAMP-DX file to parse
+    param data_format: Format of data. Choices: ['(XY..XY)', '(X++(Y..Y))']
 
-    :return: List of float values for the line
+    return: List of float values for the line
     """
     if data_format not in _DATA_FORMATS:
         msg = f'Data format {data_format} not supported type: {_DATA_FORMATS}'
@@ -338,10 +334,10 @@ def _read_parse_header(line: str, datastart: bool) -> Tuple[dict, bool]:
     Parse the header line, returning a dictionary for the key-value found
     and if we are starting into the data section.
 
-    :param line: Line to parse as a JCAMP header
-    :param datastart: Current boolean flag for if we are in a data section
+    param line: Line to parse as a JCAMP header
+    param datastart: Current boolean flag for if we are in a data section
 
-    :return: Tuple of a header dictionary and datastart boolean.
+    return: Tuple of a header dictionary and datastart boolean.
         Dictionary with header keys found.
         Will mostly return a single key-value pair but
         for some will return multiple pairs
@@ -378,10 +374,10 @@ def _read_parse_header(line: str, datastart: bool) -> Tuple[dict, bool]:
             header_dict[key] = value
 
         # Figure out if we are starting a new data entry
-        if (key in _DATA_XY_TYPES):
+        if key in _DATA_XY_TYPES:
             datastart = True
             header_dict[_DATA_XY_TYPE_KEY] = value
-        elif (key == 'end'):
+        elif key == 'end':
             datastart = True
         elif datastart:
             datastart = False
@@ -395,17 +391,16 @@ def _read_parse_header_line(
     """
     Parse the JCAMP header line and update the output JCAMP dictionary.
 
-    :param line: Header line to parse
-    :param jcamp_dict: Dictionary currently holding the JCAMP-DX file info
-    :param datastart: Boolean that is True if we are inside a data section,
-        False if not
-    :param last_key: String to store the last key we parsed from the header
+    param line: Header line to parse
+    param jcamp_dict: Dictionary currently holding the JCAMP-DX file info
+    param datastart: Boolean that is True if we are inside a data section, False if not
+    param last_key: String to store the last key we parsed from the header
 
-    :return: Tuple of the modified JCAMP dictionary, the updated flag for if
+    return: Tuple of the modified JCAMP dictionary, the updated flag for if
         in a data section and the last key entered used for updating a
         multiline comment in the header.
 
-    :raises MultiHeaderKeyException: If multiple header keys parsed
+    raises MultiHeaderKeyException: If multiple header keys parsed
     """
     output_dict = dict(jcamp_dict)
     header_dict, datastart = _read_parse_header(line, datastart)
@@ -439,14 +434,14 @@ def _read_post_process_data_xy(
 ) -> Tuple[List[float], List[float]]:
     """
     Utility function for _reader to format the XY data in a
-    post-process manner after we parse out this data from the file.
+    postprocess manner after we parse out this data from the file.
 
-    :param jcamp_dict: JCAMP dictionary parsed from file
-    :param x: X-axis data
-    :param y: Y-axis data
-    :param xstart: Starting X-axis values for multi-datasets
-    :param xnum: Number of starting X-axis value for multi-datasets
-    :return: Post-processed XY data
+    param jcamp_dict: JCAMP dictionary parsed from file
+    param x: X-axis data
+    param y: Y-axis data
+    param xstart: Starting X-axis values for multi-datasets
+    param xnum: Number of starting X-axis value for multi-datasets
+    return: Post-processed XY data
     """
     if jcamp_dict.get(_DATA_XY_TYPE_KEY) == _DATA_FORMAT_XYYY:
         xstart.append(jcamp_dict['lastx'])
@@ -455,7 +450,7 @@ def _read_post_process_data_xy(
             dx = (xstart[n+1] - xstart[n]) / xnum[n]
             x = np.append(x, xstart[n]+(dx*np.arange(xnum[n])))
 
-        if (xnum[len(xnum)-1] > 1):
+        if xnum[len(xnum) - 1] > 1:
             numerator = (jcamp_dict['lastx'] - xstart[len(xnum)-1])
             denominator = (xnum[len(xnum)-1] - 1.0)
             dx = numerator / denominator
@@ -471,9 +466,9 @@ def _read_post_process_data_xy(
         x = np.array([float(xval) for xval in x])
         y = np.array([float(yval) for yval in y])
 
-    if ('xfactor' in jcamp_dict):
+    if 'xfactor' in jcamp_dict:
         x = x * jcamp_dict['xfactor']
-    if ('yfactor' in jcamp_dict):
+    if 'yfactor' in jcamp_dict:
         y = y * jcamp_dict['yfactor']
 
     return x, y
@@ -483,8 +478,8 @@ def _reader(filehandle: str) -> dict:
     """
     File reader for JCAMP-DX file format
 
-    :param filehandle: JCAMP-DX file to read from
-    :return: Dictionary parsed from JCAMP-DX file
+    param filehandle: JCAMP-DX file to read from
+    return: Dictionary parsed from JCAMP-DX file
     """
     jcamp_dict = dict()
     xstart = []
@@ -511,7 +506,7 @@ def _reader(filehandle: str) -> dict:
             continue
 
         # If we are reading a compound block, collect lines into an array to be
-        # processed by a recursive call this this function.
+        # processed by a recursive call to this function.
         if in_compound_block:
             compound_block_contents.append(line)
 
@@ -560,8 +555,8 @@ def _read_get_description(jcamp_dict: dict, keywords: List[str]) -> str:
     Utility function to create a description string from the JCAMP
     dictionary
 
-    :param jcamp_dict: JCAMP-DX dictionary extracted from read
-    :return: String for the description for SciData object
+    param jcamp_dict: JCAMP-DX dictionary extracted from read
+    return: String for the description for SciData object
     """
     description_lines = []
     for key in keywords:
@@ -651,8 +646,8 @@ def _read_get_aspects_section(jcamp_dict: dict) -> dict:
     Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
     'aspects' sub-ection of the 'methodology' section
 
-    :param jcamp_dict: JCAMP-DX dictionary to extract aspects section from
-    :return: The 'aspects' section of SciData JSON-LD methodology
+    param jcamp_dict: JCAMP-DX dictionary to extract aspects section from
+    return: The 'aspects' section of SciData JSON-LD methodology
     """
     measurement = {}
     if "spectrometer/data system" in jcamp_dict:
@@ -730,14 +725,13 @@ def _read_get_aspects_section(jcamp_dict: dict) -> dict:
 def _read_get_facets_section(jcamp_dict: dict) -> dict:
     """
     Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
-    'facets' sub-section of the 'system' section
+    'facets' subsection of the 'system' section
 
-    :param jcamp_dict: JCAMP-DX dictionary to extract facets section from
-    :return: The 'facets' section of SciData JSON-LD from translation
+    param jcamp_dict: JCAMP-DX dictionary to extract facets section from
+    return: The 'facets' section of SciData JSON-LD from translation
     """
     facets = []
 
-    compound_dict = {}
     if "molform" in jcamp_dict or "cas registry no" in jcamp_dict:
         compound_dict = {
             "@id": "compound/1",
@@ -750,7 +744,6 @@ def _read_get_facets_section(jcamp_dict: dict) -> dict:
             compound_dict.update({"casrn": jcamp_dict.get("cas registry no")})
         facets.append(compound_dict)
 
-    substances_dict = {}
     if "state" in jcamp_dict:
         substances_dict = {
             "@id": "substance/1",
@@ -784,13 +777,10 @@ def _read_get_facets_section(jcamp_dict: dict) -> dict:
 
 def _read_get_datagroup_subsection(jcamp_dict: dict) -> List[dict]:
     """
-    Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
-    'dataset' section's datagroup
+    Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD 'dataset' section's datagroup
 
-    :param jcamp_dict: JCAMP-DX dictionary to extract
-        dataset section's datagroup from
-    :return: The 'dataset' section's datagroup of
-        SciData JSON-LD from translation
+    param jcamp_dict: JCAMP-DX dictionary to extract dataset section's datagroup from
+    return: The 'dataset' section's datagroup of SciData JSON-LD from translation
     """
     # Convert from JCAMP units -> SciData JSON-LD unitref
     xunits = jcamp_dict.get("xunits", "")
@@ -909,9 +899,8 @@ def _read_get_dataseries_subsection(jcamp_dict: dict) -> List[dict]:
     Extract and translate from the JCAMP-DX dictionary the SciData JSON-LD
     'dataset' section's dataseries
 
-    :param jcamp_dict: JCAMP-DX dictionary to extract dataset section's
-        dataseries from
-    :return: The 'dataset' section's dataseries of SciData
+    param jcamp_dict: JCAMP-DX dictionary to extract dataset section's dataseries from
+    return: The 'dataset' section's dataseries of SciData
     """
     xunits = jcamp_dict.get("xunits", "")
     xunitref = _XUNIT_MAP.get(xunits)
@@ -949,8 +938,8 @@ def _read_translate_jcamp_to_scidata(jcamp_dict: dict) -> SciData:
     """
     Main translation of JCAMP-DX to SciData JSON-LD
 
-    :param jcamp_dict: JCAMP-DX dictionary extracted from read
-    :return: SciData object from translation
+    param jcamp_dict: JCAMP-DX dictionary extracted from read
+    return: SciData object from translation
     """
     scidata = SciData(_SCIDATA_UID)
 
@@ -1023,9 +1012,9 @@ def _write_extract_description_section(description: str, key: str) -> str:
     Given a description string of the form "KEY1: VALUE1, KEY2: VALUE2, ..."
     extract the KEY that matches input key and extract the VALUE
 
-    :param desc: The description of form "KEY1: VALUE1, KEY2: VALUE2, ..."
-    :param key: The key used to extract value from the description
-    :return: String of the VALUE extracted from description for the key
+    param desc: The description of form "KEY1: VALUE1, KEY2: VALUE2, ..."
+    param key: The key used to extract value from the description
+    return: String of the VALUE extracted from description for the key
         provided. None is returned if key is not in the description.
     """
     desc_list = description.split(_DESCRIPTION_KEY_SPLIT_CHAR)
@@ -1042,14 +1031,13 @@ def _write_add_header_lines_general(scidata: SciData) -> List[str]:
     Get the general graph header lines from the SciData object
     used to write the JCAMP-DX header lines
 
-    :param scidata: SciData object to write as JCAMP-DX file
-    :return: List of header lines to write to the JCAMP-DX file
+    param scidata: SciData object to write as JCAMP-DX file
+    return: List of header lines to write to the JCAMP-DX file
     """
     graph = scidata.output.get("@graph")
     description = graph.get("description", "")
     jcamp_dx = _write_extract_description_section(description, "JCAMP-DX")
-    lines = []
-    lines.append(f'##JCAMP-DX={jcamp_dx}')
+    lines = [f'##JCAMP-DX={jcamp_dx}']
     if "property" in graph["scidata"]:
         lines.append(f'##DATA TYPE={graph["scidata"]["property"][0]}')
     if "publisher" in graph:
@@ -1101,8 +1089,8 @@ def _write_add_header_lines_methodology(scidata: SciData) -> List[str]:
     Get the methodology header lines from the SciData object
     used to write the JCAMP-DX header lines
 
-    :param scidata: SciData object to write as JCAMP-DX file
-    :return: List of header lines to write to the JCAMP-DX file
+    param scidata: SciData object to write as JCAMP-DX file
+    return: List of header lines to write to the JCAMP-DX file
     """
     lines = []
     graph = scidata.output.get("@graph")
@@ -1148,8 +1136,8 @@ def _write_add_header_lines_system(scidata: SciData) -> List[str]:
     Get the system header lines from the SciData object
     used to write the JCAMP-DX header lines
 
-    :param scidata: SciData object to write as JCAMP-DX file
-    :return: List of header lines to write to the JCAMP-DX file
+    param scidata: SciData object to write as JCAMP-DX file
+    return: List of header lines to write to the JCAMP-DX file
     """
     lines = []
     graph = scidata.output.get("@graph")
@@ -1188,9 +1176,9 @@ def _write_add_header_lines_dataset(scidata: SciData) -> List[str]:
     Get the dataset header lines from the SciData object
     used to write the JCAMP-DX header lines
 
-    :param scidata: SciData object to write as JCAMP-DX file
+    param scidata: SciData object to write as JCAMP-DX file
 
-    :return: List of header lines to write to the JCAMP-DX file
+    return: List of header lines to write to the JCAMP-DX file
     """
     lines = []
 
@@ -1204,9 +1192,6 @@ def _write_add_header_lines_dataset(scidata: SciData) -> List[str]:
         reverse_xunit_map = {v: k for k, v in _XUNIT_MAP.items()}
         scidata_xunits = attributes[0]["value"]["unitref"]
         xunits = reverse_xunit_map[scidata_xunits]
-
-        scidata_yunits = attributes[0]["value"]["unitref"]
-        yunits = scidata_yunits
 
         npoints = attributes[0]["value"]["number"]
 
@@ -1252,9 +1237,9 @@ def _write_jcamp_header_section(
     Writes header of the JCAMP-DX file for given SciData object
     to the filename provided. Default mode is to overwrite the file.
 
-    :param filename: String name of file to write JCAMP header
-    :param scidata: SciData object to extract header info
-    :param mode: File mode to use (i.e. 'w' for overwrite, 'a' for append, ...)
+    param filename: String name of file to write JCAMP header
+    param scidata: SciData object to extract header info
+    param mode: File mode to use (i.e. 'w' for overwrite, 'a' for append, ...)
     """
     lines = []
 
@@ -1288,10 +1273,10 @@ def _write_jcamp_data_section(
     Writes dataset section of the JCAMP-DX file for given SciData object
     to the filename provided. Default mode is to overwrite the file.
 
-    :param filename: String name of file to write JCAMP header
-    :param scidata: SciData object to extract dataset info
-    :param mode: File mode to use (i.e. 'w' for overwrite, 'a' for append, ...)
-    :param precision: Floating point number for formatting the output data
+    param filename: String name of file to write JCAMP header
+    param scidata: SciData object to extract dataset info
+    param mode: File mode to use (i.e. 'w' for overwrite, 'a' for append, ...)
+    param precision: Floating point number for formatting the output data
     """
 
     dataset = scidata.output.get("@graph").get("scidata").get("dataset")
