@@ -10,7 +10,7 @@ A Python library writing [SciData](http://stuchalk.github.io/scidata/) [JSON-LD]
 # SciData and JSON-LD
 
 JSON-LD is a convenient (human-readable) encoding of Resource
-Desctiption Framework (RDF) triples.  However, unlike traditional
+Description Framework (RDF) triples.  However, unlike traditional
 relational databases (e.g., MySQL), the graph has no schema. This
 is problematic as including data from different sources results
 in a system with no common way to search across the data.  The
@@ -57,8 +57,8 @@ code uses the '@base' to populate this, so they are consistent. As a result,
       "@base": "https://my.research.edu/<uniqueid>/"
     }
   ],
-  "@id": "file_identifier",
-  "generatedAt": "<automatically added",
+  "@id": "graph name",
+  "generatedAt": "<automatically added>",
   "version": "1",
   "@graph": {
     "@id": "https://my.research.edu/<uniqueid>/",
