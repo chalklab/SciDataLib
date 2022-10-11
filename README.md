@@ -1,9 +1,9 @@
 # SciDataLib
 
-| Health | Releases |
-|--------|----------|
+| Health                                                                                                                                                                                  | Releases                                                                                        |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
 | [![GitHub Actions](https://github.com/ChalkLab/SciDataLib/actions/workflows/actions.yml/badge.svg?branch=master)](https://github.com/ChalkLab/SciDataLib/actions/workflows/actions.yml) | [![PyPI version](https://badge.fury.io/py/scidatalib.svg)](https://badge.fury.io/py/SciDataLib) |
-| [![codecov](https://codecov.io/gh/ChalkLab/SciDataLib/branch/master/graph/badge.svg)](https://codecov.io/gh/ChalkLab/SciDataLib) | [![DOI](https://zenodo.org/badge/219040010.svg)](https://zenodo.org/badge/latestdoi/219040010) |
+| [![codecov](https://codecov.io/gh/ChalkLab/SciDataLib/branch/master/graph/badge.svg)](https://codecov.io/gh/ChalkLab/SciDataLib)                                                        | [![DOI](https://zenodo.org/badge/219040010.svg)](https://zenodo.org/badge/latestdoi/219040010)  |
 
 A Python library writing [SciData](http://stuchalk.github.io/scidata/) [JSON-LD](https://json-ld.org/) files.
 
@@ -189,10 +189,10 @@ print(json.dumps(example.output, indent=2))
       "sub": "https://stuchalk.github.io/scidata/ontology/substance.owl#",
       "chm": "https://stuchalk.github.io/scidata/ontology/chemical.owl#",
       "w3i": "https://w3id.org/skgo/modsci#",
-      "qudt": "http://qudt.org/vocab/unit/",
+      "qudt": "https://qudt.org/vocab/unit/",
       "obo": "http://purl.obolibrary.org/obo/",
-      "dc": "http://purl.org/dc/terms/",
-      "xsd": "http://www.w3.org/2001/XMLSchema#"
+      "dc": "https://purl.org/dc/terms/",
+      "xsd": "https://www.w3.org/2001/XMLSchema#"
     },
     {
       "@base": "https://scidata.unf.edu/chalk:example:jsonld/"
