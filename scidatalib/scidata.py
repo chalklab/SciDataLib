@@ -2,6 +2,7 @@
 from datetime import datetime
 
 
+# noinspection PyTypeChecker
 class SciData:
     """
     This class is used to create and populate a SciData object, to be
@@ -19,10 +20,8 @@ class SciData:
 
         self.meta = {
             "@context":
-                ["https://stuchalk.github.io/scidata/"
-                 "contexts/scidata.jsonld",  # def context
-                 {"sdo": "https://stuchalk.github.io/scidata/"
-                         "ontology/scidata.owl#"},  # def namespaces
+                ["https://stuchalk.github.io/scidata/contexts/scidata.jsonld",  # def context
+                 {"sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"},  # def namespaces
                  {}],  # def base
             "@id": "",  # def docid
             "generatedAt": "",  # autopopulated
@@ -64,20 +63,17 @@ class SciData:
                 },
                 "sources": [],  # def sources
                 "rights": []  # def rights
-                    }
+                }
         }
         self.contexts = []
         self.nspaces = {}
         # self.nspaces = {
-        #     "sdo": "https://stuchalk.github.io/scidata/
-        #     ontology/scidata.owl#",
+        #     "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
         #     "w3i": "https://w3id.org/skgo/modsci#",
-        #     "qudt": "http://qudt.org/vocab/unit/",
+        #     "qudt": "https://qudt.org/vocab/unit/",
         #     "obo": "http://purl.obolibrary.org/obo/",
         #     "dc": "http://purl.org/dc/terms/",
         #     "xsd": "http://www.w3.org/2001/XMLSchema#",
-        #     "sci": "https://stuchalk.github.io/scidata/
-        #     ontology/scidata.owl#"
         # }
         self.baseurl = {}
         self.meta['@graph']['uid'] = uid
@@ -123,7 +119,7 @@ class SciData:
         """
         Add to or replace the dictionary of namespaces within @context.
         Namespaces are needed for values in a file that reference external
-        resources the define something (vocabulary/taxonomy/ontology entries).
+        resources that define something (vocabulary/taxonomy/ontology entries).
 
         :param namespaces: dictionary of namespaces (key->ns, val->URI start)
         :param replace: boolean to replace or not the existing data
@@ -137,8 +133,7 @@ class SciData:
         .. code-block:: python
 
             SciDataObject.namespaces(
-            {"sci": "https://stuchalk.github.io/scidata/
-            ontology/scidata.owl#"})
+            {"sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"})
         """
         if isinstance(namespaces, dict):
             if replace:
@@ -153,16 +148,15 @@ class SciData:
 
     def base(self, base: str) -> dict:
         """
-        Assign the JSON-LD @base URL
-        (also defines '@id' under '@graph' for consistency)
+        Assign the JSON-LD @base URL (also defines '@id' under '@graph' for consistency)
         See: https://www.w3.org/TR/json-ld/#base-iri
 
         :param base: @base URL for a JSON-LD file
 
         Defines the base url for all internal unique identifiers
-        (define though '@id's). For consistency, the codes also
-        sets the '@id' field under '@graph' so that all triple
-        subjects are unique and associated with the same graph
+        (defined though '@id' keyword fields). For consistency, the
+        code also sets the '@id' field under '@graph' so that all
+        triple subjects are unique and associated with the same graph
 
         Example:
 
@@ -323,7 +317,6 @@ class SciData:
     def publisher(self, publisher: str) -> str:
         """
         Assign the publisher field within @graph
-
         :param publisher - the name or title of the publisher of the data
 
         This is a person, project, research group, organization etc.
@@ -426,7 +419,7 @@ class SciData:
 
         .. code-block:: python
 
-            SciDataObject.related('http://example.com/greatdata.jsonld')
+            SciDataObject.related('https://example.com/greatdata.jsonld')
         """
         rels = []
         if not replace:
@@ -501,7 +494,8 @@ class SciData:
         (requires the addition of the 'w3i' namespace)
         """
         if isinstance(disc, str):
-            self.__addid(disc)
+            if ":" in disc:
+                self.__addid(disc)
             self.meta['@graph']['scidata']['discipline'] = disc
         return self.meta['@graph']['scidata']['discipline']
 
@@ -521,7 +515,8 @@ class SciData:
             SciDataObject.subdiscipline('w3i:AnalyticalChemistry')
         """
         if isinstance(subdisc, str):
-            self.__addid(subdisc)
+            if ":" in subdisc:
+                self.__addid(subdisc)
             self.meta['@graph']['scidata']['subdiscipline'] = subdisc
         return self.meta['@graph']['scidata']['subdiscipline']
 
@@ -541,7 +536,8 @@ class SciData:
             SciDataObject.evaluation('experimental')
         """
         if isinstance(evaln, str):
-            self.__addid(evaln)
+            if ":" in evaln:
+                self.__addid(evaln)
             self.meta['@graph']['scidata']['methodology']['evaluation'] = evaln
         return self.meta['@graph']['scidata']['methodology']['evaluation']
 
@@ -570,13 +566,12 @@ class SciData:
             intlinklist = None
             if '#intlinks' in listentry.keys():
                 intlinklist = listentry.pop('#intlinks')
-            rootitem = self.__iterate_function(listentry, False)
+            rootitem = self.__iterate_function(listentry)
             rootitemid = rootitem['@id']
             itemlist = [rootitem]
             if intlinklist:
                 for intlinkentry in intlinklist:
-                    intitem = (self.__iterate_function
-                               (intlinkentry, False))
+                    intitem = (self.__iterate_function(intlinkentry))
                     intitem.update({'aspects#': [rootitemid]})
                     itemlist.append(intitem)
             for n, item in enumerate(itemlist):
@@ -632,17 +627,16 @@ class SciData:
             intlinklist = None
             if '#intlinks' in listentry.keys():
                 intlinklist = listentry.pop('#intlinks')
-            rootitem = self.__iterate_function(listentry, False)
+            rootitem = self.__iterate_function(listentry)
             rootitemid = rootitem['@id']
             itemlist = [rootitem]
             if intlinklist:
                 for intlinkentry in intlinklist:
-                    intitem = self.__iterate_function(intlinkentry, False)
+                    intitem = self.__iterate_function(intlinkentry)
                     intitem.update({'facets#': [rootitemid]})
                     itemlist.append(intitem)
             for n, item in enumerate(itemlist):
-                item_noid = {k: item[k] for k in
-                             set(list(item.keys())) - {'@id'} - {'facets#'}}
+                item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'} - {'facets#'}}
                 matched_facet = 0
                 for facetitem in curr_facets:
                     facet_item_noid = {
@@ -654,8 +648,7 @@ class SciData:
                         if facetitem.get('facets#', None):
                             item['facets#'] = [rootitemid]
                             facetitem['facets#'].append(item['facets#'][0])
-                            facetitem['facets#'] = \
-                                list(set(facetitem['facets#']))
+                            facetitem['facets#'] = list(set(facetitem['facets#']))
                         matched_facet = facetitem
                 if matched_facet:
                     self.uidindex.remove(item['@id'])
@@ -818,71 +811,84 @@ class SciData:
         self.meta['@graph']['scidata'] = scidata
         return new_group
 
-    def scidatapacket(self, packet):
-        """Add a packet of data where the datapoints are linked
-            with the associated aspects and facets
+    def scidatapackage(self, package):
+        """
+        Add a package of data where the datapoints are linked with the associated aspects and facets
+        A package contains one or more 'packets' of associated aspects, facets and datapoints
 
         Template:
 
         .. code-block:: python
 
-            packet = [{'aspects':{},'facets':{},'datapoint':{}},
-                {'aspects':{},'facets':{},'datapoint':{}}]
+            package = [
+                {'aspects':{},'facets':{},'datapoints':{}},
+                {'aspects':{},'facets':{},'datapoints':{}}
+                ]
 
         Example:
 
         .. code-block:: python
 
-            SciDataObject.scidatapacket([{
-            "aspects": [
-                {"@id": "assay",
+            SciDataObject.scidatapackage([{
+            "aspects": [{
+                "@id": "assay/",
                 "@type": "sdo:assay",
-                "description": "Inhibition of human ERG
-                 by MK499 binding assay",
-                "assay_organism": "Homo sapiens"}],
+                "description": "Inhibition of human ERG by MK499 binding assay",
+                "assay_organism": "Homo sapiens"
+            }],
             "facets": [
-                {"@id": "compound",
-                "@type": "sdo:compound",
-                "mw_freebase": "491.52",
-                "full_molformula": "C26H26FN5O4",
-                "#intlinks": [
-                    {"@id": "identifier",
-                    "@type": "sdo:identifier",
-                    "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
-                {"@id": "target",
-                "@type": "sdo:target",
-                "pref_name": "HERG",
-                "tax_id": 9606,
-                "organism": "Homo sapiens"}],
-            "dataset": [
-                {"@id": "datapoint",
+                {
+                    "@id": "compound/",
+                    "@type": "sdo:compound",
+                    "mw_freebase": "491.52",
+                    "full_molformula": "C26H26FN5O4",
+                    "#intlinks": [{
+                        "@id": "identifier/",
+                        "@type": "sdo:identifier",
+                        "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"
+                    }]
+                },
+                {
+                    "@id": "target/",
+                    "@type": "sdo:target",
+                    "pref_name": "HERG",
+                    "tax_id": 9606,
+                    "organism": "Homo sapiens"
+                }
+            ],
+            "datapoints": [
+                {"@id": "datapoint/",
                 "@type": "sdo:datapoint",
                 "data":[
                     {"@id": "datum",
                     "@type": "sdo:exptdata",
                     "type": "IC50",
                     "value": "15.2",
-                    "units": "uM"}]}]}])
+                    "units": "uM"}]
+                }]
+            }])
 
         """
-        for packetentry in packet:
-            packetentry['facets'] = self.facets(packetentry['facets'])
-            packetentry['aspects'] = self.aspects(packetentry['aspects'])
-            atfacet = [a_dict["@id"] for a_dict in packetentry['facets']]
-            ataspect = [a_dict["@id"] for a_dict in packetentry['aspects']]
-            for dp in packetentry['dataset']:
+        for packet in package:
+            packet['facets'] = self.facets(packet['facets'])
+            packet['aspects'] = self.aspects(packet['aspects'])
+            atfacet = [a_dict["@id"] for a_dict in packet['facets']]
+            ataspect = [a_dict["@id"] for a_dict in packet['aspects']]
+            for dp in packet['dataset']:
                 if atfacet:
                     dp.update({'facets#': atfacet})
                 if ataspect:
                     dp.update({'aspects#': ataspect})
-            self.datapoint(packetentry['dataset'])
+            self.datapoint(packet['dataset'])
 
     def sources(self, sources: list, replace=False) -> dict:
         """
         Add to or replace the source reference list
 
         :param sources: information about where the data came from
-        :param replace: boolean to replace or not the existing data
+        :type sources: list
+        :param replace: replace (True) or add to the existing sources (False)
+        :type replace: bool (default: False)
 
         Add a list of sources with any of the available defined fields
         in the SciData context file: citation, reftype, url, doi
@@ -909,28 +915,30 @@ class SciData:
             srcs.append(ld)
         return self.meta['@graph']['sources']
 
-    def rights(self, holder: str, license: str) -> dict:
+    def rights(self, holder: str, lic: str) -> dict:
         """
         Add the rights section to the file (max: 1 entry)
 
         :param holder: the entity that holds the license to this data
-        :param license: the assigned license
+        :param lic: the assigned license
 
         """
         rights = []
-        if isinstance(holder, str) and isinstance(license, str):
+        if isinstance(holder, str) and isinstance(lic, str):
             rights = [{
                 '@id': 'rights/1/',
                 '@type': 'dc:rights',
                 'holder': holder,
-                'license': license,
+                'license': lic,
             }]
         self.meta['@graph']['rights'] = rights
         return self.meta['@graph']['rights']
 
     # private class functions
     def __addid(self, text: str) -> bool:
-        """ adds entry to ids list if string contains ':'"""
+        """
+        Adds entry to ids list if string contains ':'
+        """
         if isinstance(text, str):
             if '://' in text:
                 return False
@@ -945,8 +953,7 @@ class SciData:
     def __graphid(self, gid: str) -> bool:
         """
         Assigns the @id value within the @graph JSON object.
-
-        Automatically set as the value of the '@base'"""
+        """
         self.meta['@graph']['@id'] = gid
         return True
 
@@ -1005,10 +1012,11 @@ class SciData:
         else:
             uid = category + '/1/'
 
-        def enumuid(uid):
-            uidsplit = uid.rsplit('/', 2)
-            uid = uidsplit[0] + '/' + str(int(uidsplit[1]) + 1) + '/'
-            return uid
+        def enumuid(uidstr):
+            """ function to create unique internal id ('@id') for each section of the file """
+            uidsplit = uidstr.rsplit('/', 2)
+            uidstr = uidsplit[0] + '/' + str(int(uidsplit[1]) + 1) + '/'
+            return uidstr
 
         while uid in self.uidindex:
             uid = enumuid(uid)
@@ -1039,34 +1047,90 @@ class SciData:
     @property
     def output(self) -> dict:
         """
-        Cleans up Scidata Object
-
+        Completes and cleans a Scidata Object (instance of this class) before its output
         """
-        today = datetime.today()
-        self.meta['generatedAt'] = today.strftime("%m-%d-%y %H:%M:%S")
 
-        # clean top level
+        # add the generatedAt date
+        self.meta['generatedAt'] = datetime.today().strftime("%m-%d-%y %H:%M:%S")
+
+        # clean @graph
         for key in list(self.meta['@graph']):
             if not self.meta['@graph'][key]:
                 if key != 'toc':
                     del self.meta['@graph'][key]
+
+        # clean scidata
         for key in list(self.meta['@graph']['scidata']):
-            if not self.meta['@graph']['scidata'][key]:
+            if not self.meta['@graph']['scidata'][key] or self.meta['@graph']['scidata'][key] == "":
                 del self.meta['@graph']['scidata'][key]
-        if self.meta['@graph']['scidata'].get('methodology'):
-            if not self.meta['@graph']['scidata'] \
-                    .get('methodology', {}).get('aspects', False):
-                del self.meta['@graph']['scidata']['methodology']
-        if self.meta['@graph']['scidata'].get('system'):
-            if not self.meta['@graph']['scidata'] \
-                    .get('system', {}).get('facets', False):
-                del self.meta['@graph']['scidata']['system']
-        if self.meta['@graph']['scidata'].get('dataset'):
-            if not self.meta['@graph']['scidata'].get(
-                    'dataset', {}).get('datapoint', False):
-                if not self.meta['@graph']['scidata'].get(
-                        'dataset', {}).get('dataseries', False):
+
+        # clean methodology
+        if self.meta['@graph']['scidata']['methodology'].get('aspects', False):
+            for key in list(self.meta['@graph']['scidata']['methodology']):
+                if not self.meta['@graph']['scidata']['methodology'][key] or \
+                        self.meta['@graph']['scidata']['methodology'][key] == "":
+                    del self.meta['@graph']['scidata']['methodology'][key]
+        else:
+            # as 'aspects' is empty, delete the methodology section
+            del self.meta['@graph']['scidata']['methodology']
+
+        # clean system
+        if self.meta['@graph']['scidata']['system'].get('facets', False):
+            for key in list(self.meta['@graph']['scidata']['system']):
+                if not self.meta['@graph']['scidata']['system'][key] or \
+                        self.meta['@graph']['scidata']['system'][key] == "":
+                    del self.meta['@graph']['scidata']['system'][key]
+        else:
+            # as 'facets' is empty, delete the system section
+            del self.meta['@graph']['scidata']['system']
+
+        # remove data set if not data
+        if not self.meta['@graph']['scidata']['dataset'].get('dataseries', False):
+            if not self.meta['@graph']['scidata']['dataset'].get('datagroups', False):
+                if not self.meta['@graph']['scidata']['dataset'].get('datapoints', False):
                     del self.meta['@graph']['scidata']['dataset']
+
+        if self.meta['@graph']['scidata']['dataset']:
+            # clean dataset
+            for key in list(self.meta['@graph']['scidata']['dataset']):
+                if not self.meta['@graph']['scidata']['dataset'][key] or \
+                        self.meta['@graph']['scidata']['dataset'][key] == "":
+                    del self.meta['@graph']['scidata']['dataset'][key]
+
+            # clean dataseries
+            if 'dataseries' in self.meta['@graph']['scidata']['dataset'].keys():
+                if self.meta['@graph']['scidata']['dataset'].get('dataseries', False):
+                    for seridx, series in enumerate(self.meta['@graph']['scidata']['dataset']['dataseries']):
+                        for key in list(series):
+                            if not series[key]:
+                                del self.meta['@graph']['scidata']['dataset']['dataseries'][seridx][key]
+                else:
+                    # delete if present but empty
+                    del self.meta['@graph']['scidata']['dataset']['dataseries']
+
+            # clean datagroups
+            if 'datagroups' in self.meta['@graph']['scidata']['dataset'].keys():
+                if self.meta['@graph']['scidata']['dataset'].get('datagroups', False):
+                    for grpidx, series in enumerate(self.meta['@graph']['scidata']['dataset']['datagroups']):
+                        for key in list(series):
+                            if not series[key]:
+                                del self.meta['@graph']['scidata']['dataset']['datagroups'][grpidx][key]
+                else:
+                    # delete if present but empty
+                    del self.meta['@graph']['scidata']['dataset']['datagroups']
+
+            # clean datapoints
+            if 'datapoints' in self.meta['@graph']['scidata']['dataset'].keys():
+                if self.meta['@graph']['scidata']['dataset'].get('datapoints', False):
+                    for pntidx, series in enumerate(self.meta['@graph']['scidata']['dataset']['datapoints']):
+                        for key in list(series):
+                            if not series[key]:
+                                del self.meta['@graph']['scidata']['dataset']['datapoints'][pntidx][key]
+                else:
+                    # delete if present but empty
+                    del self.meta['@graph']['scidata']['dataset']['datapoints']
+
+        # add the toc to the output
         self.__addtoc()
 
         return self.meta
