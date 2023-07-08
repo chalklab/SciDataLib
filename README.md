@@ -2,8 +2,8 @@
 
 | Health                                                                                                                                                                                  | Releases                                                                                        |
 |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------|
-| [![GitHub Actions](https://github.com/ChalkLab/SciDataLib/actions/workflows/actions.yml/badge.svg?branch=master)](https://github.com/ChalkLab/SciDataLib/actions/workflows/actions.yml) | [![PyPI version](https://badge.fury.io/py/scidatalib.svg)](https://badge.fury.io/py/SciDataLib) |
-| [![codecov](https://codecov.io/gh/ChalkLab/SciDataLib/branch/master/graph/badge.svg)](https://codecov.io/gh/ChalkLab/SciDataLib)                                                        | [![DOI](https://zenodo.org/badge/219040010.svg)](https://zenodo.org/badge/latestdoi/219040010)  |
+| [![GitHub Actions](https://github.com/ChalkLab/SciDataLib/actions/workflows/actions.yml/badge.svg?branch=main)](https://github.com/ChalkLab/SciDataLib/actions/workflows/actions.yml) | [![PyPI version](https://badge.fury.io/py/scidatalib.svg)](https://badge.fury.io/py/SciDataLib) |
+| [![codecov](https://codecov.io/gh/ChalkLab/SciDataLib/branch/main/graph/badge.svg)](https://codecov.io/gh/ChalkLab/SciDataLib)                                                        | [![DOI](https://zenodo.org/badge/219040010.svg)](https://zenodo.org/badge/latestdoi/219040010)  |
 
 A Python library writing [SciData](http://stuchalk.github.io/scidata/) [JSON-LD](https://json-ld.org/) files.
 
