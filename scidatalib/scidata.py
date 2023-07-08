@@ -19,10 +19,11 @@ class SciData:
         """Initialize the instance using a unique id"""
 
         self.meta = {
-            "@context":
-                ["https://stuchalk.github.io/scidata/contexts/scidata.jsonld",  # def context
-                 {"sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"},  # def namespaces
-                 {}],  # def base
+            "@context": [
+                "https://stuchalk.github.io/scidata/contexts/scidata.jsonld",  # noqa
+                {"sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"},  # noqa
+                {}
+            ],  # def base
             "@id": "",  # def docid
             "generatedAt": "",  # autopopulated
             "version": "",  # def version
@@ -67,14 +68,6 @@ class SciData:
         }
         self.contexts = []
         self.nspaces = {}
-        # self.nspaces = {
-        #     "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#",
-        #     "w3i": "https://w3id.org/skgo/modsci#",
-        #     "qudt": "https://qudt.org/vocab/unit/",
-        #     "obo": "http://purl.obolibrary.org/obo/",
-        #     "dc": "http://purl.org/dc/terms/",
-        #     "xsd": "http://www.w3.org/2001/XMLSchema#",
-        # }
         self.baseurl = {}
         self.meta['@graph']['uid'] = uid
         self.uidindex = []
@@ -132,8 +125,11 @@ class SciData:
 
         .. code-block:: python
 
-            SciDataObject.namespaces(
-            {"sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"})
+          SciDataObject.namespaces(
+            {
+              "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"
+            }
+          )
         """
         if isinstance(namespaces, dict):
             if replace:
@@ -148,7 +144,8 @@ class SciData:
 
     def base(self, base: str) -> dict:
         """
-        Assign the JSON-LD @base URL (also defines '@id' under '@graph' for consistency)
+        Assign the JSON-LD @base URL
+        (also defines '@id' under '@graph' for consistency)
         See: https://www.w3.org/TR/json-ld/#base-iri
 
         :param base: @base URL for a JSON-LD file
@@ -636,7 +633,10 @@ class SciData:
                     intitem.update({'facets#': [rootitemid]})
                     itemlist.append(intitem)
             for n, item in enumerate(itemlist):
-                item_noid = {k: item[k] for k in set(list(item.keys())) - {'@id'} - {'facets#'}}
+                item_keys = set(list(item.keys()))
+                item_noid = {
+                    k: item[k] for k in item_keys - {'@id'} - {'facets#'}
+                }
                 matched_facet = 0
                 for facetitem in curr_facets:
                     facet_item_noid = {
@@ -648,7 +648,8 @@ class SciData:
                         if facetitem.get('facets#', None):
                             item['facets#'] = [rootitemid]
                             facetitem['facets#'].append(item['facets#'][0])
-                            facetitem['facets#'] = list(set(facetitem['facets#']))
+                            facet_list = list(set(facetitem['facets#']))
+                            facetitem['facets#'] = facet_list
                         matched_facet = facetitem
                 if matched_facet:
                     self.uidindex.remove(item['@id'])
@@ -813,8 +814,10 @@ class SciData:
 
     def scidatapackage(self, package):
         """
-        Add a package of data where the datapoints are linked with the associated aspects and facets
-        A package contains one or more 'packets' of associated aspects, facets and datapoints
+        Add a package of data where the datapoints are linked with the
+        associated aspects and facets.
+        A package contains one or more 'packets' of associated aspects,
+        facets and datapoints.
 
         Template:
 
@@ -829,44 +832,45 @@ class SciData:
 
         .. code-block:: python
 
-            SciDataObject.scidatapackage([{
+          SciDataObject.scidatapackage([{
             "aspects": [{
-                "@id": "assay/",
-                "@type": "sdo:assay",
-                "description": "Inhibition of human ERG by MK499 binding assay",
-                "assay_organism": "Homo sapiens"
+              "@id": "assay/",
+              "@type": "sdo:assay",
+              "description": "Inhibition of human ERG by MK499 binding assay",
+              "assay_organism": "Homo sapiens"
             }],
             "facets": [
-                {
-                    "@id": "compound/",
-                    "@type": "sdo:compound",
-                    "mw_freebase": "491.52",
-                    "full_molformula": "C26H26FN5O4",
-                    "#intlinks": [{
-                        "@id": "identifier/",
-                        "@type": "sdo:identifier",
-                        "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"
-                    }]
-                },
-                {
-                    "@id": "target/",
-                    "@type": "sdo:target",
-                    "pref_name": "HERG",
-                    "tax_id": 9606,
-                    "organism": "Homo sapiens"
-                }
-            ],
-            "datapoints": [
-                {"@id": "datapoint/",
-                "@type": "sdo:datapoint",
-                "data":[
-                    {"@id": "datum",
-                    "@type": "sdo:exptdata",
-                    "type": "IC50",
-                    "value": "15.2",
-                    "units": "uM"}]
+              {
+                "@id": "compound/",
+                "@type": "sdo:compound",
+                "mw_freebase": "491.52",
+                "full_molformula": "C26H26FN5O4",
+                "#intlinks": [{
+                  "@id": "identifier/",
+                  "@type": "sdo:identifier",
+                  "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"
                 }]
-            }])
+              },
+              {
+                "@id": "target/",
+                "@type": "sdo:target",
+                "pref_name": "HERG",
+                "tax_id": 9606,
+                "organism": "Homo sapiens"
+              }
+            ],
+            "datapoints": [{
+              "@id": "datapoint/",
+              "@type": "sdo:datapoint",
+              "data":[{
+                "@id": "datum",
+                "@type": "sdo:exptdata",
+                "type": "IC50",
+                "value": "15.2",
+                "units": "uM"
+              }]
+            }]
+          }])
 
         """
         for packet in package:
@@ -1013,7 +1017,10 @@ class SciData:
             uid = category + '/1/'
 
         def enumuid(uidstr):
-            """ function to create unique internal id ('@id') for each section of the file """
+            """
+            function to create unique internal id ('@id')
+            for each section of the file.
+            """
             uidsplit = uidstr.rsplit('/', 2)
             uidstr = uidsplit[0] + '/' + str(int(uidsplit[1]) + 1) + '/'
             return uidstr
@@ -1047,11 +1054,13 @@ class SciData:
     @property
     def output(self) -> dict:
         """
-        Completes and cleans a Scidata Object (instance of this class) before its output
+        Completes and cleans a Scidata Object (instance of this class)
+        before its output.
         """
 
         # add the generatedAt date
-        self.meta['generatedAt'] = datetime.today().strftime("%m-%d-%y %H:%M:%S")
+        today = datetime.today()
+        self.meta['generatedAt'] = today.strftime("%m-%d-%y %H:%M:%S")
 
         # clean @graph
         for key in list(self.meta['@graph']):
@@ -1061,78 +1070,84 @@ class SciData:
 
         # clean scidata
         for key in list(self.meta['@graph']['scidata']):
-            if not self.meta['@graph']['scidata'][key] or self.meta['@graph']['scidata'][key] == "":
+            value = self.meta['@graph']['scidata'][key]
+            if not value or value == "":
                 del self.meta['@graph']['scidata'][key]
 
         # clean methodology, if exists
         if 'methodology' in self.meta['@graph']['scidata']:
-            if self.meta['@graph']['scidata']['methodology'].get('aspects', False):
-                for key in list(self.meta['@graph']['scidata']['methodology']):
-                    if not self.meta['@graph']['scidata']['methodology'][key] or \
-                            self.meta['@graph']['scidata']['methodology'][key] == "":
-                        del self.meta['@graph']['scidata']['methodology'][key]
+            methodology = self.meta['@graph']['scidata']['methodology']
+
+            if methodology.get('aspects', False):
+                for key in list(methodology):
+                    if not methodology[key] or methodology[key] == "":
+                        del methodology[key]
             else:
                 # as 'aspects' is empty, delete the methodology section
-                del self.meta['@graph']['scidata']['methodology']
+                del methodology
 
             # clean system, if exists
         if 'system' in self.meta['@graph']['scidata']:
-            if self.meta['@graph']['scidata']['system'].get('facets', False):
-                for key in list(self.meta['@graph']['scidata']['system']):
-                    if not self.meta['@graph']['scidata']['system'][key] or \
-                            self.meta['@graph']['scidata']['system'][key] == "":
-                        del self.meta['@graph']['scidata']['system'][key]
+            system = self.meta['@graph']['scidata']['system']
+            if system.get('facets', False):
+                for key in list(system):
+                    if not system[key] or system[key] == "":
+                        del system[key]
             else:
                 # as 'facets' is empty, delete the system section
-                del self.meta['@graph']['scidata']['system']
+                del system
 
         # remove data set if not data
         if 'dataset' in self.meta['@graph']['scidata']:
-            if not self.meta['@graph']['scidata']['dataset'].get('dataseries', False):
-                if not self.meta['@graph']['scidata']['dataset'].get('datagroups', False):
-                    if not self.meta['@graph']['scidata']['dataset'].get('datapoints', False):
-                        del self.meta['@graph']['scidata']['dataset']
+            dataset = self.meta['@graph']['scidata']['dataset']
+            if not dataset.get('dataseries', False):
+                if not dataset.get('datagroups', False):
+                    if not dataset.get('datapoints', False):
+                        del dataset
 
         # clean dataset, if exists
         if 'dataset' in self.meta['@graph']['scidata']:
-            if self.meta['@graph']['scidata']['dataset']:
-                for key in list(self.meta['@graph']['scidata']['dataset']):
-                    if not self.meta['@graph']['scidata']['dataset'][key] or \
-                            self.meta['@graph']['scidata']['dataset'][key] == "":
-                        del self.meta['@graph']['scidata']['dataset'][key]
+            dataset = self.meta['@graph']['scidata']['dataset']
+            if dataset:
+                for key in list(dataset):
+                    if not dataset[key] or dataset[key] == "":
+                        del dataset[key]
 
                 # clean dataseries
-                if 'dataseries' in self.meta['@graph']['scidata']['dataset'].keys():
-                    if self.meta['@graph']['scidata']['dataset'].get('dataseries', False):
-                        for seridx, series in enumerate(self.meta['@graph']['scidata']['dataset']['dataseries']):
+                if 'dataseries' in dataset.keys():
+                    if dataset.get('dataseries', False):
+                        dataseries = dataset["dataseries"]
+                        for seridx, series in enumerate(dataseries):
                             for key in list(series):
                                 if not series[key]:
-                                    del self.meta['@graph']['scidata']['dataset']['dataseries'][seridx][key]
+                                    del dataseries[seridx][key]
                     else:
                         # delete if present but empty
-                        del self.meta['@graph']['scidata']['dataset']['dataseries']
+                        del dataseries
 
                 # clean datagroups
-                if 'datagroups' in self.meta['@graph']['scidata']['dataset'].keys():
-                    if self.meta['@graph']['scidata']['dataset'].get('datagroups', False):
-                        for grpidx, series in enumerate(self.meta['@graph']['scidata']['dataset']['datagroups']):
+                if 'datagroups' in dataset.keys():
+                    if dataset.get('datagroups', False):
+                        datagroups = dataset["datagroups"]
+                        for grpidx, series in enumerate(datagroups):
                             for key in list(series):
                                 if not series[key]:
-                                    del self.meta['@graph']['scidata']['dataset']['datagroups'][grpidx][key]
+                                    del datagroups[grpidx][key]
                     else:
                         # delete if present but empty
-                        del self.meta['@graph']['scidata']['dataset']['datagroups']
+                        del datagroups
 
                 # clean datapoints
-                if 'datapoints' in self.meta['@graph']['scidata']['dataset'].keys():
-                    if self.meta['@graph']['scidata']['dataset'].get('datapoints', False):
-                        for pntidx, series in enumerate(self.meta['@graph']['scidata']['dataset']['datapoints']):
+                if 'datapoints' in dataset.keys():
+                    if dataset.get('datapoints', False):
+                        datapoints = dataset["datapoints"]
+                        for pntidx, series in enumerate(datapoints):
                             for key in list(series):
                                 if not series[key]:
-                                    del self.meta['@graph']['scidata']['dataset']['datapoints'][pntidx][key]
+                                    del datapoints[pntidx][key]
                     else:
                         # delete if present but empty
-                        del self.meta['@graph']['scidata']['dataset']['datapoints']
+                        del datapoints
 
         # add the toc to the output
         self.__addtoc()
