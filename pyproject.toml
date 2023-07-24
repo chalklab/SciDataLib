@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "SciDataLib"
-version = "v0.2.6-alpha.6"
+version = "v0.3.0-alpha.1"
 description = "Python library for development of SciData JSON-LD files"
 authors = [
     "Stuart Chalk <schalk@unf.edu>",
