@@ -23,7 +23,7 @@ scidatalib = "scidatalib.cli:cli"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-numpy = "^1.24"
+numpy = "^1.22"
 
 [tool.poetry.group.dev.dependencies]
 autopep8 = "^1.7.0"
