@@ -696,4 +696,4 @@ def test_rights_replace(sd):
             "holder": holder, "license": lic}]
     inn = {'holder': holder, 'license': lic}
     sd.rights([inn, inn])
-    assert sd.rights([inn, True]) == out
+    assert sd.rights([inn], True) == out
