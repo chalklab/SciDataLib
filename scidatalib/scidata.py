@@ -940,8 +940,6 @@ class SciData:
             }
             ld.update(x)
             rites.append(ld)
-        else:
-            rites = rights
         self.meta['@graph']['rights'] = rites
         return self.meta['@graph']['rights']
 
