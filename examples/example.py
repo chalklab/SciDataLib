@@ -28,10 +28,7 @@ def create_scidata():
     example.author([sjc])
 
     # add description
-    description = (
-        'Determination of the pH of a 3 ppm cyanide solution ',
-        'after complete reaction'
-    )
+    description = 'Determination of the pH of a 3 ppm cyanide solution after complete reaction'
     example.description(description)
 
     # add publisher
@@ -308,7 +305,7 @@ def create_scidata():
         'University of North Florida'
     )
     lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
-    example.rights(holder, lic)
+    example.rights([holder, lic])
 
     packet = [{
         "aspects":
