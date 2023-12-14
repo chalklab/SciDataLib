@@ -917,25 +917,32 @@ class SciData:
             }
             ld.update(x)
             srcs.append(ld)
+        self.meta['@graph']['sources'] = srcs
         return self.meta['@graph']['sources']
 
-    def rights(self, holder: str, lic: str) -> dict:
+    def rights(self, rights: list, replace=False) -> dict:
         """
-        Add the rights section to the file (max: 1 entry)
+        Add the rights section to the file (min: 1 entry)
 
-        :param holder: the entity that holds the license to this data
-        :param lic: the assigned license
+        :param rights: the rights of the data consisting of:
+            holder: the rights holder
+            license: the license given by the holder
+        :param replace: the assigned license
 
         """
-        rights = []
-        if isinstance(holder, str) and isinstance(lic, str):
-            rights = [{
-                '@id': 'rights/1/',
-                '@type': 'dc:rights',
-                'holder': holder,
-                'license': lic,
-            }]
-        self.meta['@graph']['rights'] = rights
+        rites = []
+        if not replace:
+            rites = self.meta['@graph']['rights']
+        for x in rights:
+            ld = {
+                '@id': 'rights/' + str(len(rites) + 1) + '/',
+                '@type': 'dc:rights'
+            }
+            ld.update(x)
+            rites.append(ld)
+        else:
+            rites = rights
+        self.meta['@graph']['rights'] = rites
         return self.meta['@graph']['rights']
 
     # private class functions

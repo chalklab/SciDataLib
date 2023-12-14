@@ -675,10 +675,25 @@ def test_source(sd):
     assert sd.sources(src) == out
 
 
-def test_rights(sd):
+def test_rights_append(sd):
+    holder = 'Megadodo Productions'
+    licurl = 'https://creativecommons.org/licenses/by/4.0/'
+    lic = 'Creative Commons, Attribution 4.0 Galactic (CC BY 4.0) ' + licurl
+    out = [{"@id": "rights/1/", "@type": "dc:rights",
+            "holder": holder, "license": lic},
+           {"@id": "rights/2/", "@type": "dc:rights",
+            "holder": holder, "license": lic}]
+    inn = {'holder': holder, 'license': lic}
+    sd.rights([inn])
+    assert sd.rights([inn]) == out
+
+
+def test_rights_replace(sd):
     holder = 'Megadodo Productions'
     licurl = 'https://creativecommons.org/licenses/by/4.0/'
     lic = 'Creative Commons, Attribution 4.0 Galactic (CC BY 4.0) ' + licurl
     out = [{"@id": "rights/1/", "@type": "dc:rights",
             "holder": holder, "license": lic}]
-    assert sd.rights(holder, lic) == out
+    inn = {'holder': holder, 'license': lic}
+    sd.rights([inn, inn])
+    assert sd.rights([inn, True]) == out
