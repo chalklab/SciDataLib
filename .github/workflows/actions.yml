@@ -17,9 +17,9 @@ jobs:
       matrix:
         python-version: ["3.9", "3.10", "3.11"]
         allow_failure: [false]
-        include:
-          - python-version: "3.12"
-            allow_failure: [true]
+#        include:
+#          - python-version: "3.12"
+#            allow_failure: [true]
 
     steps:
       - uses: actions/checkout@v4
