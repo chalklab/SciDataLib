@@ -1,4 +1,4 @@
-name: GitHub Actions 
+name: GitHub Actions
 
 env:
   PYTHON_MAIN_VERSION: 3.11
@@ -11,11 +11,10 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
         python-version: ["3.9", "3.10", "3.11"]
         allow_failure: [false]
         include:
