@@ -699,3 +699,14 @@ def test_rights_replace(sd):
     inn = {'holder': holder, 'license': lic}
     sd.rights([inn, inn])
     assert sd.rights([inn], True) == out
+
+
+def test_ont_field_name_update(sd):
+    dis = 'Chemistry'
+    sub = 'mod:MultiverseChemistry'
+    sd.namespaces({'mod': 'https://w3id.org/skgo/modsci#'})
+    sd.discipline(dis)
+    sd.subdiscipline(sub)
+    out = sd.output
+    assert out['@graph']['scidata']['discipline'] == dis
+    assert out['@graph']['scidata']['subdiscipline#'] == sub
