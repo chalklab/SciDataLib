@@ -19,7 +19,7 @@ jobs:
         allow_failure: [false]
         include:
           - python-version: "3.12"
-            allow_failure: true
+            allow_failure: [true]
 
     steps:
       - uses: actions/checkout@v4
