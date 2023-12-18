@@ -300,12 +300,10 @@ def create_scidata():
 
     # add rights
     holder = (
-        'Chalk Research Group, ',
-        'Department of Chemistry, ',
-        'University of North Florida'
+        'Chalk Research Group, Department of Chemistry, Univ. of North Florida'
     )
     lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
-    example.rights([holder, lic])
+    example.rights([{'holder': holder, 'license': lic}])
 
     packet = [{
         "aspects":
@@ -357,6 +355,8 @@ def create_scidata():
         "dataset": [
             {"@id": "datapoint",
              "@type": "sdo:datapoint",
+             "empty_entry": "",
+             "some_entry": "some",
              "data": [
                  {"@id": "datum",
                   "@type": "sdo:exptdata",
@@ -365,7 +365,7 @@ def create_scidata():
                       "12.300000000000000000000000000000",
                   "units": "uM"}]}]}]
 
-    example.scidatapacket(packet)
+    example.scidatapackage(packet)
 
     # print(json.dumps(example.output, ensure_ascii=False))
     print(json.dumps(example.output, indent=4, ensure_ascii=False))

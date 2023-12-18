@@ -59,6 +59,8 @@ class SciData:
                     "dataset": {
                         "@id": "dataset/",
                         "@type": "sdo:dataset",
+                        "dataseries": [],  # def dataseries
+                        "datagroup": [],  # def datagroup
                         "datapoint": [],  # def datapoint OR def scidatapacket
                         "scope": ""},  # def scope
                 },
@@ -1060,7 +1062,7 @@ class SciData:
     def output(self) -> dict:
         """
         Completes and cleans a Scidata Object (instance of this class)
-        before its output.
+        before it is output.
         """
 
         # add the generatedAt date
@@ -1076,83 +1078,99 @@ class SciData:
         # clean scidata
         for key in list(self.meta['@graph']['scidata']):
             value = self.meta['@graph']['scidata'][key]
-            if not value or value == "":
+            if not value:
                 del self.meta['@graph']['scidata'][key]
 
         # clean methodology, if exists
         if 'methodology' in self.meta['@graph']['scidata']:
-            methodology = self.meta['@graph']['scidata']['methodology']
-
-            if methodology.get('aspects', False):
-                for key in list(methodology):
-                    if not methodology[key] or methodology[key] == "":
-                        del methodology[key]
+            # check if aspects is set or not in methodology
+            if 'aspects' in self.meta['@graph']['scidata']['methodology'].keys():
+                # check if aspects has data
+                if self.meta['@graph']['scidata']['methodology']['aspects']:
+                    for key in list(self.meta['@graph']['scidata']['methodology']):
+                        if not self.meta['@graph']['scidata']['methodology'][key]:
+                            del self.meta['@graph']['scidata']['methodology'][key]
+                else:
+                    # as 'aspects' is present but empty, delete the methodology section
+                    del self.meta['@graph']['scidata']['methodology']
             else:
-                # as 'aspects' is empty, delete the methodology section
-                del methodology
+                # as 'aspects' is not present, delete the methodology section
+                del self.meta['@graph']['scidata']['methodology']
 
-            # clean system, if exists
+        # clean system, if exists
         if 'system' in self.meta['@graph']['scidata']:
-            system = self.meta['@graph']['scidata']['system']
-            if system.get('facets', False):
-                for key in list(system):
-                    if not system[key] or system[key] == "":
-                        del system[key]
+            if 'facets' in self.meta['@graph']['scidata']['system'].keys():
+                # check if aspects has data
+                if self.meta['@graph']['scidata']['system']['facets']:
+                    for key in list(self.meta['@graph']['scidata']['system']):
+                        if not self.meta['@graph']['scidata']['system'][key]:
+                            del self.meta['@graph']['scidata']['system'][key]
+                else:
+                    # as 'aspects' is present but empty, delete the methodology section
+                    del self.meta['@graph']['scidata']['system']
             else:
-                # as 'facets' is empty, delete the system section
-                del system
+                # as 'facets'  is not present, delete the system section
+                del self.meta['@graph']['scidata']['system']
 
-        # remove data set if not data
+        # remove dataset if no data
         if 'dataset' in self.meta['@graph']['scidata']:
-            dataset = self.meta['@graph']['scidata']['dataset']
-            if not dataset.get('dataseries', False):
-                if not dataset.get('datagroups', False):
-                    if not dataset.get('datapoints', False):
-                        del dataset
+            if not self.meta['@graph']['scidata']['dataset']['dataseries']:
+                if not self.meta['@graph']['scidata']['dataset']['datagroup']:
+                    if not self.meta['@graph']['scidata']['dataset']['datapoint']:
+                        del self.meta['@graph']['scidata']['dataset']
 
         # clean dataset, if exists
         if 'dataset' in self.meta['@graph']['scidata']:
-            dataset = self.meta['@graph']['scidata']['dataset']
-            if dataset:
-                for key in list(dataset):
-                    if not dataset[key] or dataset[key] == "":
-                        del dataset[key]
+            # if dataset exists and is not empty
+            if self.meta['@graph']['scidata']['dataset']:
+                # check each key of the dictionary
+                for key in list(self.meta['@graph']['scidata']['dataset']):
+                    if not self.meta['@graph']['scidata']['dataset'][key]:
+                        # if the key section is empty, delete the key section
+                        del self.meta['@graph']['scidata']['dataset'][key]
 
                 # clean dataseries
-                if 'dataseries' in dataset.keys():
-                    if dataset.get('dataseries', False):
-                        dataseries = dataset["dataseries"]
-                        for seridx, series in enumerate(dataseries):
-                            for key in list(series):
-                                if not series[key]:
-                                    del dataseries[seridx][key]
+                if 'dataseries' in list(self.meta['@graph']['scidata']['dataset']):
+                    if self.meta['@graph']['scidata']['dataset']['dataseries']:
+                        # look at each series in the list
+                        for seridx in range(len(self.meta['@graph']['scidata']['dataset']['dataseries'])):
+                            for key in list(self.meta['@graph']['scidata']['dataset']['dataseries'][seridx]):
+                                # if the dictionary entry is empty, delete the dictionary entry
+                                if not self.meta['@graph']['scidata']['dataset']['dataseries'][seridx][key]:
+                                    del self.meta['@graph']['scidata']['dataset']['dataseries'][seridx][key]
                     else:
-                        # delete if present but empty
-                        del dataseries
+                        # delete if dataseries is present but empty
+                        del self.meta['@graph']['scidata']['dataset']['dataseries']
 
                 # clean datagroups
-                if 'datagroups' in dataset.keys():
-                    if dataset.get('datagroups', False):
-                        datagroups = dataset["datagroups"]
-                        for grpidx, series in enumerate(datagroups):
-                            for key in list(series):
-                                if not series[key]:
-                                    del datagroups[grpidx][key]
+                if 'datagroup' in list(self.meta['@graph']['scidata']['dataset']):
+                    if self.meta['@graph']['scidata']['dataset']['datagroup']:
+                        # look at each series in the list
+                        for grpidx in range(len(self.meta['@graph']['scidata']['dataset']['datagroup'])):
+                            for key in list(self.meta['@graph']['scidata']['dataset']['datagroup'][grpidx]):
+                                # if the dictionary entry is empty, delete the dictionary entry
+                                if not self.meta['@graph']['scidata']['dataset']['datagroup'][grpidx][key]:
+                                    del self.meta['@graph']['scidata']['dataset']['datagroup'][grpidx][key]
                     else:
-                        # delete if present but empty
-                        del datagroups
+                        # delete if datagroup is present but empty
+                        del self.meta['@graph']['scidata']['dataset']['datagroup']
 
                 # clean datapoints
-                if 'datapoints' in dataset.keys():
-                    if dataset.get('datapoints', False):
-                        datapoints = dataset["datapoints"]
-                        for pntidx, series in enumerate(datapoints):
-                            for key in list(series):
-                                if not series[key]:
-                                    del datapoints[pntidx][key]
+                if 'datapoint' in list(self.meta['@graph']['scidata']['dataset']):
+                    if self.meta['@graph']['scidata']['dataset']['datapoint']:
+                        # look at each series in the list
+                        for pntidx in range(len(self.meta['@graph']['scidata']['dataset']['datapoint'])):
+                            for key in list(self.meta['@graph']['scidata']['dataset']['datapoint'][pntidx]):
+                                # if the dictionary entry is empty, delete the dictionary entry
+                                if not self.meta['@graph']['scidata']['dataset']['datapoint'][pntidx][key]:
+                                    del self.meta['@graph']['scidata']['dataset']['datapoint'][pntidx][key]
                     else:
-                        # delete if present but empty
-                        del datapoints
+                        # delete if datapoint is present but empty
+                        del self.meta['@graph']['scidata']['dataset']['datapoint']
+
+            else:
+                # dataset exists but is empty
+                del self.meta['@graph']['scidata']['dataset']
 
         # add the toc to the output
         self.__addtoc()
