@@ -437,15 +437,16 @@ def test_datagroup_with_datapoints(sd):
                 "label": "datagroup 2",
                 "ids": ["datapoint/3/", "datapoint/4/"]}
 
-    out = [{
-        "@id": "datagroup/1/",
-        "@type": "sdo:datagroup",
-        "label": "datagroup 1",
-        "ids": [
-            "datapoint/1/",
-            "datapoint/2/"
-        ]
-    },
+    out = [
+        {
+            "@id": "datagroup/1/",
+            "@type": "sdo:datagroup",
+            "label": "datagroup 1",
+            "ids": [
+                "datapoint/1/",
+                "datapoint/2/"
+            ]
+        },
         {
             "@id": "datagroup/2/",
             "@type": "sdo:datagroup",

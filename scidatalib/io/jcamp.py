@@ -456,7 +456,7 @@ def _read_post_process_data_xy(
             x = np.append(x, xstart[n] + (dx * np.arange(xnum[n])))
 
         if xnum[len(xnum) - 1] > 1:
-            numerator = (jcamp_dict['lastx'] - xstart[len(xnum)-1])
+            numerator = (jcamp_dict['lastx'] - xstart[len(xnum) - 1])
             denominator = (xnum[len(xnum) - 1] - 1.0)
             dx = numerator / denominator
 
