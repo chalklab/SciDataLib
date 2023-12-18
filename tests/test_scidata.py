@@ -454,7 +454,8 @@ def test_datagroup_with_datapoints(sd):
                 "datapoint/3/",
                 "datapoint/4/"
             ]
-        }]
+        }
+    ]
     assert sd.datagroup([datagrp1, datagrp2]) == out
 
 

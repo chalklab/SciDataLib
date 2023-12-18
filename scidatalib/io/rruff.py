@@ -197,11 +197,11 @@ def _read_translate_rruff_to_scidata(rruff_dict: dict) -> dict:
 
     if "url" in rruff_dict:
         sources.append({
-                "@id": f"source/{len(sources) + 1}",
-                "@type": "dc:source",
-                "citation": "RRUFF project database entry",
-                "url": f'https://{rruff_dict.get("url")}',
-            })
+            "@id": f"source/{len(sources) + 1}",
+            "@type": "dc:source",
+            "citation": "RRUFF project database entry",
+            "url": f'https://{rruff_dict.get("url")}',
+        })
     scidata.sources(sources)
 
     # Discipline and sub-discipline

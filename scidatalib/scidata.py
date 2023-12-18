@@ -66,7 +66,7 @@ class SciData:
                 },
                 "sources": [],  # def sources
                 "rights": []  # def rights
-                }
+            }
         }
         self.contexts = []
         self.nspaces = {}
@@ -457,19 +457,19 @@ class SciData:
             for idee in ids:
                 if ':' in idee:
                     if idee.split(':')[0] not in self.nspaces.keys():
-                        print('Note: Namespace <'
-                              + idee.split(':')[0]
-                              + "> not set. A crosswalk "
-                                "url prefix is likely not "
-                                "matched with it's linked namespace")
+                        print('Note: Namespace <' +
+                              idee.split(':')[0] +
+                              "> not set. A crosswalk "
+                              "url prefix is likely not "
+                              "matched with it's linked namespace")
                         # raise EnvironmentError
                     curr_ids.append(idee)
         elif isinstance(ids, str):
             if ':' in ids:
                 if ids.split(':')[0] not in self.nspaces.keys():
-                    print('Note: Namespace <' + ids.split(':')[0]
-                          + "> not set. A crosswalk url prefix is "
-                            "likely not matched with it's linked namespace")
+                    print('Note: Namespace <' + ids.split(':')[0] +
+                          "> not set. A crosswalk url prefix is "
+                          "likely not matched with it's linked namespace")
                     # raise EnvironmentError
                 curr_ids.append(ids)
         self.meta['@graph']['ids'] = sorted(set(curr_ids))

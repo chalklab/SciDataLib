@@ -100,9 +100,7 @@ def convert_rruff():
         'name': name,
         'formula': formula
     }
-    meta = requests.get(
-        'https://opsin.ch.cam.ac.uk/opsin/' +
-        name).json()  # get metadata from OPSIN
+    meta = requests.get('https://opsin.ch.cam.ac.uk/opsin/' + name).json()  # get metadata from OPSIN
     ignore = ['status', 'message', 'cml', 'inchi']
     for key, value in meta.items():
         if key not in ignore:

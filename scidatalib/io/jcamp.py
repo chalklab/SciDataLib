@@ -224,7 +224,7 @@ def _read_parse_dataset_duplicate_characters(line: str) -> str:
             # NOTE: subtract one since we will already have one character from
             #       the original one we are duplicating from.
             nduplicates = DUP_digits[char] - 1
-            new_line += line[i-1] * nduplicates
+            new_line += line[i - 1] * nduplicates
         else:
             new_line += char
     return "".join(new_line)
@@ -451,16 +451,16 @@ def _read_post_process_data_xy(
     if jcamp_dict.get(_DATA_XY_TYPE_KEY) == _DATA_FORMAT_XYYY:
         xstart.append(jcamp_dict['lastx'])
         x = np.array([])
-        for n in range(len(xnum)-1):
-            dx = (xstart[n+1] - xstart[n]) / xnum[n]
-            x = np.append(x, xstart[n]+(dx*np.arange(xnum[n])))
+        for n in range(len(xnum) - 1):
+            dx = (xstart[n + 1] - xstart[n]) / xnum[n]
+            x = np.append(x, xstart[n] + (dx * np.arange(xnum[n])))
 
         if xnum[len(xnum) - 1] > 1:
             numerator = (jcamp_dict['lastx'] - xstart[len(xnum)-1])
-            denominator = (xnum[len(xnum)-1] - 1.0)
+            denominator = (xnum[len(xnum) - 1] - 1.0)
             dx = numerator / denominator
 
-            xnext = xstart[len(xnum)-1]+(dx*np.arange(xnum[len(xnum)-1]))
+            xnext = xstart[len(xnum) - 1] + (dx * np.arange(xnum[len(xnum) - 1]))
             x = np.append(x, xnext)
         else:
             x = np.append(x, jcamp_dict['lastx'])
@@ -660,7 +660,7 @@ def _read_get_aspects_section(jcamp_dict: dict) -> dict:
             "@id": "measurement/1",
             "@type": "sdo:measurement",
             "techniqueType": "cao:spectroscopy",
-            "instrument":  f'{jcamp_dict.get("spectrometer/data system")}',
+            "instrument": f'{jcamp_dict.get("spectrometer/data system")}',
         }
 
     settings = []
