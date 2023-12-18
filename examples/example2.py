@@ -6,7 +6,7 @@ import requests
 
 def convert_rruff():
     """ load and process rruff file """
-    f = open("tests/data/rruff/raman_soddyite.rruff", "r")
+    f = open("../tests/data/rruff/raman_soddyite.rruff", "r")
     lines = f.read().splitlines()
     rruff, seriesx, seriesy = {}, [], []
     for line in lines:
@@ -179,7 +179,7 @@ def convert_rruff():
         'relating to the database and software, ',
         'nor in any copy of any part of the database and software.'
     )
-    example2.rights(holder, lic)
+    example2.rights([{'holder': holder, 'license': lic}])
 
     print(json.dumps(example2.output, indent=4))
     exit()

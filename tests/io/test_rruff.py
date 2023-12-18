@@ -37,8 +37,8 @@ def test_read_rruff(raman_soddyite_file):
     assert "RRUFF" in graph["sources"][1]["citation"]
     assert graph["sources"][1]["url"] == "https://rruff.info/R060361"
 
-    assert graph["scidata"]["discipline"] == "w3i:Chemistry"
-    assert graph["scidata"]["subdiscipline"] == "w3i:AnalyticalChemistry"
+    assert graph["scidata"]["discipline#"] == "w3i:Chemistry"
+    assert graph["scidata"]["subdiscipline#"] == "w3i:AnalyticalChemistry"
 
     # Check description has all the keywords from RRUFF file
     description = graph.get("description")
