@@ -28,7 +28,7 @@ def create_scidata():
     example.author([sjc])
 
     # add description
-    description = 'Determination of the pH of a 3 ppm cyanide solution after complete reaction'
+    description = 'Determination of the pH of a 3 ppm cyanide solution'
     example.description(description)
 
     # add publisher
