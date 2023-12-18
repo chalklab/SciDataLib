@@ -41,10 +41,14 @@ def create_scidata():
     link = 'https://stuchalk.github.io/scidata/examples/ph_min.jsonld'
     example.permalink(link)
 
-    # add discipline and subdiscipline (plus namespace)
+    # add namespaces (needed for values that point to ontological definitions of things)
     example.namespaces({'w3i': 'https://w3id.org/skgo/modsci#'})
-    example.discipline('w3i:Chemistry')
-    example.subdiscipline('w3i:ChemicalInformatics')
+    example.namespaces({'qudt': 'https://qudt.org/vocab/unit/'})
+    example.namespaces({'obo': 'http://purl.obolibrary.org/obo/'})
+
+    # add discipline and subdiscipline
+    example.discipline('Chemistry')
+    example.subdiscipline('w3i:Cheminformatics')
 
     """ METHODOLOGY SECTION """
     # methodology data goes into the aspects array in the JSON-LD file
@@ -363,7 +367,7 @@ def create_scidata():
                   "type": "IC50",
                   "value":
                       "12.300000000000000000000000000000",
-                  "units": "uM"}]}]}]
+                  "units": "qudt:MicroM"}]}]}]
 
     example.scidatapackage(packet)
 

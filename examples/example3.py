@@ -38,54 +38,54 @@ comp6 = {
     'chebi': 'obo:CHEBI_15377'}
 
 con1 = {
-    '@id': 'constituent',
+    '@id': 'constituent/1/',
     'source': 'substance/1/',
     'role': 'chm:analyte',
-    'properties': [{
-        '@id': 'property',
-        'quantity': 'mass of substance per volume',
-        'property': 'Concentration (w/v)',
+    'quantities': [{
+        '@id': 'quantity/1/',
+        'quantitykind': 'mass of substance per volume',
+        'quantity': 'Concentration (w/v)',
         'value': {
             '@id': 'value', 'number': 2.99, 'unitref': 'qudt:PPM'}
     }, {
-        '@id': 'property',
-        'quantity': 'volume',
-        'property': 'Volume of solution',
+        '@id': 'quantity/2/',
+        'quantitykind': 'volume',
+        'quantity': 'Volume of solution',
         'value': {
             '@id': 'value', 'number': 100.0, 'unitref': 'qudt:MilliL'}
     }]
 }
 con2 = {
-    '@id': 'constituent',
+    '@id': 'constituent/2/',
     'source': 'substance/2/',
     'role': 'chm:reagent',
     'properties': [{
-        '@id': 'property',
-        'quantity': 'mass of substance per volume',
-        'property': 'Concentration (w/v)',
+        '@id': 'quantity/1/',
+        'quantitykind': 'mass of substance per volume',
+        'quantity': 'Concentration (w/v)',
         'value': {
             '@id': 'value', 'number': 2.99, 'unitref': 'qudt:PPM'}
     }, {
-        '@id': 'property',
-        'quantity': 'volume',
-        'property': 'Volume of solution',
+        '@id': 'quantity/2/',
+        'quantitykind': 'volume',
+        'quantity': 'Volume of solution',
         'value': {
             '@id': 'value', 'number': 100.0, 'unitref': 'qudt:MilliL'}
     }]}
 con3 = {
-    '@id': 'constituent',
+    '@id': 'constituent/3/',
     'source': 'substance/3/',
     'role': 'chm:reagent'}
 con4 = {
-    '@id': 'constituent',
+    '@id': 'constituent/4/',
     'source': 'substance/4/',
     'role': 'chm:buffer'}
 con5 = {
-    '@id': 'constituent',
+    '@id': 'constituent/5/',
     'source': 'substance/5/',
     'role': 'chm:solvent'}
 con6 = {
-    '@id': 'constituent',
+    '@id': 'constituent/6/',
     'source': 'substance/6/',
     'role': 'chm:solvent'}
 cons = [con1, con2, con3, con4, con5, con6]
@@ -99,25 +99,25 @@ sub1 = {
     'phase#': 'sub:liquid',
     'constituents': cons,
     'properties': [{
-        '@id': 'property',
-        'quantity': 'mass of substance per volume',
-        'property': 'Concentration (w/v)',
+        '@id': 'quantity/1/',
+        'quantitykind': 'mass of substance per volume',
+        'quantity': 'Concentration (w/v)',
         'value': {
             '@id': 'value', 'number': 4, 'unitref': 'qudt:PPM'}
     }, {
-        '@id': 'property',
-        'quantity': 'volume',
-        'property': 'Volume of solution',
+        '@id': 'quantity/2/',
+        'quantitykind': 'volume',
+        'quantity': 'Volume of solution',
         'value': {
             '@id': 'value', 'number': 250.0, 'unitref': 'qudt:MilliL'}
     }]}
 con1 = {
-    '@id': 'condition',
+    '@id': 'condition/1/',
     'source': 'measurement/1/',
     'scope': 'substance/1/',
-    'quantity': 'temperature',
-    'property': 'Ambient temperature',
-    'propertyref': 'gb:T06321',
+    'quantitykind': 'temperature',
+    'quantity': 'Ambient temperature',
+    'quantity#': 'gb:T06321',
     'value': '100.0'}
 facets = [comp1, comp2, comp3, comp4, comp5, comp6, sub1, con1]
 example.facets(facets)

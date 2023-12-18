@@ -46,11 +46,14 @@ class SciData:
                     "@id": "scidata/",
                     "@type": "sdo:scientificData",
                     "discipline": "",  # def discipline
+                    "discipline#": "",  # def discipline (ont entry)
                     "subdiscipline": "",  # def subdiscipline
+                    "subdiscipline#": "",  # def subdiscipline (ont entry)
                     "methodology": {
                         "@id": "methodology/",
                         "@type": "sdo:methodology",
                         "evaluation": "",  # def evaluation
+                        "evaluation#": "",  # def evaluation (ont entry)
                         "aspects": []},  # def aspects OR def scidatapacket
                     "system": {
                         "@id": "system/",
@@ -490,9 +493,15 @@ class SciData:
         """
         if isinstance(disc, str):
             if ":" in disc:
-                self.__addid(disc)
-            self.meta['@graph']['scidata']['discipline'] = disc
-        return self.meta['@graph']['scidata']['discipline']
+                if self.__addid(disc):
+                    self.meta['@graph']['scidata']['discipline#'] = disc
+                    return self.meta['@graph']['scidata']['discipline#']
+                else:
+                    self.meta['@graph']['scidata']['discipline'] = disc
+                    return self.meta['@graph']['scidata']['discipline']
+            else:
+                self.meta['@graph']['scidata']['discipline'] = disc
+                return self.meta['@graph']['scidata']['discipline']
 
     def subdiscipline(self, subdisc: str) -> str:
         """
@@ -511,9 +520,15 @@ class SciData:
         """
         if isinstance(subdisc, str):
             if ":" in subdisc:
-                self.__addid(subdisc)
-            self.meta['@graph']['scidata']['subdiscipline'] = subdisc
-        return self.meta['@graph']['scidata']['subdiscipline']
+                if self.__addid(subdisc):
+                    self.meta['@graph']['scidata']['subdiscipline#'] = subdisc
+                    return self.meta['@graph']['scidata']['subdiscipline#']
+                else:
+                    self.meta['@graph']['scidata']['subdiscipline'] = subdisc
+                    return self.meta['@graph']['scidata']['subdiscipline']
+            else:
+                self.meta['@graph']['scidata']['subdiscipline'] = subdisc
+                return self.meta['@graph']['scidata']['subdiscipline']
 
     def evaluation(self, evaln: str) -> str:
         """
@@ -532,9 +547,15 @@ class SciData:
         """
         if isinstance(evaln, str):
             if ":" in evaln:
-                self.__addid(evaln)
-            self.meta['@graph']['scidata']['methodology']['evaluation'] = evaln
-        return self.meta['@graph']['scidata']['methodology']['evaluation']
+                if self.__addid(evaln):
+                    self.meta['@graph']['scidata']['methodology']['evaluation#'] = evaln
+                    return self.meta['@graph']['scidata']['methodology']['evaluation#']
+                else:
+                    self.meta['@graph']['scidata']['methodology']['evaluation'] = evaln
+                    return self.meta['@graph']['scidata']['methodology']['evaluation']
+            else:
+                self.meta['@graph']['scidata']['methodology']['evaluation'] = evaln
+                return self.meta['@graph']['scidata']['methodology']['evaluation']
 
     def aspects(self, aspects: list) -> list:
         """Add to or replace the aspects of the file
@@ -883,7 +904,7 @@ class SciData:
                     dp.update({'aspects#': ataspect})
             self.datapoint(packet['dataset'])
 
-    def sources(self, sources: list, replace=False) -> dict:
+    def sources(self, sources: list, replace=False) -> list:
         """
         Add to or replace the source reference list
 
@@ -913,6 +934,9 @@ class SciData:
                 '@id': 'source/' + str(len(srcs) + 1) + '/',
                 '@type': 'dc:source'
             }
+            # check data in source for values that are ontological (':')
+            # updates dictionary keys with additional '#' if not present and needed
+            x = self.__chkont(x)
             ld.update(x)
             srcs.append(ld)
         self.meta['@graph']['sources'] = srcs
@@ -949,13 +973,29 @@ class SciData:
         if isinstance(text, str):
             if '://' in text:
                 return False
-            elif len(text.split(':')) > 1:
-                return False
-            elif ':' in text:
+            elif ':' in text and len(text.split(':')) == 2:
                 self.ids(text)
                 return True
+            else:
+                return False
         else:
             return False
+
+    def __chkont(self, data: dict) -> bool:
+        # checks that
+        keys = list(data.keys())
+        vals = list(data.values())
+        data = {}
+        for val in vals:
+            idx = vals.index(val)
+            if ':' in val:
+                # check this is ontology entry and if it is then check the dictionary key for '#'
+                if self.__addid(val):
+                    # update dictionary name (keys) with '#' ending if not already present
+                    if keys[idx][-1] != "#":
+                        keys[idx] = keys[idx] + "#"
+            data.update({keys[idx]: vals[idx]})
+        return data
 
     def __graphid(self, gid: str) -> bool:
         """
