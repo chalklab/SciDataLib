@@ -5,7 +5,7 @@ env:
 
 on:
   push:
-    tags: 'foo-test-v[0-9]+.[0-9]+.[0-9]+-*'
+    tags: 'test-v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
   build:
