@@ -91,7 +91,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.context(
             ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld'])
@@ -129,7 +129,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
           SciDataObject.namespaces(
             {
@@ -163,7 +163,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.graph_uid("<uniqueidentifier>")
         """
@@ -223,7 +223,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.graph_uid("<uniqueidentifier>")
         """
@@ -249,7 +249,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.author(
             [{'name': 'George Washington', 'ORCID': 1},
@@ -259,7 +259,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.author(['George Washington', 'John Adams'])
         """
@@ -290,7 +290,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.title("The Hitchhiker's Guide to the Galaxy")
         """
@@ -309,7 +309,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.description('a brief description')
         """
@@ -326,7 +326,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.publisher('The Daily Prophet')
         """
@@ -345,7 +345,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.graphversion('ChEMBL database v28')
         """
@@ -362,7 +362,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.keywords('important')
         """
@@ -383,11 +383,11 @@ class SciData:
 
         :param stime: datetime string
 
-        Typically in "%m-%d-%y %H:%M:%S" format
+        Typically, in "%m-%d-%y %H:%M:%S" format
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.starttime('04-05-21 06:14:53')
         """
@@ -403,7 +403,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.permalink('https://permanent.link.com/data1')
         """
@@ -420,7 +420,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.related('https://example.com/greatdata.jsonld')
         """
@@ -450,7 +450,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.ids(['chebi:00001','qudt:GM'])
 
@@ -459,16 +459,16 @@ class SciData:
         curr_ids = self.meta['@graph']['ids']
         if isinstance(ids, list):
             for idee in ids:
-                if ':' in idee:
-                    if idee.split(':')[0] not in self.nspaces.keys():
-                        print('Note: Namespace <' + idee.split(':')[0] + "> not set. A crosswalk "
+                if ":" in idee:
+                    if idee.split(":")[0] not in self.nspaces.keys():
+                        print('Note: Namespace <' + idee.split(":")[0] + "> not set. A crosswalk "
                               "url prefix is likely not matched with it's linked namespace")
                         # raise EnvironmentError
                     curr_ids.append(idee)
         elif isinstance(ids, str):
-            if ':' in ids:
-                if ids.split(':')[0] not in self.nspaces.keys():
-                    print('Note: Namespace <' + ids.split(':')[0] + "> not set. A crosswalk url prefix is "
+            if ":" in ids:
+                if ids.split(":")[0] not in self.nspaces.keys():
+                    print('Note: Namespace <' + ids.split(":")[0] + "> not set. A crosswalk url prefix is "
                           "likely not matched with it's linked namespace")
                     # raise EnvironmentError
                 curr_ids.append(ids)
@@ -486,14 +486,14 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.discipline('w3i:Chemistry')
 
         (requires the addition of the 'w3i' namespace)
         """
         if isinstance(disc, str):
-            if ":" in disc:
+            if ":" in disc and ": " not in disc and "':" not in disc:
                 if self.__addid(disc):
                     self.meta['@graph']['scidata']['discipline#'] = disc
                     return self.meta['@graph']['scidata']['discipline#']
@@ -515,12 +515,12 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.subdiscipline('w3i:AnalyticalChemistry')
         """
         if isinstance(subdisc, str):
-            if ":" in subdisc:
+            if ":" in subdisc and ": " not in subdisc and "':" not in subdisc:
                 if self.__addid(subdisc):
                     self.meta['@graph']['scidata']['subdiscipline#'] = subdisc
                     return self.meta['@graph']['scidata']['subdiscipline#']
@@ -542,12 +542,12 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.evaluation('experimental')
         """
         if isinstance(evaln, str):
-            if ":" in evaln:
+            if ":" in evaln and ": " not in evaln and "':" not in evaln:
                 if self.__addid(evaln):
                     self.meta['@graph']['scidata']['methodology']['evaluation#'] = evaln
                     return self.meta['@graph']['scidata']['methodology']['evaluation#']
@@ -563,7 +563,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.aspects(
             [{"@id": "assay",
@@ -625,7 +625,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.facets(
             [{"@id": "compound",
@@ -695,7 +695,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.scope('chemicalsystem/1/')
         """
@@ -841,7 +841,7 @@ class SciData:
 
         Template:
 
-        .. code-block:: python
+        code-block:: python
 
             package = [
                 {'aspects':{},'facets':{},'datapoints':{}},
@@ -850,7 +850,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
           SciDataObject.scidatapackage([{
             "aspects": [{
@@ -919,7 +919,7 @@ class SciData:
 
         Example:
 
-        .. code-block:: python
+        code-block:: python
 
             SciDataObject.sources([
             {'citation': 'Chalk, S.J. SciData: a data model and
@@ -935,7 +935,7 @@ class SciData:
                 '@id': 'source/' + str(len(srcs) + 1) + '/',
                 '@type': 'dc:source'
             }
-            # check data in source for values that are ontological (':')
+            # check data in source for values that are ontological (":")
             # updates dictionary keys with additional '#' if not present and needed
             x = self.__chkont(x)
             ld.update(x)
@@ -969,12 +969,12 @@ class SciData:
     # private class functions
     def __addid(self, text: str) -> bool:
         """
-        Adds entry to ids list if string contains ':'
+        Adds entry to ids list if string contains ":"
         """
         if isinstance(text, str):
             if '://' in text:
                 return False
-            elif ':' in text and len(text.split(':')) == 2:
+            elif ":" in text and len(text.split(":")) == 2:
                 self.ids(text)
                 return True
             else:
@@ -989,7 +989,7 @@ class SciData:
         data = {}
         for val in vals:
             idx = vals.index(val)
-            if ':' in val:
+            if ":" in val and ": " not in val and "':" not in val:
                 # check this is ontology entry and if it is then check the dictionary key for '#'
                 if self.__addid(val):
                     # update dictionary name (keys) with '#' ending if not already present
