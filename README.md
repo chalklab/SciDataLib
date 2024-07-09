@@ -51,7 +51,7 @@ code uses the '@base' to populate this, so they are consistent. As a result,
   "@context": [
     "https://stuchalk.github.io/scidata/contexts/scidata.jsonld",
     {
-      "sci": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"
+      "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"
     },
     {
       "@base": "https://my.research.edu/<uniqueid>/"
