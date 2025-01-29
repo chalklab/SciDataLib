@@ -1,7 +1,7 @@
 name: Release to PyPi 
 
 env:
-  POETRY_VERSION: 1.8.5
+  POETRY_VERSION: 2.0.1
 
 on:
   push:
