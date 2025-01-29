@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "SciDataLib"
-version = "v0.3.0"
+version = "v0.4.0"
 description = "Python library for development of SciData JSON-LD files"
 authors = [
     "Stuart Chalk <schalk@unf.edu>",
@@ -22,15 +22,15 @@ classifiers = [
 scidatalib = "scidatalib.cli:cli"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-numpy = "^1.22"
+python = "^3.10"
+numpy = "^2.2.0"
 
 [tool.poetry.group.dev.dependencies]
-autopep8 = "^1.7.0"
-flake8 = "^5.0.4"
-pytest = "^7.2.0"
-pytest-cov = "^4.0.0"
+autopep8 = "^2.3.2"
+flake8 = "^7.1.1"
+pytest = "^8.3.4"
+pytest-cov = "^6.0.0"
 
 [build-system]
-requires = ["poetry-core>=1.4.0"]
+requires = ["poetry-core>=1.9.1"]
 build-backend = "poetry.core.masonry.api"

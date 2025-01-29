@@ -303,73 +303,72 @@ def create_scidata():
     example.sources([src])
 
     # add rights
-    holder = (
-        'Chalk Research Group, Department of Chemistry, Univ. of North Florida'
-    )
+    holder = 'Chalk Research Group, Department of Chemistry and Biochemistry, Univ. of North Florida'
+
     lic = 'https://creativecommons.org/licenses/by-nc-nd/4.0/'
     example.rights([{'holder': holder, 'license': lic}])
 
-    packet = [{
-        "aspects":
-            [{"@id": "assay",
-              "@type": "sdo:assay",
-              "description": "Inhibition of human hERG by MK499 binding assay",
-              "assay_organism": "Homo sapiens"}],
-        "facets": [
-            {"@id": "substance",
-             "mw_freebase": "491.52",
-             "full_molformula": "C26H26FN5O4",
-             "#intlinks": [
-                 {"@id": "identifier",
-                  "standard_inchi_key":
-                      "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
-            {"@id": "target",
-             "@type": "sdo:target",
-             "pref_name": "HERG",
-             "tax_id": 9606,
-             "organism": "Homo sapiens"}],
-        "dataset": [
-            {"@id": "datapoint",
-             "@type": "sdo:datapoint",
-             "data": [
-                 {"@id": "datum",
-                  "@type": "sdo:exptdata",
-                  "type": "IC50",
-                  "value":
-                      "15.200000000000000000000000000000",
-                  "units": "uM"}]}]}, {
-        "aspects": [
-            {"@id": "assay",
-             "@type": "sdo:assay",
-             "description": "Inhibition of human ERG "
-                            "by MK499 binding assay",
-             "assay_organism": "Homo sapiens"}],
-        "facets": [
-            {"@id": "substance",
-             "mw_freebase": "491.52",
-             "full_molformula": "C26H26FN5O4",
-             "#intlinks": [
-                 {"@id": "identifier",
-                  "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
-            {"@id": "target",
-             "@type": "sdo:target",
-             "pref_name": "HERG",
-             "tax_id": 9606,
-             "organism": "Homo sapiens"}],
-        "dataset": [
-            {"@id": "datapoint",
-             "@type": "sdo:datapoint",
-             "empty_entry": "",
-             "some_entry": "some",
-             "data": [
-                 {"@id": "datum",
-                  "@type": "sdo:exptdata",
-                  "type": "IC50",
-                  "value":
-                      "12.300000000000000000000000000000",
-                  "units": "qudt:MicroM"}]}]}]
-
-    example.scidatapackage(packet)
+    # packet = [{
+    #     "aspects":
+    #         [{"@id": "assay",
+    #           "@type": "sdo:assay",
+    #           "description": "Inhibition of human hERG by MK499 binding assay",
+    #           "assay_organism": "Homo sapiens"}],
+    #     "facets": [
+    #         {"@id": "substance",
+    #          "mw_freebase": "491.52",
+    #          "full_molformula": "C26H26FN5O4",
+    #          "#intlinks": [
+    #              {"@id": "identifier",
+    #               "standard_inchi_key":
+    #                   "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
+    #         {"@id": "target",
+    #          "@type": "sdo:target",
+    #          "pref_name": "HERG",
+    #          "tax_id": 9606,
+    #          "organism": "Homo sapiens"}],
+    #     "dataset": [
+    #         {"@id": "datapoint",
+    #          "@type": "sdo:datapoint",
+    #          "data": [
+    #              {"@id": "datum",
+    #               "@type": "sdo:exptdata",
+    #               "type": "IC50",
+    #               "value":
+    #                   "15.200000000000000000000000000000",
+    #               "units": "uM"}]}]}, {
+    #     "aspects": [
+    #         {"@id": "assay",
+    #          "@type": "sdo:assay",
+    #          "description": "Inhibition of human ERG "
+    #                         "by MK499 binding assay",
+    #          "assay_organism": "Homo sapiens"}],
+    #     "facets": [
+    #         {"@id": "substance",
+    #          "mw_freebase": "491.52",
+    #          "full_molformula": "C26H26FN5O4",
+    #          "#intlinks": [
+    #              {"@id": "identifier",
+    #               "standard_inchi_key": "OINHUVBCKUJZAG-UHFFFAOYSA-N"}]},
+    #         {"@id": "target",
+    #          "@type": "sdo:target",
+    #          "pref_name": "HERG",
+    #          "tax_id": 9606,
+    #          "organism": "Homo sapiens"}],
+    #     "dataset": [
+    #         {"@id": "datapoint",
+    #          "@type": "sdo:datapoint",
+    #          "empty_entry": "",
+    #          "some_entry": "some",
+    #          "data": [
+    #              {"@id": "datum",
+    #               "@type": "sdo:exptdata",
+    #               "type": "IC50",
+    #               "value":
+    #                   "12.300000000000000000000000000000",
+    #               "units": "qudt:MicroM"}]}]}]
+    #
+    # example.scidatapackage(packet)
 
     # print(json.dumps(example.output, ensure_ascii=False))
     print(json.dumps(example.output, indent=4, ensure_ascii=False))
