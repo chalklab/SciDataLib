@@ -1,7 +1,7 @@
 name: Release to TestPyPi 
 
 env:
-  POETRY_VERSION: 2.0.1
+  POETRY_VERSION: 2.1.3
 
 on:
   push:
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest]
-        python-version: ["3.10"]
+        python-version: ["3.10","3.11","3.12","3.13"]
 
     steps:
       - uses: actions/checkout@v4
