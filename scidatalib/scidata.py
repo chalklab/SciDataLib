@@ -9,10 +9,10 @@ class SciData:
     output as a SciData JSON-LD document
 
     A SciData object is created by calling the SciData class
-    i.e. SciDataObject = SciData(<uid>)
+    i.e., SciDataObject = SciData(<uid>)
 
     The meta variable defines the keys that make up the backbone structure of
-    the JSON-LD document. Class methods are called to populate the meta keys
+    the JSON-LD document. Class methods are called to populate the meta-keys
     """
 
     def __init__(self, uid: str):
@@ -79,7 +79,7 @@ class SciData:
         self.temp = {}
 
     # public class methods
-    def context(self, context: [str, list], replace=False) -> list:
+    def context(self, context: str | list, replace=False) -> list:
         """
         Add to or replace the list of external context files
 
@@ -90,11 +90,8 @@ class SciData:
         be replaced or updated with the supplied list of context urls
 
         Example:
-
         code-block:: python
-
-            SciDataObject.context(
-            ['https://stuchalk.github.io/scidata/contexts/scidata.jsonld'])
+            SciDataObject.context(['https://stuchalk.github.io/scidata/contexts/scidata.jsonld'])
         """
 
         if replace:
@@ -116,26 +113,20 @@ class SciData:
 
     def namespaces(self, namespaces: dict, replace=False) -> dict:
         """
-        Add to or replace the dictionary of namespaces within @context.
+        Add to, or replace, the dictionary of namespaces within @context.
         Namespaces are needed for values in a file that reference external
         resources that define something (vocabulary/taxonomy/ontology entries).
 
-        :param namespaces: dictionary of namespaces (key->ns, val->URI start)
+        :param namespaces: Dictionary of namespaces (key->ns, val->URI start)
         :param replace: boolean to replace or not the existing data
 
         When called, the dictionary of namespaces within the @context key
-        of the meta variable will be replaced or updated with the supplied
+        of the meta-variable will be replaced or updated with the supplied
         dictionary of namespaces
 
         Example:
-
         code-block:: python
-
-          SciDataObject.namespaces(
-            {
-              "sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"
-            }
-          )
+          SciDataObject.namespaces({"sdo": "https://stuchalk.github.io/scidata/ontology/scidata.owl#"})
         """
         if isinstance(namespaces, dict):
             if replace:
@@ -150,21 +141,18 @@ class SciData:
 
     def base(self, base: str) -> dict:
         """
-        Assign the JSON-LD @base URL
-        (also defines '@id' under '@graph' for consistency)
+        Assign the JSON-LD @base URL (also defines '@id' under '@graph' for consistency)
         See: https://www.w3.org/TR/json-ld/#base-iri
 
         :param base: @base URL for a JSON-LD file
 
-        Defines the base url for all internal unique identifiers
+        Define the base url for all internal unique identifiers
         (defined though '@id' keyword fields). For consistency, the
         code also sets the '@id' field under '@graph' so that all
         triple subjects are unique and associated with the same graph
 
         Example:
-
         code-block:: python
-
             SciDataObject.graph_uid("<uniqueidentifier>")
         """
         if isinstance(base, str):
@@ -177,11 +165,9 @@ class SciData:
 
     def __make_context(self) -> dict:
         """
-        Recreates the context when something is added to contexts,
-        namespaces or base. The method is called as part of
-        the contexts, namespaces and base methods.
+        Recreates the context when something is added to contexts, namespaces, or base.
+        The method is called as part of the contexts, namespaces, and base methods.
         """
-
         self.contexts += self.meta['@context'][:-2]
         self.contexts = sorted(list(set(self.contexts)))
         c = self.contexts
@@ -196,7 +182,7 @@ class SciData:
         Assign the document identifier.  This will become the
         graph name if the file is uploaded to a graph database
 
-        :param docid: the root level @id value
+        :param docid: The root level @id value
         """
         if isinstance(docid, str):
             self.meta['@id'] = docid
@@ -216,15 +202,13 @@ class SciData:
         """
         Assign the uid value within the @graph JSON object
 
-        :param guid: the @graph uid value
+        :param guid: The @graph uid value
 
         Normally the same as the unique id used in the @graph @id
         value and used to easily find the data in a file system.
 
         Example:
-
         code-block:: python
-
             SciDataObject.graph_uid("<uniqueidentifier>")
         """
         if isinstance(guid, str):
@@ -235,32 +219,24 @@ class SciData:
         """
         Add to or replace the list of authors within the @graph authors section
 
-        :param authors: list of names, or list of dicts with multiple fields
+        :param authors: A list of names, or list of dicts with multiple fields
         :param replace: boolean to replace or not the existing data
 
-        Add the list of authors of a set of data with the following defined
-        fields in the SciData context file: name, address, organization,
-        email, orcid.
+        Add the list of authors for a set of data with the following defined fields
+        in the SciData context file: name, address, organization, email, orcid.
 
-        Expects either:
+        Expect either:
 
-        1)  a list of dictionaries where each dictionary contains
-        at minimum of a key that is 'name'
-
+        1) a list of dictionaries where each dictionary contains at minimum of a key that is 'name'
+           but preferably more context, and if available an author ORCID(s)
         Example:
-
         code-block:: python
+            SciDataObject.author([{'name': 'George Washington', 'ORCID': 1},
+                                  {'name': 'John Adams', 'ORCID': 2}])
 
-            SciDataObject.author(
-            [{'name': 'George Washington', 'ORCID': 1},
-            {'name': 'John Adams', 'ORCID': 2}])
-
-        2)  a list of strings which are author names
-
+        2) a list of strings which are author names
         Example:
-
         code-block:: python
-
             SciDataObject.author(['George Washington', 'John Adams'])
         """
         if isinstance(authors, list):
@@ -289,9 +265,7 @@ class SciData:
         typically be the title of the article
 
         Example:
-
         code-block:: python
-
             SciDataObject.title("The Hitchhiker's Guide to the Galaxy")
         """
         if isinstance(title, str):
@@ -302,15 +276,13 @@ class SciData:
         """
         Assign the description field within @graph
 
-        :param description: textual description of the dataset
+        :param description: Textual description of the dataset
 
-        Used as a brief description of the type of data. For a
-        journal article, this might house the abstract
+        Used as a brief description of the data type. For a
+        journal article, this would be the abstract
 
         Example:
-
         code-block:: python
-
             SciDataObject.description('a brief description')
         """
         if isinstance(description, str):
@@ -322,12 +294,10 @@ class SciData:
         Assign the publisher field within @graph
         :param publisher - the name or title of the publisher of the data
 
-        This is a person, project, research group, organization etc.
+        This is a person, project, research group, organization, etc.
 
         Example:
-
         code-block:: python
-
             SciDataObject.publisher('The Daily Prophet')
         """
         if isinstance(publisher, str):
@@ -344,16 +314,14 @@ class SciData:
         can be used to indicate the 'state' of the data as downloaded
 
         Example:
-
         code-block:: python
-
             SciDataObject.graphversion('ChEMBL database v28')
         """
         if isinstance(version, str):
             self.meta['@graph']['version'] = version
         return self.meta['@graph']['version']
 
-    def keywords(self, keywords: [str, list], replace=False) -> list:
+    def keywords(self, keywords: str | list, replace=False) -> list:
         """
         Add to or replace the keywords of the instance
 
@@ -361,9 +329,7 @@ class SciData:
         :param replace: boolean to replace or not the existing data
 
         Example:
-
         code-block:: python
-
             SciDataObject.keywords('important')
         """
         keys = []
@@ -386,10 +352,8 @@ class SciData:
         Typically, in "%m-%d-%y %H:%M:%S" format
 
         Example:
-
         code-block:: python
-
-            SciDataObject.starttime('04-05-21 06:14:53')
+            SciDataObject.starttime('04-05-2021 06:14:53')
         """
         if isinstance(stime, str):
             self.meta['@graph']['starttime'] = stime
@@ -397,21 +361,19 @@ class SciData:
 
     def permalink(self, link: str) -> dict:
         """
-        Assign the document permanent link
+        Assign the document a permanent link
 
         :param link: URL to the location where this document can be found
 
         Example:
-
         code-block:: python
-
             SciDataObject.permalink('https://permanent.link.com/data1')
         """
         if isinstance(link, str):
             self.meta['@graph']['permalink'] = link
         return self.meta['@graph']['permalink']
 
-    def related(self, related: [str, list], replace=False) -> list:
+    def related(self, related: str | list, replace=False) -> list:
         """
         Add to or replace the related URLs
 
@@ -419,9 +381,7 @@ class SciData:
         :param replace: boolean to replace or not the existing data
 
         Example:
-
         code-block:: python
-
             SciDataObject.related('https://example.com/greatdata.jsonld')
         """
         rels = []
@@ -434,27 +394,23 @@ class SciData:
         self.meta['@graph']['related'] = rels
         return self.meta['@graph']['related']
 
-    def ids(self, ids: [str, list]) -> list:
+    def ids(self, ids: str | list) -> list:
         """
-        Add to the ids list
+        Add to the 'ids' list
 
-        :param ids: string or list of strings that are
+        :param ids: A string or list of strings that are
          external references to ontological concepts
 
-        When called the contents of 'ids' is added to the ids list.
-        Note that when the output function is called it iterates
+        When called, the contents of 'ids' are added to the 'ids' list.
+        Note that when the output function is called, it iterates
         over instance content to find any values that are ontological
         references, in the format "<namespace>:<uniquevalue>", and
         adds them to ids. Only ids provided in this format will be added
         and duplicates are ignored. Remember to add namespaces for ids.
 
-        Example:
-
+        Example: (requires the addition of the 'chebi' namespace)
         code-block:: python
-
             SciDataObject.ids(['chebi:00001','qudt:GM'])
-
-        (requires the addition of the 'chebi' namespace)
         """
         curr_ids = self.meta['@graph']['ids']
         if isinstance(ids, list):
@@ -482,15 +438,11 @@ class SciData:
         :param disc: a discipline name or identifier (preferred)
 
         Best practice is to use and entry in an ontology,
-        i.e. the Modern Science Ontology (https://w3id.org/skgo/modsci#)
+        i.e., the Modern Science Ontology (https://w3id.org/skgo/modsci#)
 
-        Example:
-
+        Example: (requires the addition of the 'w3i' namespace)
         code-block:: python
-
-            SciDataObject.discipline('w3i:Chemistry')
-
-        (requires the addition of the 'w3i' namespace)
+            SciDataObject.discipline('w3i: Chemistry')
         """
         if isinstance(disc, str):
             if ":" in disc and ": " not in disc and "':" not in disc:
@@ -503,6 +455,7 @@ class SciData:
             else:
                 self.meta['@graph']['scidata']['discipline'] = disc
                 return self.meta['@graph']['scidata']['discipline']
+        return None
 
     def subdiscipline(self, subdisc: str) -> str:
         """
@@ -511,12 +464,10 @@ class SciData:
         :param subdisc: a subdiscipline name or identifier (preferred)
 
         Best practice is to use and entry in an ontology,
-        i.e. the Modern Science Ontology (https://w3id.org/skgo/modsci#)
+        i.e., the Modern Science Ontology (https://w3id.org/skgo/modsci#)
 
-        Example:
-
+        Example: (requires the addition of the 'w3i' namespace)
         code-block:: python
-
             SciDataObject.subdiscipline('w3i:AnalyticalChemistry')
         """
         if isinstance(subdisc, str):
@@ -530,20 +481,19 @@ class SciData:
             else:
                 self.meta['@graph']['scidata']['subdiscipline'] = subdisc
                 return self.meta['@graph']['scidata']['subdiscipline']
+        return None
 
     def evaluation(self, evaln: str) -> str:
         """
         Assign the evaluation field
 
-        :param evaln: the method of evaluation of research data
+        :param evaln: the method of evaluation for research data
 
         Recommended values of this field are:
         experimental, theoretical, computational
 
         Example:
-
         code-block:: python
-
             SciDataObject.evaluation('experimental')
         """
         if isinstance(evaln, str):
@@ -557,22 +507,18 @@ class SciData:
             else:
                 self.meta['@graph']['scidata']['methodology']['evaluation'] = evaln
                 return self.meta['@graph']['scidata']['methodology']['evaluation']
+        return None
 
     def aspects(self, aspects: list) -> list:
         """Add to or replace the aspects of the file
 
         Example:
-
         code-block:: python
-
-            SciDataObject.aspects(
-            [{"@id": "assay",
-             "@type": "sdo:assay",
-             "description": "Inhibition of human ERG "
-                            "by MK499 binding assay",
+            SciDataObject.aspects([{"@id": "assay", "@type": "sdo:assay",
+             "description": "Inhibition of human ERG by MK499 binding assay",
              "assay_organism": "Homo sapiens"}])
 
-        Method also accepts keyword '#intlinks'.
+        Method also accepts the keyword '#intlinks'.
         See documentation for def scidatapackage.
         """
         new_aspects = []
@@ -624,16 +570,11 @@ class SciData:
         """Add to or replace the facets of the file
 
         Example:
-
         code-block:: python
+            SciDataObject.facets([{"@id": "compound", "@type": "sdo:compound",
+            "mw_freebase": "491.52", "full_molformula": "C26H26FN5O4"}])
 
-            SciDataObject.facets(
-            [{"@id": "compound",
-            "@type": "sdo:compound",
-            "mw_freebase": "491.52",
-            "full_molformula": "C26H26FN5O4"}])
-
-        Method also accepts keyword '#intlinks'.
+        Method also accepts the keyword '#intlinks'.
         See documentation for def scidatapackage.
         """
         new_facets = []
@@ -682,21 +623,19 @@ class SciData:
         self.meta['@graph']['scidata'] = scidata
         return new_facets
 
-    def scope(self, scope: [str, list]) -> str:
+    def scope(self, scope: str | list) -> str:
         """
         Assign what thing(s) the dataset relates to
 
-        :param scope: str or list of internal unique id()s of
+        :param scope: str, or list, of internal unique 'ids' of
          entity(ies) in the system to which the data describes
 
         The scope of a datasets should be described in the 'system' 'facets'
-        section, e.g. chemical system, organism, specimen, should be included
+        section, e.g., chemical system, organism, specimen, should be included
         as a scope using the defined unique '@id' for that section
 
         Example:
-
         code-block:: python
-
             SciDataObject.scope('chemicalsystem/1/')
         """
         if isinstance(scope, str) or isinstance(scope, list):
@@ -739,9 +678,7 @@ class SciData:
         """Add one or more datapoints
 
         Example:
-
         .. code-block:: python
-
             SciDataObject.datapoint(
             [{"@id": "datapoint",
              "@type": "sdo:datapoint",
@@ -750,7 +687,6 @@ class SciData:
                        "type": "IC50",
                        "value": "15.2",
                        "units": "uM"}]}])
-
         """
         new_points = []
         scidata: dict = self.meta['@graph']['scidata']
@@ -837,21 +773,17 @@ class SciData:
         Add a package of data where the datapoints are linked with the
         associated aspects and facets.
         A package contains one or more 'packets' of associated aspects,
-        facets and datapoints.
+        facets, and datapoints.
 
         Template:
 
         code-block:: python
-
-            package = [
-                {'aspects':{},'facets':{},'datapoints':{}},
-                {'aspects':{},'facets':{},'datapoints':{}}
-                ]
+            package = [{'aspects': {},'facets': {},'datapoints': {}},
+                       {'aspects': {},'facets': {},'datapoints': {}}]
 
         Example:
 
         code-block:: python
-
           SciDataObject.scidatapackage([{
             "aspects": [{
               "@id": "assay/",
@@ -909,22 +841,18 @@ class SciData:
         """
         Add to or replace the source reference list
 
-        :param sources: information about where the data came from
-        :type sources: list
-        :param replace: replace (True) or add to the existing sources (False)
+        :param sources: Information about where the data came from
+        :type sources: 'list'
+        :param replace: Replace (True) or add to the existing sources (False)
         :type replace: bool (default: False)
 
         Add a list of sources with any of the available defined fields
         in the SciData context file: citation, reftype, url, doi
 
         Example:
-
         code-block:: python
-
-            SciDataObject.sources([
-            {'citation': 'Chalk, S.J. SciData: a data model and
-            ontology for semantic representation of scientific data.
-            J Cheminform 8, 54 (2016)',
+            SciDataObject.sources([{'citation': 'Chalk, S. J.; SciData: a data model and
+            ontology for semantic representation of scientific data. J Cheminform 8, 54 (2016)',
             doi': https://doi.org/10.1186/s13321-016-0168-9'}])
         """
         srcs = []
@@ -935,7 +863,7 @@ class SciData:
                 '@id': 'source/' + str(len(srcs) + 1) + '/',
                 '@type': 'dc:source'
             }
-            # check data in source for values that are ontological (":")
+            # check data in 'source' for values that are ontological (":")
             # updates dictionary keys with additional '#' if not present and needed
             x = self.__chkont(x)
             ld.update(x)
@@ -948,10 +876,10 @@ class SciData:
         Add the rights section to the file (min: 1 entry)
 
         :param rights: the rights of the data consisting of:
-            holder: the rights holder
-            license: the license given by the holder
-        :param replace: the assigned license
-
+            holder: the right's holder
+            license: the license given by the 'holder'
+        :param replace: 'true' -> replace the current license(s)
+                        'false' -> append to the current license(s)
         """
         rites = []
         if not replace:
@@ -969,7 +897,7 @@ class SciData:
     # private class functions
     def __addid(self, text: str) -> bool:
         """
-        Adds entry to ids list if string contains ":"
+        Adds entry to the 'ids' list if string contains ":"
         """
         if isinstance(text, str):
             if '://' in text:
@@ -1124,9 +1052,9 @@ class SciData:
 
         # clean methodology, if exists
         if 'methodology' in self.temp['@graph']['scidata']:
-            # check if aspects is set or not in methodology
+            # check if 'aspects' is set or not in methodology
             if 'aspects' in self.temp['@graph']['scidata']['methodology'].keys():
-                # check if aspects has data
+                # check if 'aspects' has data
                 if self.temp['@graph']['scidata']['methodology']['aspects']:
                     for key in list(self.temp['@graph']['scidata']['methodology']):
                         if not self.temp['@graph']['scidata']['methodology'][key]:
@@ -1141,7 +1069,7 @@ class SciData:
         # clean system, if exists
         if 'system' in self.temp['@graph']['scidata']:
             if 'facets' in self.temp['@graph']['scidata']['system'].keys():
-                # check if aspects has data
+                # check if 'aspects' has data
                 if self.temp['@graph']['scidata']['system']['facets']:
                     for key in list(self.temp['@graph']['scidata']['system']):
                         if not self.temp['@graph']['scidata']['system'][key]:
@@ -1150,7 +1078,7 @@ class SciData:
                     # as 'aspects' is present but empty, delete the methodology section
                     del self.temp['@graph']['scidata']['system']
             else:
-                # as 'facets'  is not present, delete the system section
+                # as 'facets' is not present, delete the system section
                 del self.temp['@graph']['scidata']['system']
 
         # remove dataset if no data
@@ -1180,7 +1108,7 @@ class SciData:
                                 if not self.temp['@graph']['scidata']['dataset']['dataseries'][seridx][key]:
                                     del self.temp['@graph']['scidata']['dataset']['dataseries'][seridx][key]
                     else:
-                        # delete if dataseries is present but empty
+                        # delete it if dataseries is present but empty
                         del self.temp['@graph']['scidata']['dataset']['dataseries']
 
                 # clean datagroups
@@ -1193,7 +1121,7 @@ class SciData:
                                 if not self.temp['@graph']['scidata']['dataset']['datagroup'][grpidx][key]:
                                     del self.temp['@graph']['scidata']['dataset']['datagroup'][grpidx][key]
                     else:
-                        # delete if datagroup is present but empty
+                        # delete this if datagroup is present but empty
                         del self.temp['@graph']['scidata']['dataset']['datagroup']
 
                 # clean datapoints
@@ -1206,7 +1134,7 @@ class SciData:
                                 if not self.temp['@graph']['scidata']['dataset']['datapoint'][pntidx][key]:
                                     del self.temp['@graph']['scidata']['dataset']['datapoint'][pntidx][key]
                     else:
-                        # delete if datapoint is present but empty
+                        # delete this if datapoint is present but empty
                         del self.temp['@graph']['scidata']['dataset']['datapoint']
 
             else:
